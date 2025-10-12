@@ -1,0 +1,10 @@
+{
+    "content": {
+        "recipes": "./content/recipes",
+        "blogs": "./content/blogs"
+    },
+    "output": {
+        "recipes": "./public/recipes",
+        "blogs": "./public/blogs"
+    }
+}

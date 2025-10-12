@@ -1,0 +1,12 @@
+# Dependency directories
+node_modules/
+
+# Content directories
+content/blogs
+!content/blogs/.gitkeep
+content/recipes
+!content/recipes/.gitkeep
+
+# Output directories
+public
+!public/.gitkeep
