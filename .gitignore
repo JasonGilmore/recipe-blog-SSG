@@ -2,11 +2,7 @@
 node_modules/
 
 # Content directories
-content/blogs
-!content/blogs/.gitkeep
-content/recipes
-!content/recipes/.gitkeep
+content
 
 # Output directories
 public
-!public/.gitkeep

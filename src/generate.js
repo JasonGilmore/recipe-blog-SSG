@@ -3,31 +3,48 @@ const fs = require('fs');
 const path = require('path');
 const marked = require('marked');
 
-if (!config.content || !config.output) {
-    throw new Error('Config file missing required sections: config or output');
+// Validate config
+if (!config.content) {
+    throw new Error('Config file missing required sections: content');
+}
+for (const contentType in config.content) {
+    if (!config.content[contentType].contentFolder) {
+        throw new Error(`Config type ${contentType} missing required sections: contentFolder`);
+    }
+}
+
+const CONTENT_DIRECTORY = path.join(__dirname, '../content');
+const OUTPUT_DIRECTORY = path.join(__dirname, '../public');
+
+if (!fs.existsSync(OUTPUT_DIRECTORY)) {
+    fs.mkdirSync(OUTPUT_DIRECTORY);
 }
 
 // Read the content and generate the public files, for each content type
 for (let contentType in config.content) {
-    const outputDirectory = config.output[contentType];
-    const contentDirectory = config.content[contentType];
+    const contentDirectory = path.join(CONTENT_DIRECTORY, config.content[contentType].contentFolder);
+    const outputDirectory = path.join(OUTPUT_DIRECTORY, config.content[contentType].contentFolder);
 
     preparePublicSubDirectory(outputDirectory);
     generatecontent(contentDirectory, outputDirectory);
 }
 
 // Creates the content type directories if not present, and clears all contents
-function preparePublicSubDirectory(subDirectory) {
+function preparePublicSubDirectory(outputSubDirectory) {
     // Directory must be a valid output directory
-    if (!Object.values(config.output).includes(subDirectory)) {
-        throw new Error(`Invalid folder path ${subDirectory}. Must be a valid output folder.`);
+    if (
+        !Object.values(config.content)
+            .map((contentType) => path.join(OUTPUT_DIRECTORY, contentType.contentFolder))
+            .includes(outputSubDirectory)
+    ) {
+        throw new Error(`Invalid path ${outputSubDirectory}. Must be a valid content type from config.`);
     }
 
-    if (!fs.existsSync(subDirectory)) {
-        fs.mkdirSync(subDirectory);
+    if (!fs.existsSync(outputSubDirectory)) {
+        fs.mkdirSync(outputSubDirectory);
     } else {
-        fs.rmSync(subDirectory, { recursive: true, force: true });
-        fs.mkdirSync(subDirectory);
+        fs.rmSync(outputSubDirectory, { recursive: true, force: true });
+        fs.mkdirSync(outputSubDirectory);
     }
 }
 
