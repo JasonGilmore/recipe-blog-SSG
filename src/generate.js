@@ -2,6 +2,8 @@ const config = require('./config.json');
 const fs = require('fs');
 const path = require('path');
 const marked = require('marked');
+const generateHomepage = require('../templates/homepage.js');
+const generateAssets = require('../templates/assetsHandler.js');
 
 // Validate config
 if (!config.content) {
@@ -13,8 +15,8 @@ for (const contentType in config.content) {
     }
 }
 
-const CONTENT_DIRECTORY = path.join(__dirname, '../content');
-const OUTPUT_DIRECTORY = path.join(__dirname, '../public');
+const CONTENT_DIRECTORY = path.join(__dirname, config.contentDirectory);
+const OUTPUT_DIRECTORY = path.join(__dirname, config.outputDirectory);
 
 if (!fs.existsSync(OUTPUT_DIRECTORY)) {
     fs.mkdirSync(OUTPUT_DIRECTORY);
@@ -28,6 +30,10 @@ for (let contentType in config.content) {
     preparePublicSubDirectory(outputDirectory);
     generatecontent(contentDirectory, outputDirectory);
 }
+
+// Generate the site
+generateHomepage(null);
+generateAssets();
 
 // Creates the content type directories if not present, and clears all contents
 function preparePublicSubDirectory(outputSubDirectory) {
@@ -75,7 +81,7 @@ function generatecontent(contentDirectory, outputDirectory) {
         }
 
         // Copy any images
-        const allContentItemImages = postFiles.filter((item) => allowedImageExtensions.includes(path.extname(item).toLowerCase()));
+        const allContentItemImages = postFiles.filter((fileName) => allowedImageExtensions.includes(path.extname(fileName).toLowerCase()));
         allContentItemImages.forEach((imageFile) => {
             fs.copyFileSync(path.join(contentDirectory, postName, imageFile), path.join(outputDirectory, postName, imageFile));
         });
