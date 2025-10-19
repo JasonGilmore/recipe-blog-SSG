@@ -18,7 +18,7 @@ function createHomepage(recentPosts) {
             ${createNavbar()}
             <main>
                 ${createSiteWelcome()}
-                ${createPosts(recentPosts)}
+                ${createPosts(recentPosts, true)}
             </main>
 
             ${createFooter()}

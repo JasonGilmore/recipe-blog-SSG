@@ -145,10 +145,20 @@ body {
     height: 300px;
     text-align: center;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    position: relative;
 }
 
 .post:hover {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5), 0 6px 20px 0 rgba(0, 0, 0, 0.3);
+}
+
+.typeIcon {
+    position: absolute;
+    margin: 8px;
+    padding: 5px;
+    background: white;
+    border-radius: 5px;
+    right: 0;
 }
 
 .post img {
