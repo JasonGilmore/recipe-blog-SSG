@@ -5,6 +5,7 @@ const marked = require('marked');
 const fm = require('front-matter');
 const generateHomepage = require('../templates/homepage.js');
 const generateAssets = require('../templates/assetsHandler.js');
+const generateMenuPages = require('../templates/menuPages.js');
 
 // Validate config
 if (!config.content) {
@@ -30,6 +31,7 @@ const recentPosts = getRecentPosts(postMetaGroupedByType, 5);
 
 // Generate the site
 generateHomepage(recentPosts);
+generateMenuPages(postMetaGroupedByType);
 generateAssets();
 
 // For each content type, create the output directory and generate the files
@@ -77,12 +79,13 @@ function generatePosts(contentDirectory, outputDirectory) {
         // Create a folder for the post
         fs.mkdirSync(postOutputDirectory);
 
-        // Generate the html from the md file
+        // Generate the metadata and html from the md file
         const markdownFilename = postFiles.find((file) => path.extname(file).toLowerCase() === '.md');
         if (markdownFilename) {
-            const markdownContent = fs.readFileSync(path.join(postContentDirectory, markdownFilename), 'utf8');
-            postMeta.push({ ...fm(markdownContent).attributes, filename: postName });
-            const htmlContent = marked.parse(markdownContent);
+            const fileContent = fs.readFileSync(path.join(postContentDirectory, markdownFilename), 'utf8');
+            const content = fm(fileContent);
+            postMeta.push({ ...content.attributes, filename: postName });
+            const htmlContent = marked.parse(content.body);
             fs.writeFileSync(path.join(outputDirectory, postName, postName + '.html'), htmlContent, 'utf8');
         } else {
             throw new Error(`Missing markdown file for ${postName}`);

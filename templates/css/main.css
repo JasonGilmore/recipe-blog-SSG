@@ -153,12 +153,18 @@ body {
 
 .post img {
     width: 100%;
-    height: 70%;
+    height: 60%;
     object-fit: cover;
 }
 
-.post p {
+.post-title {
     font-size: 1.5rem;
+    margin: 10px 30px;
+    padding-bottom: 5px;
+}
+
+.post-description {
+    margin: 0px 10px;
 }
 
 /* Small device */
