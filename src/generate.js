@@ -25,7 +25,7 @@ if (!fs.existsSync(OUTPUT_DIRECTORY)) {
 }
 
 // Generate content and get a list of all post metadata, grouped by type
-// Each post has a property "filename" so the templates can link to it
+// Each post has an additional property "filename" and "type" so the templates can link to it
 const postMetaGroupedByType = generateContent();
 const recentPosts = getRecentPosts(postMetaGroupedByType, 5);
 
@@ -35,6 +35,7 @@ generateMenuPages(postMetaGroupedByType);
 generateAssets();
 
 // For each content type, create the output directory and generate the files
+// Return all post metadata grouped by type
 function generateContent() {
     let postMetaGroupedByType = {};
 
@@ -44,7 +45,8 @@ function generateContent() {
 
         preparePublicSubDirectory(outputDirectory);
         let allPostContent = generatePosts(contentDirectory, outputDirectory);
-        postMetaGroupedByType[contentType] = allPostContent;
+        // Add the content type to the post metadata
+        postMetaGroupedByType[contentType] = allPostContent.map((post) => ({ ...post, type: contentType }));
     }
 
     return postMetaGroupedByType;
@@ -105,7 +107,7 @@ function generatePosts(contentDirectory, outputDirectory) {
 function getRecentPosts(postMetaGroupedByType, numberOfPosts) {
     let allPosts = [];
     for (let contentType of Object.keys(postMetaGroupedByType)) {
-        allPosts.push(...postMetaGroupedByType[contentType].map((post) => ({ ...post, type: contentType })));
+        allPosts.push(...postMetaGroupedByType[contentType]);
     }
     // Sort posts by created date descending
     allPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
