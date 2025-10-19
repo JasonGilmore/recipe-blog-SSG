@@ -1,19 +1,19 @@
-function createPosts() {
+function createPosts(posts) {
     return `
     <div class="post-container">
 
-        //
+        ${posts.map((post) => createPost(post)).join(' ')}
 
     </div>
     `;
 }
 
-function createPost() {
+function createPost(post) {
     return `
-        <a href="#">
+        <a href="${post.filename}">
             <article class="post">
                 <img src="" alt="" />
-                <p>Content</p>
+                <p>${post.title}</p>
             </article>
         </a>
     `;

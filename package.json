@@ -10,6 +10,7 @@
   "author": "",
   "license": "",
   "dependencies": {
+    "front-matter": "=4.0.2",
     "marked": "=16.4.0"
   }
 }

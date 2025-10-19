@@ -7,7 +7,6 @@ function createNavbar() {
     Object.entries(config.content).forEach(([key, value]) => {
         contentTypes.push(value);
     });
-    console.log(contentTypes);
 
     return `
     <nav class="nav-bar">

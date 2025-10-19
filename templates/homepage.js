@@ -33,7 +33,7 @@ function createHomepage(posts) {
                 
                 ${createSiteWelcome()}
 
-                ${createPosts()}
+                ${createPosts(posts)}
             </main>
 
             <hr />

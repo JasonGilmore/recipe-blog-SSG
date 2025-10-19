@@ -2,6 +2,7 @@ const config = require('./config.json');
 const fs = require('fs');
 const path = require('path');
 const marked = require('marked');
+const fm = require('front-matter');
 const generateHomepage = require('../templates/homepage.js');
 const generateAssets = require('../templates/assetsHandler.js');
 
@@ -22,30 +23,33 @@ if (!fs.existsSync(OUTPUT_DIRECTORY)) {
     fs.mkdirSync(OUTPUT_DIRECTORY);
 }
 
-// Read the content and generate the public files, for each content type
-for (let contentType in config.content) {
-    const contentDirectory = path.join(CONTENT_DIRECTORY, config.content[contentType].contentFolder);
-    const outputDirectory = path.join(OUTPUT_DIRECTORY, config.content[contentType].contentFolder);
-
-    preparePublicSubDirectory(outputDirectory);
-    generatecontent(contentDirectory, outputDirectory);
-}
+// Generate content and get a list of all post metadata, grouped by type
+// Each post has a property "filename" so the templates can link to it
+const postMetaGroupedByType = generateContent();
+const recentPosts = getRecentPosts(postMetaGroupedByType, 5);
 
 // Generate the site
-generateHomepage(null);
+generateHomepage(recentPosts);
 generateAssets();
+
+// For each content type, create the output directory and generate the files
+function generateContent() {
+    let postMetaGroupedByType = {};
+
+    for (let contentType in config.content) {
+        const contentDirectory = path.join(CONTENT_DIRECTORY, config.content[contentType].contentFolder);
+        const outputDirectory = path.join(OUTPUT_DIRECTORY, config.content[contentType].contentFolder);
+
+        preparePublicSubDirectory(outputDirectory);
+        let allPostContent = generatePosts(contentDirectory, outputDirectory);
+        postMetaGroupedByType[contentType] = allPostContent;
+    }
+
+    return postMetaGroupedByType;
+}
 
 // Creates the content type directories if not present, and clears all contents
 function preparePublicSubDirectory(outputSubDirectory) {
-    // Directory must be a valid output directory
-    if (
-        !Object.values(config.content)
-            .map((contentType) => path.join(OUTPUT_DIRECTORY, contentType.contentFolder))
-            .includes(outputSubDirectory)
-    ) {
-        throw new Error(`Invalid path ${outputSubDirectory}. Must be a valid content type from config.`);
-    }
-
     if (!fs.existsSync(outputSubDirectory)) {
         fs.mkdirSync(outputSubDirectory);
     } else {
@@ -55,11 +59,14 @@ function preparePublicSubDirectory(outputSubDirectory) {
 }
 
 // Generates the content in its own directory, converting .md files to .html
-function generatecontent(contentDirectory, outputDirectory) {
+function generatePosts(contentDirectory, outputDirectory) {
     const allowedImageExtensions = ['.jpg', '.jpeg', '.png'];
 
     // Read all folder names for the content type
     const contentTypeFolders = fs.readdirSync(contentDirectory, 'utf8');
+
+    // Collect all post metadata for use in generating site
+    let postMeta = [];
 
     // Generate content
     // Content structure is content > content type folder > post folder > post.md + images
@@ -71,9 +78,10 @@ function generatecontent(contentDirectory, outputDirectory) {
         fs.mkdirSync(postOutputDirectory);
 
         // Generate the html from the md file
-        const markdownFileName = postFiles.find((file) => path.extname(file).toLowerCase() === '.md');
-        if (markdownFileName) {
-            const markdownContent = fs.readFileSync(path.join(postContentDirectory, markdownFileName), 'utf8');
+        const markdownFilename = postFiles.find((file) => path.extname(file).toLowerCase() === '.md');
+        if (markdownFilename) {
+            const markdownContent = fs.readFileSync(path.join(postContentDirectory, markdownFilename), 'utf8');
+            postMeta.push({ ...fm(markdownContent).attributes, filename: postName });
             const htmlContent = marked.parse(markdownContent);
             fs.writeFileSync(path.join(outputDirectory, postName, postName + '.html'), htmlContent, 'utf8');
         } else {
@@ -81,9 +89,22 @@ function generatecontent(contentDirectory, outputDirectory) {
         }
 
         // Copy any images
-        const allContentItemImages = postFiles.filter((fileName) => allowedImageExtensions.includes(path.extname(fileName).toLowerCase()));
+        const allContentItemImages = postFiles.filter((filename) => allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
         allContentItemImages.forEach((imageFile) => {
             fs.copyFileSync(path.join(contentDirectory, postName, imageFile), path.join(outputDirectory, postName, imageFile));
         });
     });
+
+    return postMeta;
+}
+
+// Get an array of the most recent posts across all content types
+function getRecentPosts(postMetaGroupedByType, numberOfPosts) {
+    let allPosts = [];
+    for (let contentType of Object.keys(postMetaGroupedByType)) {
+        allPosts.push(...postMetaGroupedByType[contentType].map((post) => ({ ...post, type: contentType })));
+    }
+    // Sort posts by created date descending
+    allPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+    return allPosts.length < numberOfPosts ? allPosts : allPosts.slice(0, numberOfPosts);
 }
