@@ -24,7 +24,7 @@ function generateFooter() {
         let generatedFooterLocation = path.join(FOOTER_OUTPUT_DIRECTORY, fileName + '.html');
         // Create the files after the loop is completed, so the footer pages can have the footer added using footerItems
         footersToGenerate.push({ fileLocation: generatedFooterLocation, content: htmlContent });
-        footerItems.push({ location: generatedFooterLocation, displayName: content.attributes.displayName, order: content.attributes.order });
+        footerItems.push({ location: './footers/' + fileName, displayName: content.attributes.displayName, order: content.attributes.order });
     }
 
     for (footerToGenerate of footersToGenerate) {
