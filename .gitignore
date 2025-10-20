@@ -8,5 +8,5 @@ content
 public
 
 # Site specific content
-templates/siteContent.json
-templates/images
+src/templates/siteContent.json
+src/templates/images

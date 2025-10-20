@@ -1,4 +1,4 @@
-const templateUtils = require('../src/utils.js');
+const templateUtils = require('../utils.js');
 
 function createPosts(posts, shouldShowType) {
     return `

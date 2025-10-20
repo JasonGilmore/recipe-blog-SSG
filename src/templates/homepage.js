@@ -5,10 +5,10 @@ const createNavbar = require('./navbar.js');
 const createSiteWelcome = require('./siteWelcome.js');
 const createPosts = require('./posts.js');
 const footerHandler = require('./footer.js');
-const templateUtils = require('../src/utils.js');
+const templateUtils = require('../utils.js');
 
 function generateHomepage(recentPosts) {
-    fs.writeFileSync(path.join(templateUtils.OUTPUT_DIRECTORY, '/index.html'), createHomepage(recentPosts), 'utf8');
+    fs.writeFileSync(path.join(templateUtils.CONTENT_OUTPUT_DIRECTORY, '/index.html'), createHomepage(recentPosts), 'utf8');
 }
 
 function createHomepage(recentPosts) {

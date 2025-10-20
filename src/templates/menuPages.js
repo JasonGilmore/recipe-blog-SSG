@@ -4,11 +4,11 @@ const createHead = require('./head.js');
 const createNavbar = require('./navbar.js');
 const createPosts = require('./posts.js');
 const footerHandler = require('./footer.js');
-const templateUtils = require('../src/utils.js');
+const templateUtils = require('../utils.js');
 
 function generateMenuPages(postMetaGroupedByType) {
     for (let contentName of Object.keys(postMetaGroupedByType)) {
-        fs.writeFileSync(path.join(templateUtils.OUTPUT_DIRECTORY, contentName + '.html'), createMenuPage(contentName, postMetaGroupedByType[contentName]), 'utf8');
+        fs.writeFileSync(path.join(templateUtils.CONTENT_OUTPUT_DIRECTORY, contentName + '.html'), createMenuPage(contentName, postMetaGroupedByType[contentName]), 'utf8');
     }
 }
 

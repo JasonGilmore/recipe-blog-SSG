@@ -4,10 +4,10 @@ const path = require('path');
 const marked = require('marked');
 const fm = require('front-matter');
 const utils = require('./utils.js');
-const footerHandler = require('../templates/footer.js');
-const generateHomepage = require('../templates/homepage.js');
-const generateAssets = require('../templates/assetsHandler.js');
-const generateMenuPages = require('../templates/menuPages.js');
+const footerHandler = require('./templates/footer.js');
+const generateHomepage = require('./templates/homepage.js');
+const generateAssets = require('./templates/assetsHandler.js');
+const generateMenuPages = require('./templates/menuPages.js');
 
 // Validate config
 if (!config.content) {
@@ -20,10 +20,10 @@ for (const contentType in config.content) {
 }
 
 const CONTENT_DIRECTORY = utils.CONTENT_DIRECTORY;
-const OUTPUT_DIRECTORY = utils.OUTPUT_DIRECTORY;
+const CONTENT_OUTPUT_DIRECTORY = utils.CONTENT_OUTPUT_DIRECTORY;
 
-if (!fs.existsSync(OUTPUT_DIRECTORY)) {
-    fs.mkdirSync(OUTPUT_DIRECTORY);
+if (!fs.existsSync(CONTENT_OUTPUT_DIRECTORY)) {
+    fs.mkdirSync(CONTENT_OUTPUT_DIRECTORY);
 }
 
 // Generate content and get a list of all post metadata (front matter), grouped by type
@@ -44,7 +44,7 @@ function generateContent() {
 
     for (let contentType in config.content) {
         const contentDirectory = path.join(CONTENT_DIRECTORY, config.content[contentType].contentFolder);
-        const outputDirectory = path.join(OUTPUT_DIRECTORY, config.content[contentType].contentFolder);
+        const outputDirectory = path.join(CONTENT_OUTPUT_DIRECTORY, config.content[contentType].contentFolder);
 
         utils.prepareDirectory(outputDirectory);
         let allPostContent = generatePosts(contentDirectory, outputDirectory);
