@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const marked = require('marked');
 const fm = require('front-matter');
+const utils = require('./utils.js');
+const footerHandler = require('../templates/footer.js');
 const generateHomepage = require('../templates/homepage.js');
 const generateAssets = require('../templates/assetsHandler.js');
 const generateMenuPages = require('../templates/menuPages.js');
@@ -17,19 +19,20 @@ for (const contentType in config.content) {
     }
 }
 
-const CONTENT_DIRECTORY = path.join(__dirname, config.contentDirectory);
-const OUTPUT_DIRECTORY = path.join(__dirname, config.outputDirectory);
+const CONTENT_DIRECTORY = utils.CONTENT_DIRECTORY;
+const OUTPUT_DIRECTORY = utils.OUTPUT_DIRECTORY;
 
 if (!fs.existsSync(OUTPUT_DIRECTORY)) {
     fs.mkdirSync(OUTPUT_DIRECTORY);
 }
 
-// Generate content and get a list of all post metadata, grouped by type
-// Each post has an additional property "filename" and "type" so the templates can link to it
+// Generate content and get a list of all post metadata (front matter), grouped by type
+// Each post has an additional property "filename", "typeToDisplay" and "contentFolder" so the templates can link and display these items
 const postMetaGroupedByType = generateContent();
 const recentPosts = getRecentPosts(postMetaGroupedByType, 5);
 
 // Generate the site
+footerHandler.generateFooter();
 generateHomepage(recentPosts);
 generateMenuPages(postMetaGroupedByType);
 generateAssets();
@@ -43,23 +46,14 @@ function generateContent() {
         const contentDirectory = path.join(CONTENT_DIRECTORY, config.content[contentType].contentFolder);
         const outputDirectory = path.join(OUTPUT_DIRECTORY, config.content[contentType].contentFolder);
 
-        preparePublicSubDirectory(outputDirectory);
+        utils.prepareDirectory(outputDirectory);
         let allPostContent = generatePosts(contentDirectory, outputDirectory);
         // Add the content type to the post metadata
-        postMetaGroupedByType[contentType] = allPostContent.map((post) => ({ ...post, type: contentType }));
+        const contentTypeName = config.content[contentType].contentName;
+        postMetaGroupedByType[contentTypeName] = allPostContent.map((post) => ({ ...post, typeToDisplay: contentTypeName, contentFolder: contentType }));
     }
 
     return postMetaGroupedByType;
-}
-
-// Creates the content type directories if not present, and clears all contents
-function preparePublicSubDirectory(outputSubDirectory) {
-    if (!fs.existsSync(outputSubDirectory)) {
-        fs.mkdirSync(outputSubDirectory);
-    } else {
-        fs.rmSync(outputSubDirectory, { recursive: true, force: true });
-        fs.mkdirSync(outputSubDirectory);
-    }
 }
 
 // Generates the content in its own directory, converting .md files to .html
@@ -74,9 +68,9 @@ function generatePosts(contentDirectory, outputDirectory) {
 
     // Generate content
     // Content structure is content > content type folder > post folder > post.md + images
-    contentTypeFolders.forEach((postName) => {
-        const postContentDirectory = path.join(contentDirectory, postName);
-        const postOutputDirectory = path.join(outputDirectory, postName);
+    contentTypeFolders.forEach((contentFolderName) => {
+        const postContentDirectory = path.join(contentDirectory, contentFolderName);
+        const postOutputDirectory = path.join(outputDirectory, contentFolderName);
         const postFiles = fs.readdirSync(postContentDirectory, 'utf8');
         // Create a folder for the post
         fs.mkdirSync(postOutputDirectory);
@@ -84,19 +78,20 @@ function generatePosts(contentDirectory, outputDirectory) {
         // Generate the metadata and html from the md file
         const markdownFilename = postFiles.find((file) => path.extname(file).toLowerCase() === '.md');
         if (markdownFilename) {
+            const fileName = markdownFilename.slice(0, -3);
             const fileContent = fs.readFileSync(path.join(postContentDirectory, markdownFilename), 'utf8');
             const content = fm(fileContent);
-            postMeta.push({ ...content.attributes, filename: postName });
+            postMeta.push({ ...content.attributes, filename: fileName });
             const htmlContent = marked.parse(content.body);
-            fs.writeFileSync(path.join(outputDirectory, postName, postName + '.html'), htmlContent, 'utf8');
+            fs.writeFileSync(path.join(outputDirectory, contentFolderName, contentFolderName + '.html'), htmlContent, 'utf8');
         } else {
-            throw new Error(`Missing markdown file for ${postName}`);
+            throw new Error(`Missing markdown file for ${fileName}`);
         }
 
         // Copy any images
         const allContentItemImages = postFiles.filter((filename) => allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
         allContentItemImages.forEach((imageFile) => {
-            fs.copyFileSync(path.join(contentDirectory, postName, imageFile), path.join(outputDirectory, postName, imageFile));
+            fs.copyFileSync(path.join(contentDirectory, contentFolderName, imageFile), path.join(outputDirectory, contentFolderName, imageFile));
         });
     });
 

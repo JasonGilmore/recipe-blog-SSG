@@ -1,3 +1,5 @@
+const templateUtils = require('../src/utils.js');
+
 function createPosts(posts, shouldShowType) {
     return `
     <div class="post-container">
@@ -9,14 +11,12 @@ function createPosts(posts, shouldShowType) {
 }
 
 function createPost(post, shouldShowType) {
-    const postType = post.type;
-    // Remove last "s" if present
-    let type = postType.lastIndexOf('s') === postType.length - 1 ? postType.slice(0, postType.length - 1) : postType;
+    let type = templateUtils.removeLastS(post.typeToDisplay);
     return `
-        <a href="${post.filename}">
+        <a href="${post.contentFolder}/${post.filename}">
             <article class="post">
-                ${shouldShowType ? `<div class="typeIcon">${type}</div>` : ''}
-                <img src="./${post.type}/${post.filename}/${post.image}" alt="" />
+                ${shouldShowType ? `<div class="typeIcon">${type.toLowerCase()}</div>` : ''}
+                <img src="./${post.contentFolder}/${post.filename}/${post.image}" alt="" />
                 <p class="post-title">${post.title}</p>
                 <p class="post-description">${post.description}</p>
             </article>

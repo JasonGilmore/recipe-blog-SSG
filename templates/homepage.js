@@ -4,8 +4,8 @@ const createHead = require('./head.js');
 const createNavbar = require('./navbar.js');
 const createSiteWelcome = require('./siteWelcome.js');
 const createPosts = require('./posts.js');
-const createFooter = require('./footer.js');
-const templateUtils = require('./templateUtils.js');
+const footerHandler = require('./footer.js');
+const templateUtils = require('../src/utils.js');
 
 function generateHomepage(recentPosts) {
     fs.writeFileSync(path.join(templateUtils.OUTPUT_DIRECTORY, '/index.html'), createHomepage(recentPosts), 'utf8');
@@ -21,7 +21,7 @@ function createHomepage(recentPosts) {
                 ${createPosts(recentPosts, true)}
             </main>
 
-            ${createFooter()}
+            ${footerHandler.createFooter()}
         </body>
 
     </html>
