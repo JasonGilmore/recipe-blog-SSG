@@ -1,4 +1,3 @@
-const config = require('./config.json');
 const fs = require('fs');
 const path = require('path');
 const marked = require('marked');
@@ -10,25 +9,14 @@ const generateHomepage = require('./templates/homepage.js');
 const generateAssets = require('./templates/assetsHandler.js');
 const generateMenuPages = require('./templates/menuPages.js');
 
-// Validate config
-if (!config.content) {
-    throw new Error('Config file missing required sections: content');
-}
-for (const contentType in config.content) {
-    if (!config.content[contentType].contentFolder) {
-        throw new Error(`Config type ${contentType} missing required sections: contentFolder`);
-    }
-}
+utils.validateConfigurations();
 
-const CONTENT_DIRECTORY = utils.CONTENT_DIRECTORY;
-const CONTENT_OUTPUT_DIRECTORY = utils.CONTENT_OUTPUT_DIRECTORY;
-
-if (!fs.existsSync(CONTENT_OUTPUT_DIRECTORY)) {
-    fs.mkdirSync(CONTENT_OUTPUT_DIRECTORY);
+if (!fs.existsSync(utils.CONTENT_OUTPUT_DIRECTORY)) {
+    fs.mkdirSync(utils.CONTENT_OUTPUT_DIRECTORY);
 }
 
 // Generate the footer first so it can be used on site pages
-footerHandler.generateFooter();
+footerHandler.generateFooters();
 
 // Generate content and get a list of all post metadata (front matter), grouped by type
 // Each post has an additional properties "filename", "typeToDisplay" and "contentFolder" so the templates can link and display these items
@@ -45,23 +33,24 @@ generateAssets();
 function generateContent() {
     let postMetaGroupedByType = {};
 
-    for (let contentType in config.content) {
-        const contentDirectory = path.join(CONTENT_DIRECTORY, config.content[contentType].contentFolder);
-        const outputDirectory = path.join(CONTENT_OUTPUT_DIRECTORY, config.content[contentType].contentFolder);
+    for (let contentType in utils.siteConfig.content) {
+        const contentFolder = utils.siteConfig.content[contentType].contentFolder;
+        const contentDirectory = path.join(utils.CONTENT_DIRECTORY, contentFolder);
+        const outputDirectory = path.join(utils.CONTENT_OUTPUT_DIRECTORY, contentFolder);
 
         utils.prepareDirectory(outputDirectory);
-        let allPostContent = generatePosts(contentDirectory, outputDirectory);
+        let allPostContent = generatePosts(contentDirectory, contentFolder, outputDirectory);
         // Add the content type to the post metadata
-        const contentTypeName = config.content[contentType].contentName;
-        postMetaGroupedByType[contentTypeName] = allPostContent.map((post) => ({ ...post, typeToDisplay: contentTypeName, contentFolder: contentType }));
+        const contentTypeName = utils.siteConfig.content[contentType].contentName;
+        postMetaGroupedByType[contentTypeName] = allPostContent.map((post) => ({ ...post, typeToDisplay: contentTypeName, contentFolder: contentFolder }));
     }
 
     return postMetaGroupedByType;
 }
 
 // Generates the content in its own directory, converting .md files to .html
-function generatePosts(contentDirectory, outputDirectory) {
-    const allowedImageExtensions = ['.jpg', '.jpeg', '.png'];
+function generatePosts(contentDirectory, contentFolder, outputDirectory) {
+    const allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
 
     // Read all folder names for the content type
     const contentTypeFolders = fs.readdirSync(contentDirectory, 'utf8');
@@ -85,6 +74,10 @@ function generatePosts(contentDirectory, outputDirectory) {
             const fileContent = fs.readFileSync(path.join(postContentDirectory, markdownFilename), 'utf8');
             const content = fm(fileContent);
             postMeta.push({ ...content.attributes, filename: fileName });
+
+            // Replace the relative image urls
+            content.body = content.body.replace('./', `/${contentFolder}/${contentFolderName}/`);
+
             const htmlContent = marked.parse(content.body);
             const fullSitePage = generatePost(htmlContent);
             fs.writeFileSync(path.join(outputDirectory, contentFolderName, contentFolderName + '.html'), fullSitePage, 'utf8');

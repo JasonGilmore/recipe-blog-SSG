@@ -1,10 +1,10 @@
-const config = require('../config.json');
+const utils = require('../utils.js');
 const siteContent = require('./siteContent.json');
 
 function createNavbar() {
     // Add content type info into an array so it can be looped while generating the navbar
     const contentTypes = [];
-    Object.entries(config.content).forEach(([key, value]) => {
+    Object.entries(utils.siteConfig.content).forEach(([key, value]) => {
         contentTypes.push(value);
     });
 

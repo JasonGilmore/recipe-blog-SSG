@@ -1,7 +1,6 @@
 {
-    "contentDirectory": "../content",
-    "outputDirectory": "../public",
-    "footerDirectory": "../content/footer",
+    "contentDirectory": "content",
+    "outputDirectory": "public",
     "content": {
         "recipes": {
             "contentName": "Recipes",

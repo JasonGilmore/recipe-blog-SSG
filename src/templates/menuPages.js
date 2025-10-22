@@ -8,7 +8,9 @@ const templateUtils = require('../utils.js');
 
 function generateMenuPages(postMetaGroupedByType) {
     for (let contentName of Object.keys(postMetaGroupedByType)) {
-        fs.writeFileSync(path.join(templateUtils.CONTENT_OUTPUT_DIRECTORY, contentName + '.html'), createMenuPage(contentName, postMetaGroupedByType[contentName]), 'utf8');
+        const contentFolder = postMetaGroupedByType[contentName][0].contentFolder;
+        const menuPageFilePath = path.join(templateUtils.CONTENT_OUTPUT_DIRECTORY, contentFolder + '.html');
+        fs.writeFileSync(menuPageFilePath, createMenuPage(contentName, postMetaGroupedByType[contentName]), 'utf8');
     }
 }
 
