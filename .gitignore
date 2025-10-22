@@ -6,3 +6,7 @@ content
 
 # Output directories
 public
+
+# Site specific content
+src/templates/siteContent.json
+src/templates/images

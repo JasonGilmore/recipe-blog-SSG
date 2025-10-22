@@ -1,9 +1,14 @@
 {
+    "contentDirectory": "../content",
+    "outputDirectory": "../public",
+    "footerDirectory": "../content/footer",
     "content": {
         "recipes": {
+            "contentName": "Recipes",
             "contentFolder": "recipes"
         },
         "blogs": {
+            "contentName": "Blogs",
             "contentFolder": "blogs"
         }
     }
