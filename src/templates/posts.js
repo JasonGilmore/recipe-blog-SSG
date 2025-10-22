@@ -1,27 +1,20 @@
-const templateUtils = require('../utils.js');
+const createHead = require('./head.js');
+const createNavbar = require('./navbar.js');
+const footerHandler = require('./footer.js');
 
-function createPosts(posts, shouldShowType) {
+function createPost(postContent) {
     return `
-    <div class="post-container">
+        ${createHead()}
+        <body>
+            ${createNavbar()}
+            <main>
+                ${postContent}
+            </main>
+            ${footerHandler.createFooter()}
+        </body>
 
-        ${posts.map((post) => createPost(post, shouldShowType)).join(' ')}
-
-    </div>
-    `;
+    </html>
+`;
 }
 
-function createPost(post, shouldShowType) {
-    let type = templateUtils.removeLastS(post.typeToDisplay);
-    return `
-        <a href="${post.contentFolder}/${post.filename}">
-            <article class="post">
-                ${shouldShowType ? `<div class="typeIcon">${type.toLowerCase()}</div>` : ''}
-                <img src="./${post.contentFolder}/${post.filename}/${post.image}" alt="" />
-                <p class="post-title">${post.title}</p>
-                <p class="post-description">${post.description}</p>
-            </article>
-        </a>
-    `;
-}
-
-module.exports = createPosts;
+module.exports = createPost;

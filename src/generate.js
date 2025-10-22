@@ -5,6 +5,7 @@ const marked = require('marked');
 const fm = require('front-matter');
 const utils = require('./utils.js');
 const footerHandler = require('./templates/footer.js');
+const generatePost = require('./templates/posts.js');
 const generateHomepage = require('./templates/homepage.js');
 const generateAssets = require('./templates/assetsHandler.js');
 const generateMenuPages = require('./templates/menuPages.js');
@@ -26,13 +27,15 @@ if (!fs.existsSync(CONTENT_OUTPUT_DIRECTORY)) {
     fs.mkdirSync(CONTENT_OUTPUT_DIRECTORY);
 }
 
+// Generate the footer first so it can be used on site pages
+footerHandler.generateFooter();
+
 // Generate content and get a list of all post metadata (front matter), grouped by type
-// Each post has an additional property "filename", "typeToDisplay" and "contentFolder" so the templates can link and display these items
+// Each post has an additional properties "filename", "typeToDisplay" and "contentFolder" so the templates can link and display these items
 const postMetaGroupedByType = generateContent();
 const recentPosts = getRecentPosts(postMetaGroupedByType, 5);
 
-// Generate the site
-footerHandler.generateFooter();
+// Generate the rest of the site
 generateHomepage(recentPosts);
 generateMenuPages(postMetaGroupedByType);
 generateAssets();
@@ -83,7 +86,8 @@ function generatePosts(contentDirectory, outputDirectory) {
             const content = fm(fileContent);
             postMeta.push({ ...content.attributes, filename: fileName });
             const htmlContent = marked.parse(content.body);
-            fs.writeFileSync(path.join(outputDirectory, contentFolderName, contentFolderName + '.html'), htmlContent, 'utf8');
+            const fullSitePage = generatePost(htmlContent);
+            fs.writeFileSync(path.join(outputDirectory, contentFolderName, contentFolderName + '.html'), fullSitePage, 'utf8');
         } else {
             throw new Error(`Missing markdown file for ${fileName}`);
         }

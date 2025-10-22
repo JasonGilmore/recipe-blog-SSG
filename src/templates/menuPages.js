@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const createHead = require('./head.js');
 const createNavbar = require('./navbar.js');
-const createPosts = require('./posts.js');
+const createPosts = require('./postCards.js');
 const footerHandler = require('./footer.js');
 const templateUtils = require('../utils.js');
 

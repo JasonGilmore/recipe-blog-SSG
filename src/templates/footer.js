@@ -5,7 +5,6 @@ const marked = require('marked');
 const fm = require('front-matter');
 const createHead = require('./head.js');
 const createNavbar = require('./navbar.js');
-const createSiteWelcome = require('./siteWelcome.js');
 
 let footerItems = [];
 
