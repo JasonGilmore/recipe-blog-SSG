@@ -1,10 +1,10 @@
-const config = require('../config.json');
+const utils = require('../utils.js');
 const siteContent = require('./siteContent.json');
 
 function createNavbar() {
     // Add content type info into an array so it can be looped while generating the navbar
     const contentTypes = [];
-    Object.entries(config.content).forEach(([key, value]) => {
+    Object.entries(utils.siteConfig.content).forEach(([key, value]) => {
         contentTypes.push(value);
     });
 
@@ -12,7 +12,7 @@ function createNavbar() {
                 <div class="navbar-wide-grouping">
                     <!-- Nav bar full width for medium and large devices -->
                     <a href="/" class="website-name">${siteContent.siteName}</a>
-                    ${contentTypes.map((contentType) => `<a href="${contentType.contentFolder}.html">${contentType.contentName}</a>`).join(' ')}
+                    ${contentTypes.map((contentType) => `<a href="/${contentType.contentFolder}.html">${contentType.contentName}</a>`).join(' ')}
                 </div>
                 <div class="navbar-small-grouping">
                     <div class="navbar-small-heading">

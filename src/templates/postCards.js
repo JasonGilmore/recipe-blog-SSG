@@ -16,7 +16,7 @@ function createPostCard(post, shouldShowType) {
         <a href="${post.contentFolder}/${post.filename}">
             <article class="post">
                 ${shouldShowType ? `<div class="typeIcon">${type.toLowerCase()}</div>` : ''}
-                <img src="./${post.contentFolder}/${post.filename}/${post.image}" alt="" />
+                <img src="/${post.contentFolder}/${post.filename}/${post.image}" alt="" />
                 <p class="post-title">${post.title}</p>
                 <p class="post-description">${post.description}</p>
             </article>
