@@ -12,6 +12,9 @@ try {
 }
 
 const FOOTERS_FOLDER = 'footers';
+const CSS_FOLDER = 'css';
+const IMAGE_ASSETS_FOLDER = '/images/site-assets';
+
 const CONTENT_OUTPUT_DIRECTORY = path.join(__dirname, '../', siteConfig.outputDirectory);
 const CONTENT_DIRECTORY = path.join(__dirname, '../', siteConfig.contentDirectory);
 const FOOTER_DIRECTORY = path.join(CONTENT_DIRECTORY, 'footers');
@@ -48,4 +51,15 @@ function removeLastS(word) {
     return word.lastIndexOf('s') === word.length - 1 ? word.slice(0, word.length - 1) : word;
 }
 
-module.exports = { CONTENT_OUTPUT_DIRECTORY, CONTENT_DIRECTORY, FOOTER_DIRECTORY, FOOTER_OUTPUT_DIRECTORY, siteConfig, validateConfigurations, prepareDirectory, removeLastS };
+module.exports = {
+    CONTENT_OUTPUT_DIRECTORY,
+    CONTENT_DIRECTORY,
+    FOOTER_DIRECTORY,
+    FOOTER_OUTPUT_DIRECTORY,
+    IMAGE_ASSETS_FOLDER,
+    CSS_FOLDER,
+    siteConfig,
+    validateConfigurations,
+    prepareDirectory,
+    removeLastS,
+};
