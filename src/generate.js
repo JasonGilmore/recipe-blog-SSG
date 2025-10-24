@@ -10,10 +10,7 @@ const generateAssets = require('./templates/assetsHandler.js');
 const generateMenuPages = require('./templates/menuPages.js');
 
 utils.validateConfigurations();
-
-if (!fs.existsSync(utils.CONTENT_OUTPUT_DIRECTORY)) {
-    fs.mkdirSync(utils.CONTENT_OUTPUT_DIRECTORY);
-}
+utils.prepareDirectory(utils.PUBLIC_OUTPUT_DIRECTORY);
 
 // Generate the footer first so it can be used on site pages
 footerHandler.generateFooters();
@@ -36,7 +33,7 @@ function generateContent() {
     for (let contentType in utils.siteConfig.content) {
         const contentFolder = utils.siteConfig.content[contentType].contentFolder;
         const contentDirectory = path.join(utils.CONTENT_DIRECTORY, contentFolder);
-        const outputDirectory = path.join(utils.CONTENT_OUTPUT_DIRECTORY, contentFolder);
+        const outputDirectory = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, contentFolder);
 
         utils.prepareDirectory(outputDirectory);
         let allPostContent = generatePosts(contentDirectory, contentFolder, outputDirectory);

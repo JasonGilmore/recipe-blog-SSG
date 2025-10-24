@@ -11,11 +11,10 @@ let footerItems = [];
 function generateFooters() {
     // Footers are optional, if no footer directory, skip generation
     if (!fs.existsSync(utils.FOOTER_DIRECTORY)) {
-        console.log(`Footers not found and footer will not be generated. Ignore if not required.`);
+        console.log(`Footers not found and footer will not be generated on the site. Ignore if not required.`);
         return;
     }
 
-    utils.prepareDirectory(utils.FOOTER_OUTPUT_DIRECTORY);
     const footerFiles = fs.readdirSync(utils.FOOTER_DIRECTORY, 'utf8').filter((file) => path.extname(file).toLowerCase() === '.md');
     let footersToGenerate = [];
 
@@ -24,7 +23,7 @@ function generateFooters() {
         const footerContent = fs.readFileSync(path.join(utils.FOOTER_DIRECTORY, footerFile), 'utf8');
         const content = fm(footerContent);
         const htmlContent = marked.parse(content.body);
-        let generatedFooterLocation = path.join(utils.FOOTER_OUTPUT_DIRECTORY, fileName + '.html');
+        let generatedFooterLocation = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, fileName + '.html');
         // Create the files after the loop is completed, so the footer pages can have the footer added using footerItems
         footersToGenerate.push({ fileLocation: generatedFooterLocation, content: htmlContent });
         footerItems.push({ location: '/' + fileName, displayName: content.attributes.displayName, order: content.attributes.order });
@@ -59,9 +58,11 @@ function createFooter() {
     footerItems.sort((a, b) => a.order - b.order);
 
     return `
-        <hr />
-        <footer class="footer">
-            ${footerItems.map((footerItem) => `<a href="${footerItem.location}">${footerItem.displayName}</a>`).join(' ')}
+        <footer>
+            <hr />
+            <div class="footer-item-container">
+                ${footerItems.map((footerItem) => `<a href="${footerItem.location}">${footerItem.displayName}</a>`).join(' ')}
+            </div>
         </footer>
     `;
 }
