@@ -72,10 +72,13 @@ function generatePosts(contentDirectory, contentFolder, outputDirectory) {
             const content = fm(fileContent);
             postMeta.push({ ...content.attributes, filename: fileName });
 
-            // Replace the relative image urls
-            content.body = content.body.replace('./', `/${contentFolder}/${contentFolderName}/`);
-
-            const htmlContent = marked.parse(content.body);
+            let htmlContent = marked.parse(content.body);
+            // Replace the relative image urls, add image css and add other css to the content
+            htmlContent = htmlContent
+                .replaceAll('./', `/${contentFolder}/${contentFolderName}/`)
+                .replaceAll('<img ', '<img class="content-image" ')
+                .replaceAll('<p>{recipeboxstart}</p>', '<div class="recipe-box">')
+                .replaceAll('<p>{recipeboxend}</p>', '</div>');
             const fullSitePage = generatePost(htmlContent);
             fs.writeFileSync(path.join(outputDirectory, contentFolderName, contentFolderName + '.html'), fullSitePage, 'utf8');
         } else {

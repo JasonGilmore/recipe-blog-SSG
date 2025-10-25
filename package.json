@@ -5,11 +5,14 @@
   "main": "src/generate.js",
   "scripts": {
     "build": "node src/generate.js",
+    "start": "node server.js",
+    "dev": "npm run build && npm run start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "",
   "dependencies": {
+    "express": "=5.1.0",
     "front-matter": "=4.0.2",
     "marked": "=16.4.0"
   }
