@@ -8,7 +8,9 @@ function createPost(postContent) {
         <body>
             ${createNavbar()}
             <main>
-                ${postContent}
+                <div class="content-page-container">
+                    ${postContent}
+                </div>
             </main>
             ${footerHandler.createFooter()}
         </body>

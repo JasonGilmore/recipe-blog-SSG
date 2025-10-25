@@ -11,14 +11,12 @@ try {
     }
 }
 
-const FOOTERS_FOLDER = 'footers';
 const CSS_FOLDER = 'css';
 const IMAGE_ASSETS_FOLDER = '/images/site-assets';
 
-const CONTENT_OUTPUT_DIRECTORY = path.join(__dirname, '../', siteConfig.outputDirectory);
+const PUBLIC_OUTPUT_DIRECTORY = path.join(__dirname, '../', siteConfig.outputDirectory);
 const CONTENT_DIRECTORY = path.join(__dirname, '../', siteConfig.contentDirectory);
 const FOOTER_DIRECTORY = path.join(CONTENT_DIRECTORY, 'footers');
-const FOOTER_OUTPUT_DIRECTORY = path.join(CONTENT_OUTPUT_DIRECTORY, FOOTERS_FOLDER);
 
 function validateConfigurations() {
     if (!siteConfig.content) {
@@ -35,7 +33,7 @@ function validateConfigurations() {
 // Creates the directory if not present, and clears all contents
 function prepareDirectory(directory) {
     // Directory must be a valid output directory
-    if (!directory.startsWith(CONTENT_OUTPUT_DIRECTORY)) {
+    if (!directory.startsWith(PUBLIC_OUTPUT_DIRECTORY)) {
         throw new Error(`Invalid path ${directory}. Must be a valid output directory.`);
     }
 
@@ -48,18 +46,26 @@ function prepareDirectory(directory) {
 }
 
 function removeLastS(word) {
-    return word.lastIndexOf('s') === word.length - 1 ? word.slice(0, word.length - 1) : word;
+    return removeLast(word, 's');
+}
+
+function removelastSlash(word) {
+    return removeLast(word, '/');
+}
+
+function removeLast(word, text) {
+    return word.lastIndexOf(text) === word.length - 1 ? word.slice(0, word.length - 1) : word;
 }
 
 module.exports = {
-    CONTENT_OUTPUT_DIRECTORY,
+    PUBLIC_OUTPUT_DIRECTORY,
     CONTENT_DIRECTORY,
     FOOTER_DIRECTORY,
-    FOOTER_OUTPUT_DIRECTORY,
     IMAGE_ASSETS_FOLDER,
     CSS_FOLDER,
     siteConfig,
     validateConfigurations,
     prepareDirectory,
     removeLastS,
+    removelastSlash,
 };

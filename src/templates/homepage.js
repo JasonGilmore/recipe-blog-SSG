@@ -8,7 +8,7 @@ const footerHandler = require('./footer.js');
 const templateUtils = require('../utils.js');
 
 function generateHomepage(recentPosts) {
-    fs.writeFileSync(path.join(templateUtils.CONTENT_OUTPUT_DIRECTORY, '/index.html'), createHomepage(recentPosts), 'utf8');
+    fs.writeFileSync(path.join(templateUtils.PUBLIC_OUTPUT_DIRECTORY, '/index.html'), createHomepage(recentPosts), 'utf8');
 }
 
 function createHomepage(recentPosts) {

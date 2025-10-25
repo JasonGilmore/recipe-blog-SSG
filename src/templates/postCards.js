@@ -2,7 +2,7 @@ const templateUtils = require('../utils.js');
 
 function createPostCards(posts, shouldShowType) {
     return `
-    <div class="post-container">
+    <div class="post-thumbnail-container">
 
         ${posts.map((post) => createPostCard(post, shouldShowType)).join(' ')}
 
@@ -10,15 +10,15 @@ function createPostCards(posts, shouldShowType) {
     `;
 }
 
-function createPostCard(post, shouldShowType) {
+function createPostCard(post, isHomePage) {
     let type = templateUtils.removeLastS(post.typeToDisplay);
     return `
-        <a href="${post.contentFolder}/${post.filename}">
-            <article class="post">
-                ${shouldShowType ? `<div class="typeIcon">${type.toLowerCase()}</div>` : ''}
+        <a href="/${post.contentFolder}/${post.filename}">
+            <article class="post-thumbnail">
+                ${isHomePage ? `<div class="typeIcon">${type.toLowerCase()}</div>` : ''}
                 <img src="/${post.contentFolder}/${post.filename}/${post.image}" alt="" />
-                <p class="post-title">${post.title}</p>
-                <p class="post-description">${post.description}</p>
+                <p class="post-thumbnail-title">${post.title}</p>
+                <p class="post-thumbnail-description">${post.description}</p>
             </article>
         </a>
     `;

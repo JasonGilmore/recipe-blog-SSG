@@ -4,6 +4,13 @@
 
 body {
     margin: 0px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex-grow: 1;
 }
 
 .nav-bar {
@@ -123,7 +130,7 @@ body {
     margin: 15px;
 }
 
-.post-container {
+.post-thumbnail-container {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -134,12 +141,12 @@ body {
     padding-bottom: 20px;
 }
 
-.post-container a {
+.post-thumbnail-container a {
     text-decoration: none;
     color: black;
 }
 
-.post {
+.post-thumbnail {
     cursor: pointer;
     width: 350px;
     height: 300px;
@@ -148,7 +155,7 @@ body {
     position: relative;
 }
 
-.post:hover {
+.post-thumbnail:hover {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5), 0 6px 20px 0 rgba(0, 0, 0, 0.3);
 }
 
@@ -161,20 +168,71 @@ body {
     right: 0;
 }
 
-.post img {
+.post-thumbnail img {
     width: 100%;
     height: 60%;
     object-fit: cover;
 }
 
-.post-title {
+.post-thumbnail-title {
     font-size: 1.5rem;
     margin: 10px 30px;
     padding-bottom: 5px;
 }
 
-.post-description {
+.post-thumbnail-description {
     margin: 0px 10px;
+}
+
+.content-page-container {
+    max-width: 1200px;
+    width: clamp(600px, 65%, 950px);
+    margin: auto;
+    font-size: 1.2rem;
+}
+
+.content-image {
+    display: block;
+    margin: 5px auto;
+    border-radius: 4px;
+    width: 85%;
+    height: auto;
+}
+
+.recipe-box {
+    border: 1px solid #b5b5b5;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px black;
+    padding: 20px 25px;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.recipe-box h2 {
+    margin-top: 5px;
+}
+
+.content-page-container table {
+    border-collapse: collapse;
+    margin: 15px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.content-page-container thead th {
+    font-weight: bold;
+    border-bottom: 2px solid grey;
+    text-align: left;
+    padding: 5px;
+}
+
+.content-page-container tbody td {
+    border-bottom: 1px solid grey;
+    padding: 5px;
+}
+
+.content-page-container table tr:hover {
+    background-color: rgb(235, 235, 235);
 }
 
 /* Small device */
@@ -190,6 +248,10 @@ body {
     .intro-image {
         height: 20vh;
     }
+
+    .content-page-container {
+        width: 95%;
+    }
 }
 
 /* Medium device */
@@ -201,9 +263,13 @@ body {
     .navbar-wide-grouping {
         display: flex;
     }
+
+    .content-page-container {
+        width: 80%;
+    }
 }
 
-.footer {
+.footer-item-container {
     padding-left: 20px;
     padding-bottom: 10px;
     display: flex;
@@ -211,7 +277,7 @@ body {
     flex-wrap: nowrap;
 }
 
-.footer a {
+.footer-item-container a {
     margin: 10px 20px;
     text-decoration: none;
     color: black;
