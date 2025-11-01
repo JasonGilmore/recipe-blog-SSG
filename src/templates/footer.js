@@ -36,7 +36,7 @@ function generateFooters() {
 
 function addSiteToFooterPage(footerHtmlContent) {
     return `
-        ${createHead()}
+        ${createHead({ pageType: utils.PAGE_TYPES.FOOTERPAGE })}
         <body>
             ${createNavbar()}
             <main>

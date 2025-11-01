@@ -1,7 +1,7 @@
 {
   "name": "recipe-blog",
   "version": "1.0.0",
-  "description": "A static site generator for publishing recipes and food blogs. Write in Markdown, publish in HTML.",
+  "description": "A static site generator for publishing recipes and other content. Write in Markdown, publish in HTML.",
   "main": "src/generate.js",
   "scripts": {
     "build": "node src/generate.js",
@@ -9,8 +9,6 @@
     "dev": "npm run build && npm run start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "",
   "dependencies": {
     "express": "=5.1.0",
     "front-matter": "=4.0.2",

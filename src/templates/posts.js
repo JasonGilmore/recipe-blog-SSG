@@ -1,10 +1,11 @@
 const createHead = require('./head.js');
 const createNavbar = require('./navbar.js');
 const footerHandler = require('./footer.js');
+const utils = require('../utils.js');
 
 function createPost(postContent) {
     return `
-        ${createHead()}
+        ${createHead({ pageType: utils.PAGE_TYPES.POST })}
         <body>
             ${createNavbar()}
             <main>
