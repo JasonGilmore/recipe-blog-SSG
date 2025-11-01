@@ -2,6 +2,13 @@ const path = require('path');
 const fs = require('fs');
 let siteConfig;
 
+const PAGE_TYPES = {
+    POST: 'post',
+    HOMEPAGE: 'homepage',
+    MENUPAGE: 'menupage',
+    FOOTERPAGE: 'footer',
+};
+
 // Fallback to default config if config not present
 try {
     siteConfig = require('./config.json');
@@ -12,6 +19,7 @@ try {
 }
 
 const CSS_FOLDER = 'css';
+const JS_FOLDER = 'js';
 const IMAGE_ASSETS_FOLDER = '/images/site-assets';
 
 const PUBLIC_OUTPUT_DIRECTORY = path.join(__dirname, '../', siteConfig.outputDirectory);
@@ -58,11 +66,13 @@ function removeLast(word, text) {
 }
 
 module.exports = {
+    PAGE_TYPES,
     PUBLIC_OUTPUT_DIRECTORY,
     CONTENT_DIRECTORY,
     FOOTER_DIRECTORY,
     IMAGE_ASSETS_FOLDER,
     CSS_FOLDER,
+    JS_FOLDER,
     siteConfig,
     validateConfigurations,
     prepareDirectory,

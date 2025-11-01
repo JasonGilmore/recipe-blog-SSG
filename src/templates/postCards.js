@@ -1,4 +1,4 @@
-const templateUtils = require('../utils.js');
+const utils = require('../utils.js');
 
 function createPostCards(posts, shouldShowType) {
     return `
@@ -11,7 +11,7 @@ function createPostCards(posts, shouldShowType) {
 }
 
 function createPostCard(post, isHomePage) {
-    let type = templateUtils.removeLastS(post.typeToDisplay);
+    let type = utils.removeLastS(post.typeToDisplay);
     return `
         <a href="/${post.contentFolder}/${post.filename}">
             <article class="post-thumbnail">
