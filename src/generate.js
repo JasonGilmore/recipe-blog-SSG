@@ -48,8 +48,6 @@ function generateContent() {
 
 // Generates the content in its own directory, converting .md files to .html
 function generatePosts(contentDirectory, contentFolder, outputDirectory) {
-    const allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
-
     // Read all folder names for the content type
     const contentTypeFolders = fs.readdirSync(contentDirectory, 'utf8');
 
@@ -61,54 +59,65 @@ function generatePosts(contentDirectory, contentFolder, outputDirectory) {
     contentTypeFolders.forEach((contentFolderName) => {
         const postContentDirectory = path.join(contentDirectory, contentFolderName);
         const postOutputDirectory = path.join(outputDirectory, contentFolderName);
-        const postFiles = fs.readdirSync(postContentDirectory, 'utf8');
+        const allPostFiles = fs.readdirSync(postContentDirectory, 'utf8');
         // Create a folder for the post
         fs.mkdirSync(postOutputDirectory);
 
-        // Generate the metadata and html from the md file
-        const markdownFilename = postFiles.find((file) => path.extname(file).toLowerCase() === '.md');
-        if (markdownFilename) {
-            const fileName = markdownFilename.slice(0, -3);
-            const fileContent = fs.readFileSync(path.join(postContentDirectory, markdownFilename), 'utf8');
-            const content = fm(fileContent);
-            postMeta.push({ ...content.attributes, filename: fileName });
-
-            let htmlContent = marked.parse(content.body);
-            // Replace the relative image urls, add image css and add other css to the content
-            htmlContent = htmlContent
-                .replaceAll('./', `/${contentFolder}/${contentFolderName}/`)
-                .replaceAll('<img ', '<img class="content-image" ')
-                .replaceAll('<p>{recipeboxstart}</p>', '<div class="recipe-box">')
-                .replaceAll('<p>{recipeboxend}</p>', '</div>');
-            const fullSitePage = generatePost(htmlContent);
-            fs.writeFileSync(path.join(outputDirectory, contentFolderName, contentFolderName + '.html'), fullSitePage, 'utf8');
-        } else {
-            throw new Error(`Missing markdown file for ${fileName}`);
-        }
-
-        // Copy any images including exif removal
-        const allContentItemImages = postFiles.filter((filename) => allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
-        allContentItemImages.forEach((imageFile) => {
-            const imageFilePath = path.join(contentDirectory, contentFolderName, imageFile);
-            const imageOutputPath = path.join(outputDirectory, contentFolderName, imageFile);
-
-            // If contain exif data, remove and write the new image, otherwise copy the image
-            const imageAsBinaryString = fs.readFileSync(imageFilePath, 'binary');
-            const exifData = piexif.load(imageAsBinaryString);
-            const exifSections = ['0th', 'Exif', 'GPS', 'Interop', '1st', 'thumbnail'];
-            const containsExifData = exifSections.some((tag) => Object.keys(exifData?.[tag] || {}).length > 0);
-
-            if (containsExifData) {
-                const cleanedImage = piexif.remove(imageAsBinaryString);
-                const cleanedImageBuffer = Buffer.from(cleanedImage, 'binary');
-                fs.writeFileSync(imageOutputPath, cleanedImageBuffer);
-            } else {
-                fs.copyFileSync(imageFilePath, imageOutputPath);
-            }
-        });
+        processMarkdownFiles(allPostFiles, postContentDirectory, contentFolder, contentFolderName, outputDirectory, postMeta);
+        processContentImages(allPostFiles, contentDirectory, outputDirectory, contentFolderName);
     });
 
     return postMeta;
+}
+
+// Generate the html page from the md file, and add metadata to postMeta
+function processMarkdownFiles(allPostFiles, postContentDirectory, contentFolder, contentFolderName, outputDirectory, postMeta) {
+    const markdownFilename = allPostFiles.find((file) => path.extname(file).toLowerCase() === '.md');
+    if (markdownFilename) {
+        const fileName = markdownFilename.slice(0, -3);
+        const fileContent = fs.readFileSync(path.join(postContentDirectory, markdownFilename), 'utf8');
+        const content = fm(fileContent);
+        postMeta.push({ ...content.attributes, filename: fileName });
+
+        let htmlContent = marked.parse(content.body);
+        // Replace the relative image urls, add image css and add other css to the content
+        htmlContent = htmlContent
+            .replaceAll('./', `/${contentFolder}/${contentFolderName}/`)
+            .replaceAll('<img ', '<img class="content-image" ')
+            .replaceAll('<p>{recipeboxstart}</p>', '<div class="recipe-box">')
+            .replaceAll('<p>{recipeboxend}</p>', '</div>');
+        const fullSitePage = generatePost(htmlContent);
+        fs.writeFileSync(path.join(outputDirectory, contentFolderName, contentFolderName + '.html'), fullSitePage, 'utf8');
+    } else {
+        throw new Error(`Missing markdown file for ${fileName}`);
+    }
+}
+
+// Copy any images from their content directory to the output directory, including with Exif removal
+// Exif removal is synchronous as part of the static site generation since it is fast enough (total generation of ~150ms)
+// and simplifies code. If this becomes noticeably slower as the site grows, consider changing to an asynchronous approach
+function processContentImages(allPostFiles, contentDirectory, outputDirectory, contentFolderName) {
+    const allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+
+    const allContentItemImages = allPostFiles.filter((filename) => allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
+    allContentItemImages.forEach((imageFile) => {
+        const imageFilePath = path.join(contentDirectory, contentFolderName, imageFile);
+        const imageOutputPath = path.join(outputDirectory, contentFolderName, imageFile);
+
+        // If contain exif data, remove and write the new image, otherwise copy the image
+        const imageAsBinaryString = fs.readFileSync(imageFilePath, 'binary');
+        const exifData = piexif.load(imageAsBinaryString);
+        const exifSections = ['0th', 'Exif', 'GPS', 'Interop', '1st', 'thumbnail'];
+        const containsExifData = exifSections.some((tag) => Object.keys(exifData?.[tag] || {}).length > 0);
+
+        if (containsExifData) {
+            const cleanedImage = piexif.remove(imageAsBinaryString);
+            const cleanedImageBuffer = Buffer.from(cleanedImage, 'binary');
+            fs.writeFileSync(imageOutputPath, cleanedImageBuffer);
+        } else {
+            fs.copyFileSync(imageFilePath, imageOutputPath);
+        }
+    });
 }
 
 // Get an array of the most recent posts across all content types
