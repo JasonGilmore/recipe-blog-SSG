@@ -1,4 +1,5 @@
 const fs = require('fs');
+const piexif = require('piexifjs');
 const path = require('path');
 const marked = require('marked');
 const fm = require('front-matter');
@@ -85,10 +86,25 @@ function generatePosts(contentDirectory, contentFolder, outputDirectory) {
             throw new Error(`Missing markdown file for ${fileName}`);
         }
 
-        // Copy any images
+        // Copy any images including exif removal
         const allContentItemImages = postFiles.filter((filename) => allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
         allContentItemImages.forEach((imageFile) => {
-            fs.copyFileSync(path.join(contentDirectory, contentFolderName, imageFile), path.join(outputDirectory, contentFolderName, imageFile));
+            const imageFilePath = path.join(contentDirectory, contentFolderName, imageFile);
+            const imageOutputPath = path.join(outputDirectory, contentFolderName, imageFile);
+
+            // If contain exif data, remove and write the new image, otherwise copy the image
+            const imageAsBinaryString = fs.readFileSync(imageFilePath, 'binary');
+            const exifData = piexif.load(imageAsBinaryString);
+            const exifSections = ['0th', 'Exif', 'GPS', 'Interop', '1st', 'thumbnail'];
+            const containsExifData = exifSections.some((tag) => Object.keys(exifData?.[tag] || {}).length > 0);
+
+            if (containsExifData) {
+                const cleanedImage = piexif.remove(imageAsBinaryString);
+                const cleanedImageBuffer = Buffer.from(cleanedImage, 'binary');
+                fs.writeFileSync(imageOutputPath, cleanedImageBuffer);
+            } else {
+                fs.copyFileSync(imageFilePath, imageOutputPath);
+            }
         });
     });
 
