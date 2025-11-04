@@ -5,15 +5,19 @@
   "main": "src/generate.js",
   "scripts": {
     "build": "node src/generate.js",
-    "start": "node server.js",
-    "dev": "npm run build && npm run start",
+    "serve": "npx pm2 start server.js --name recipe-blog --exp-backoff-restart-delay=100 --time",
+    "start": "npm run build && npm run serve",
+    "restart": "npx pm2 restart recipe-blog",
+    "dev:start": "npm run build && npx pm2 start server.js --name recipe-blog --watch",
+    "dev:stopdelete": "npx pm2 stop recipe-blog && npx pm2 delete recipe-blog",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "",
   "dependencies": {
-    "express": "=5.1.0",
-    "front-matter": "=4.0.2",
-    "marked": "=16.4.0"
+    "express": "~5.1.0",
+    "front-matter": "~4.0.2",
+    "marked": "~16.4.0",
+    "pm2": "~6.0.13"
   }
 }

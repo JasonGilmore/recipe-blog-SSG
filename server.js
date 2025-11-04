@@ -30,7 +30,7 @@ const gracefulShutdown = (signal) => {
     setTimeout(() => {
         console.error('Forcing shutdown due to timeout.');
         process.exit(1);
-    }, 5000);
+    }, 3000);
 
     server.close((err) => {
         if (err) {
