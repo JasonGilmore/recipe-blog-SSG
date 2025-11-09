@@ -125,5 +125,6 @@ Example:
 
 1. Combine all ingredients.
 2. ...
-   {recipeboxend}
+
+{recipeboxend}
 ```
