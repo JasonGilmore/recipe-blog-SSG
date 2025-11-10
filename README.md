@@ -34,6 +34,13 @@ A small static site generator for publishing recipes and food blogs. Write conte
 
 The site generator reads default settings from [`src/config.default.json`](src/config.default.json). To customize content and output directories, and content structure (which controls navigation tabs), create `src/config.json` which will override the defaults.
 
+Create a siteContent.json file within the [`src/templates/`](src/templates/) directory for key site information including a reference to the homepage image. Place the homepage image and a favicon into the [`src/templates/images/`](src/templates/images/) directory. siteContent.json supports the following fields:
+
+-   **siteName**: the name of the site, used in the navigation bar.
+-   **mainIntroduction**: the main introduction text, used on the homepage.
+-   **secondaryIntroduction**: the secondary introduction text, used on the homepage after the main introduction.
+-   **mainImage**: the name of the main image in the [`src/templates/images/`](src/templates/images/) directory.
+
 ## Content structure
 
 -   The content root is the folder configured by `contentDirectory` in the configuration.
