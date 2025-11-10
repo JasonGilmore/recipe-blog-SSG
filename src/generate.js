@@ -10,6 +10,9 @@ const generateHomepage = require('./templates/homepage.js');
 const generateAssets = require('./templates/assetsHandler.js');
 const generateMenuPages = require('./templates/menuPages.js');
 
+const timerLabel = 'Generate site';
+console.time(timerLabel);
+
 utils.validateConfigurations();
 utils.prepareDirectory(utils.PUBLIC_OUTPUT_DIRECTORY);
 
@@ -25,6 +28,8 @@ const recentPosts = getRecentPosts(postMetaGroupedByType, 5);
 generateHomepage(recentPosts);
 generateMenuPages(postMetaGroupedByType);
 generateAssets();
+
+console.timeEnd(timerLabel);
 
 // For each content type, create the output directory and generate the files
 // Return all post metadata grouped by type
