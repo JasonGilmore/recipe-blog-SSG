@@ -1,35 +1,18 @@
-const fs = require('fs');
 const express = require('express');
 const path = require('path');
 const app = express();
 const port = 3000;
 const utils = require('./src/utils.js');
-
-// Prepare visit counter
-const visitCountFilePath = path.join(__dirname, 'visitCounter.json');
-if (!fs.existsSync(visitCountFilePath)) {
-    fs.writeFileSync(visitCountFilePath, JSON.stringify({}));
-}
-const visitCounter = JSON.parse(fs.readFileSync(visitCountFilePath));
-
-function incrementSiteVisit(contentType, pageName) {
-    if (!visitCounter[contentType]) {
-        visitCounter[contentType] = {};
-    }
-    visitCounter[contentType][pageName] = (visitCounter[contentType][pageName] || 0) + 1;
-    fs.writeFile(visitCountFilePath, JSON.stringify(visitCounter, null, 4), (err) => {
-        if (err) {
-            console.error('Error writing counter file: ', err);
-        }
-    });
-}
+const visitCounter = require('./lib/visitCounter.js');
 
 utils.validateConfigurations();
 const contentTypes = Object.keys(utils.siteConfig.content);
+app.set('trust proxy', true);
 
 // Rewrite content paths and count visits
 // When "/recipes/bread" serve "/public/recipes/bread/bread.html"
 app.use((req, res, next) => {
+    visitCounter.setUniqueVisit(req.ip);
     const noExt = !path.extname(req.path);
     let matchedContentType;
     const isContent = contentTypes.some((contentType) => {
@@ -43,7 +26,7 @@ app.use((req, res, next) => {
     const reqParts = req.path.split('/').filter(Boolean);
     if (noExt && isContent && reqParts.length > 1) {
         const contentItem = reqParts[reqParts.length - 1];
-        incrementSiteVisit(matchedContentType, contentItem);
+        visitCounter.countPageVisit(matchedContentType, contentItem);
         req.url = `${req.url}/${contentItem}.html`;
     }
     next();

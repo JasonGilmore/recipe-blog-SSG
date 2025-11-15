@@ -12,4 +12,5 @@ src/templates/siteContent.json
 src/templates/images
 
 # Dynamic files
+data/
 visitCounter.json
