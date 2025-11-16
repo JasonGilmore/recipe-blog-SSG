@@ -5,10 +5,10 @@ A small static site generator for publishing recipes and food blogs. Write conte
 ## Features
 
 -   Convert Markdown posts with front-matter into HTML pages.
--   Copy and sanitize image assets (Exif removal).
 -   Configurable site structure and navigation via `src/config.json` (overrides [`src/config.default.json`](src/config.default.json)).
--   Generate homepage, menu pages and post pages using templates (see [`src/templates/`](src/templates)).
--   Simple templating in `src/templates/`.
+-   Generate homepage, menu pages and post pages using simple templating (see [`src/templates/`](src/templates)).
+-   Copy and sanitize image assets (Exif removal).
+-   Simple visit counter feature.
 
 ## Quick start
 
@@ -134,4 +134,30 @@ Example:
 2. ...
 
 {recipeboxend}
+```
+
+## Visit Counter
+
+This generator includes an optional visit counter to track post views and unique site visitors.
+
+-   Visit counting is enabled by default but can be customised via the `enableVisitCounter` property in the configuration.
+-   Visit counting stores simple numeric data, persisted in `data/visitCounts.json`. Content views are counted per post, and unique site visitors per day. Unique visitor counts are rotated so only the last 30 days of visits are kept.
+-   For counting unique visitors, ip addresses are stored and reset each day. If you require stricter privacy, disable this feature.
+-   Example:
+
+```json
+{
+    "recipes": {
+        "fruit-tart": 15,
+        "sourdough": 20
+    },
+    "blogs": {
+        "howto-pie-crust": 15,
+        "howot-layer-cakes": 35
+    },
+    "uniqueVisits": {
+        "2025-11-14": 25,
+        "2025-11-15": 30
+    }
+}
 ```
