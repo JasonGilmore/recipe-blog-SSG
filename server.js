@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const helmet = require('helmet');
 const path = require('node:path');
 const srcUtils = require('./src/utils.js');
 const utils = require('./lib/utils.js');
@@ -8,6 +9,12 @@ const port = process.env.PORT || 3000;
 
 srcUtils.validateConfigurations();
 app.set('trust proxy', true);
+
+app.use(
+    helmet({
+        strictTransportSecurity: false, // handled by reverse proxy
+    })
+);
 
 if (srcUtils.siteConfig.enableVisitCounter) {
     app.use(visitCounter.middleware);
