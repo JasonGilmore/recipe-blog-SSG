@@ -2,20 +2,24 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const port = 3000;
-const utils = require('./src/utils.js');
+const srcUtils = require('./src/utils.js');
+const utils = require('./lib/utils.js');
+const visitCounter = require('./lib/visitCounter.js');
 
-utils.validateConfigurations();
-const contentTypes = Object.keys(utils.siteConfig.content);
+srcUtils.validateConfigurations();
+app.set('trust proxy', true);
 
-// Rewrite content paths
-// When "/recipes/bread" serve "/public/recipes/bread/bread.html"
+if (srcUtils.siteConfig.enableVisitCounter) {
+    app.use(visitCounter.middleware);
+    visitCounter.startAutoSave();
+}
+
+// Rewrite content paths and count visits
+// When "/recipes/bread" serve "/recipes/bread/bread.html"
 app.use((req, res, next) => {
-    const noExt = !path.extname(req.path);
-    const isContent = contentTypes.some((contentType) => req.path.startsWith(`/${contentType}`));
-    const reqParts = req.path.split('/').filter(Boolean);
-    if (noExt && isContent && reqParts.length > 1) {
-        const contentItem = reqParts[reqParts.length - 1];
-        req.url = `${req.url}/${contentItem}.html`;
+    const { isContentItem, postName } = utils.parseContentRequest(req.path);
+    if (isContentItem) {
+        req.url = `${req.url}/${postName}.html`;
     }
     next();
 });
