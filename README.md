@@ -1,6 +1,6 @@
 # Recipe Blog Static Site Generator
 
-A small static site generator for publishing recipes and food blogs. Write content in Markdown and publish a static HTML site.
+A small static site generator for publishing recipes and food blogs. Write content in Markdown and publish a static HTML site. Designed to run behind a reverse proxy.
 
 ## Features
 

@@ -1,13 +1,20 @@
 const express = require('express');
-const path = require('path');
 const app = express();
-const port = 3000;
+const helmet = require('helmet');
+const path = require('node:path');
 const srcUtils = require('./src/utils.js');
 const utils = require('./lib/utils.js');
 const visitCounter = require('./lib/visitCounter.js');
+const port = process.env.PORT || 3000;
 
 srcUtils.validateConfigurations();
 app.set('trust proxy', true);
+
+app.use(
+    helmet({
+        strictTransportSecurity: false, // handled by reverse proxy
+    })
+);
 
 if (srcUtils.siteConfig.enableVisitCounter) {
     app.use(visitCounter.middleware);
@@ -38,7 +45,7 @@ const gracefulShutdown = (signal) => {
 
     server.close((err) => {
         if (err) {
-            console.error('Error during shutdown, forcing shutdown.');
+            console.error('Error during shutdown, forcing shutdown: ' + err);
             process.exit(1);
         }
         console.log('Server closed gracefully.');

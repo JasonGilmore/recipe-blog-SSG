@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const createHead = require('./head.js');
 const createNavbar = require('./navbar.js');
 const createSiteWelcome = require('./siteWelcome.js');
