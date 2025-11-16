@@ -10,5 +10,6 @@
             "contentName": "Blogs",
             "contentFolder": "blogs"
         }
-    }
+    },
+    "enableVisitCounter": true
 }
