@@ -5,7 +5,7 @@ const utils = require('../utils.js');
 
 function createPost(postContent) {
     return `
-        ${createHead({ pageType: utils.PAGE_TYPES.POST })}
+        ${createHead()}
         <body>
             ${createNavbar()}
             <main>
