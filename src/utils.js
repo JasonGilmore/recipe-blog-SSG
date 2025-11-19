@@ -10,12 +10,12 @@ const PAGE_TYPES = {
 };
 
 // Fallback to default config if config not present
-try {
-    siteConfig = require('./config.json');
-} catch (error) {
-    if (error.code === 'MODULE_NOT_FOUND') {
-        siteConfig = require('./config.default.json');
-    }
+const configPath = path.join(__dirname, 'config.json');
+const defaultConfigPath = path.join(__dirname, 'config.default.json');
+if (fs.existsSync(configPath)) {
+    siteConfig = require(configPath);
+} else {
+    siteConfig = require(defaultConfigPath);
 }
 
 const CSS_FOLDER = 'css';
