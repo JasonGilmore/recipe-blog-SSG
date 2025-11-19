@@ -14,7 +14,7 @@ app.set('trust proxy', true);
 const contentTypePaths = Object.keys(srcUtils.siteConfig.content).map((ct) => `/${ct}/`);
 const assetPaths = ['/js', '/images', '/css'];
 
-const CACHE_MAX_AGE_SECONDS = 345600; // 4 days
+const CACHE_MAX_AGE_SECONDS = 86400; // 1 day
 const CONTENT_CACHE_HEADER = `public, max-age=${CACHE_MAX_AGE_SECONDS}, must-revalidate`;
 const NO_CACHE_HEADER = 'no-cache';
 
