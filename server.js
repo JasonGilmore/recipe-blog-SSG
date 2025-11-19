@@ -14,8 +14,7 @@ app.set('trust proxy', true);
 const contentTypePaths = Object.keys(srcUtils.siteConfig.content).map((ct) => `/${ct}/`);
 const assetPaths = ['/js', '/images', '/css'];
 
-const CACHE_MAX_AGE_SECONDS = 30; // TODO update cache time
-//res.set({ 'Cache-Control': 'public, max-age=345600, must-revalidate' }); // 4 days
+const CACHE_MAX_AGE_SECONDS = 345600; // 4 days
 const CONTENT_CACHE_HEADER = `public, max-age=${CACHE_MAX_AGE_SECONDS}, must-revalidate`;
 const NO_CACHE_HEADER = 'no-cache';
 
@@ -30,10 +29,10 @@ if (srcUtils.siteConfig.enableVisitCounter) {
     visitCounter.startAutoSave();
 }
 
-// Rewrite content paths, count visits and set cache control
+// Rewrite content paths
 // When "/recipes/bread" serve "/recipes/bread/bread.html"
 app.use((req, res, next) => {
-    const { isContentItem, matchedContentType, postName } = utils.parseContentRequest(req.path);
+    const { isContentItem, postName } = utils.parseContentRequest(req.path);
     if (isContentItem) {
         req.url = `${req.url}/${postName}.html`;
     }
@@ -44,20 +43,13 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
     const path = req.path;
 
-    // Check if is content, noting that site pages like /recipes/ should not be included as may have new content
+    // Check if is content, noting that site pages like /recipes/ should not be included as they may have updated content
     const isContent = contentTypePaths.some((prefix) => path.startsWith(prefix) && path.length > prefix.length);
     const isAsset = assetPaths.some((prefix) => path.startsWith(prefix));
 
     // Don't cache other content as it may change such as home page, content pages and footers
     res.setHeader('Cache-Control', isContent || isAsset ? CONTENT_CACHE_HEADER : NO_CACHE_HEADER);
 
-    // if (isContent || isAsset) {
-    //     console.log('Caching: ' + req.path);
-    // } else {
-    //     console.log('Not caching: ' + req.path);
-    // }
-
-    // TODO update so no server reload required on changes such as new contentTypePaths
     next();
 });
 
