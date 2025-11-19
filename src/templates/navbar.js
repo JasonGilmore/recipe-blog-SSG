@@ -9,26 +9,27 @@ function createNavbar() {
     });
 
     return `<nav class="nav-bar">
-                <div class="navbar-wide-grouping">
-                    <!-- Nav bar full width for medium and large devices -->
+            <div class="navbar-wide-grouping">
+                <!-- Nav bar full width for medium and large devices -->
+                <a href="/" class="website-name">${siteContent.siteName}</a>
+                ${contentTypes.map((contentType) => `<a href="/${contentType.contentFolder}">${contentType.contentName}</a>`).join(' ')}
+            </div>
+            <div class="navbar-small-grouping">
+                <div class="navbar-small-heading">
+                    <!-- Nav bar burger mode for small devices -->
+                    <div class="burger-container" onclick="toggleBurger()">
+                        <div class="bar1"></div>
+                        <div class="bar2"></div>
+                        <div class="bar3"></div>
+                    </div>
                     <a href="/" class="website-name">${siteContent.siteName}</a>
+                </div>
+                <div class="navbar-small-links">
                     ${contentTypes.map((contentType) => `<a href="/${contentType.contentFolder}">${contentType.contentName}</a>`).join(' ')}
                 </div>
-                <div class="navbar-small-grouping">
-                    <div class="navbar-small-heading">
-                        <!-- Nav bar burger mode for small devices -->
-                        <div class="burger-container" onclick="toggleBurger()">
-                            <div class="bar1"></div>
-                            <div class="bar2"></div>
-                            <div class="bar3"></div>
-                        </div>
-                        <a href="/" class="website-name">${siteContent.siteName}</a>
-                    </div>
-                    <div class="navbar-small-links">
-                        ${contentTypes.map((contentType) => `<a href="/${contentType.contentFolder}">${contentType.contentName}</a>`).join(' ')}
-                    </div>
-                </div>
-            </nav>`;
+            </div>
+        </nav>
+`;
 }
 
 module.exports = createNavbar;

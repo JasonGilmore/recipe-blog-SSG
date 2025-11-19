@@ -35,17 +35,18 @@ function generateFooters() {
 }
 
 function addSiteToFooterPage(footerHtmlContent) {
-    return `
-        ${createHead({ pageType: utils.PAGE_TYPES.FOOTERPAGE })}
-        <body>
-            ${createNavbar()}
-            <main>
+    return `${createHead({ pageType: utils.PAGE_TYPES.FOOTERPAGE })}
+    <body>
+        ${createNavbar()}
+        <main>
+            <div class="content-page-container">
                 ${footerHtmlContent}
-            </main>
-            ${createFooter()}
-        </body>
+            </div>
+        </main>
+        ${createFooter()}
+    </body>
 
-    </html>
+</html>
 `;
 }
 

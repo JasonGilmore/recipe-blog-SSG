@@ -12,20 +12,16 @@ function generateHomepage(recentPosts) {
 }
 
 function createHomepage(recentPosts) {
-    return `
-        ${createHead({ pageType: utils.PAGE_TYPES.HOMEPAGE })}
-        <body>
-            ${createNavbar()}
-            <main>
-                ${createSiteWelcome()}
-                ${createPostCards(recentPosts, true)}
-            </main>
-
-            ${footerHandler.createFooter()}
-        </body>
-
-    </html>
-`;
+    return `${createHead({ pageType: utils.PAGE_TYPES.HOMEPAGE })}
+    <body>
+        ${createNavbar()}
+        <main>
+            ${createSiteWelcome()}
+            ${createPostCards(recentPosts, true)}
+        </main>
+        ${footerHandler.createFooter()}
+    </body>
+</html>`;
 }
 
 module.exports = generateHomepage;
