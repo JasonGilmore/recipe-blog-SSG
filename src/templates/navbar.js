@@ -17,7 +17,7 @@ function createNavbar() {
             <div class="navbar-small-grouping">
                 <div class="navbar-small-heading">
                     <!-- Nav bar burger mode for small devices -->
-                    <div class="burger-container" onclick="toggleBurger()">
+                    <div class="burger-container">
                         <div class="bar1"></div>
                         <div class="bar2"></div>
                         <div class="bar3"></div>

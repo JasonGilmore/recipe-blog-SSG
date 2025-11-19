@@ -4,3 +4,10 @@ function toggleBurger() {
     burgerContainer.classList.toggle('burger-select');
     navbarLinks.classList.toggle('navbar-small-links-active');
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const burgerMenuButton = document.querySelector('.burger-container');
+    if (burgerMenuButton) {
+        burgerMenuButton.addEventListener('click', toggleBurger);
+    }
+});
