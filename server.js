@@ -10,6 +10,14 @@ const port = process.env.PORT || 3000;
 srcUtils.validateConfigurations();
 app.set('trust proxy', true);
 
+// Precompute paths for cache control
+const contentTypePaths = Object.keys(srcUtils.siteConfig.content).map((ct) => `/${ct}/`);
+const assetPaths = ['/js', '/images', '/css'];
+
+const CACHE_MAX_AGE_SECONDS = 345600; // 4 days
+const CONTENT_CACHE_HEADER = `public, max-age=${CACHE_MAX_AGE_SECONDS}, must-revalidate`;
+const NO_CACHE_HEADER = 'no-cache';
+
 app.use(
     helmet({
         strictTransportSecurity: false, // handled by reverse proxy
@@ -21,13 +29,27 @@ if (srcUtils.siteConfig.enableVisitCounter) {
     visitCounter.startAutoSave();
 }
 
-// Rewrite content paths and count visits
+// Rewrite content paths
 // When "/recipes/bread" serve "/recipes/bread/bread.html"
 app.use((req, res, next) => {
     const { isContentItem, postName } = utils.parseContentRequest(req.path);
     if (isContentItem) {
         req.url = `${req.url}/${postName}.html`;
     }
+    next();
+});
+
+// Set cache control
+app.use((req, res, next) => {
+    const path = req.path;
+
+    // Check if is content, noting that site pages like /recipes/ should not be included as they may have updated content
+    const isContent = contentTypePaths.some((prefix) => path.startsWith(prefix) && path.length > prefix.length);
+    const isAsset = assetPaths.some((prefix) => path.startsWith(prefix));
+
+    // Don't cache other content as it may change such as home page, content pages and footers
+    res.setHeader('Cache-Control', isContent || isAsset ? CONTENT_CACHE_HEADER : NO_CACHE_HEADER);
+
     next();
 });
 
