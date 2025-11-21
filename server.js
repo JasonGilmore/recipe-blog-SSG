@@ -4,7 +4,6 @@ const helmet = require('helmet');
 const path = require('node:path');
 const srcUtils = require('./src/utils.js');
 const utils = require('./lib/utils.js');
-const visitCounter = require('./lib/visitCounter.js');
 const port = process.env.PORT || 3000;
 
 srcUtils.validateConfigurations();
@@ -25,6 +24,7 @@ app.use(
 );
 
 if (srcUtils.siteConfig.enableVisitCounter) {
+    const visitCounter = require('./lib/visitCounter.js');
     app.use(visitCounter.middleware);
     visitCounter.startAutoSave();
 }

@@ -141,8 +141,8 @@ Example:
 This generator includes an optional visit counter to track post views and unique site visitors.
 
 -   Visit counting is enabled by default but can be customised via the `enableVisitCounter` property in the configuration.
--   Visit counting stores simple numeric data, persisted in `data/visitCounts.json`. Content views are counted per post, and unique site visitors per day. Unique visitor counts are rotated so only the last 30 days of visits are kept.
--   For counting unique visitors, ip addresses are stored and reset each day. If you require stricter privacy, disable this feature.
+-   Visit counting stores simple numeric data, persisted in `data/visitCounts.json`. Content views are counted per post (noting that Cache-Control is set to 1 day for posts), and unique site visitors per day. Unique visitor counts are rotated so only the last 30 days of visits are kept.
+-   For counting unique visitors, hashed ip address and user agent are stored and reset each day. If you require stricter privacy, disable this feature.
 -   Example:
 
 ```json
