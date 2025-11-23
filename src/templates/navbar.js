@@ -15,9 +15,9 @@ function createNavbar() {
                 ${contentTypes.map((contentType) => `<a href="/${contentType.contentFolder}">${contentType.contentName}</a>`).join(' ')}
             </div>
             <div class="navbar-small-grouping">
+            <!-- Nav bar burger mode for small devices -->
                 <div class="navbar-small-heading">
-                    <!-- Nav bar burger mode for small devices -->
-                    <div class="burger-container">
+                    <div class="burger-container" tabindex="0" role="button" aria-label="Open menu" aria-expanded="false">
                         <div class="bar1"></div>
                         <div class="bar2"></div>
                         <div class="bar3"></div>
