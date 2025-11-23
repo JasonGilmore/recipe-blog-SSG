@@ -1,5 +1,11 @@
 * {
     box-sizing: border-box;
+    font-family: Georgia, serif;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
 }
 
 body {
@@ -19,7 +25,7 @@ main {
     top: 0;
     z-index: 1000;
     background-color: rgb(240, 240, 240);
-    font-size: 1.5rem;
+    font-size: 1.6rem;
 }
 
 .navbar-wide-grouping {
@@ -105,8 +111,9 @@ main {
 
 .intro-image {
     width: 100%;
-    height: 25vw;
-    max-width: 2000px;
+    height: 20vw;
+    max-width: 1800px;
+    padding: 0px 10px;
 }
 
 .intro-image img {
@@ -115,15 +122,19 @@ main {
     object-fit: cover;
 }
 
-.intro-text-header {
+.intro-text-container {
+    width: 75%;
+    text-align: center;
+}
+
+.intro-text-title {
     padding-top: 15px;
     font-size: 2.5rem;
     font-weight: normal;
 }
 
-.intro-text {
+.intro-text-sub-title {
     font-size: 1.5rem;
-    font-weight: normal;
 }
 
 .intro p {
@@ -149,7 +160,7 @@ main {
 .post-thumbnail {
     cursor: pointer;
     width: 350px;
-    height: 300px;
+    height: 325px;
     text-align: center;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     position: relative;
@@ -177,6 +188,8 @@ main {
 .post-thumbnail-title {
     font-size: 1.5rem;
     margin: 10px 30px;
+    line-height: 1.4;
+    margin: 0px 20px;
     padding-bottom: 5px;
 }
 
@@ -195,7 +208,7 @@ main {
     display: block;
     margin: 5px auto;
     border-radius: 4px;
-    width: 80%;
+    width: 75%;
     height: auto;
 }
 
@@ -203,7 +216,7 @@ main {
     border: 1px solid #b5b5b5;
     border-radius: 10px;
     box-shadow: 0 4px 12px black;
-    margin: 20px;
+    margin: 40px 20px;
     padding: 20px 25px;
     border-radius: 4px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -251,7 +264,11 @@ main {
     }
 
     .intro-image {
-        height: 20vh;
+        height: 30vw;
+    }
+
+    .intro-text-container {
+        width: 95%;
     }
 
     .content-page-container {
@@ -269,8 +286,16 @@ main {
         display: flex;
     }
 
+    .intro-image {
+        height: 25vw;
+    }
+
     .content-page-container {
         width: 80%;
+    }
+
+    .intro-text-container {
+        width: 85%;
     }
 }
 

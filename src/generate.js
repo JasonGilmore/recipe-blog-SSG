@@ -87,7 +87,7 @@ function processMarkdownFiles(allPostFiles, postContentDirectory, contentFolder,
         let htmlContent = marked.parse(content.body);
         // Replace the relative image urls, add image css and add other css to the content
         htmlContent = htmlContent
-            .replaceAll('./', `/${contentFolder}/${contentFolderName}/`)
+            .replaceAll('src="./', `src="/${contentFolder}/${contentFolderName}/`)
             .replaceAll('<img ', '<img class="content-image" ')
             .replaceAll('<p>{recipeboxstart}</p>', '<div class="recipe-box">')
             .replaceAll('<p>{recipeboxend}</p>', '</div>');
