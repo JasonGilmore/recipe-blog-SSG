@@ -238,6 +238,11 @@ main {
     margin-top: 5px;
 }
 
+.content-page-container .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
 .content-page-container table {
     border-collapse: collapse;
     margin: 15px;
@@ -250,6 +255,7 @@ main {
     border-bottom: 2px solid grey;
     text-align: left;
     padding: 5px;
+    white-space: nowrap;
 }
 
 .content-page-container tbody td {
