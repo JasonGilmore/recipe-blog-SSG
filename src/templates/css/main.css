@@ -254,7 +254,7 @@ main {
     font-weight: bold;
     border-bottom: 2px solid grey;
     text-align: left;
-    padding: 5px;
+    padding: 5px 10px;
     white-space: nowrap;
 }
 
