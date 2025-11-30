@@ -89,6 +89,8 @@ function processMarkdownFiles(allPostFiles, postContentDirectory, contentFolder,
         htmlContent = htmlContent
             .replaceAll('src="./', `src="/${contentFolder}/${contentFolderName}/`)
             .replaceAll('<img ', '<img class="content-image" ')
+            .replaceAll('<table>', '<div class="table-wrapper"><table>')
+            .replaceAll('</table>', '</table></div>')
             .replaceAll('<p>{recipeboxstart}</p>', '<div class="recipe-box">')
             .replaceAll('<p>{recipeboxend}</p>', '</div>');
         const fullSitePage = generatePost(htmlContent);
