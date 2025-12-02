@@ -25,17 +25,18 @@ function generateFooters() {
         const htmlContent = marked.parse(content.body);
         let generatedFooterLocation = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, fileName + '.html');
         // Create the files after the loop is completed, so the footer pages can have the footer added using footerItems
-        footersToGenerate.push({ fileLocation: generatedFooterLocation, content: htmlContent });
-        footerItems.push({ location: '/' + fileName, displayName: content.attributes.displayName, order: content.attributes.order });
+        const displayName = content.attributes.displayName;
+        footersToGenerate.push({ fileLocation: generatedFooterLocation, content: htmlContent, displayName: displayName });
+        footerItems.push({ location: '/' + fileName, displayName: displayName, order: content.attributes.order });
     }
 
-    for (footerToGenerate of footersToGenerate) {
-        fs.writeFileSync(footerToGenerate.fileLocation, addSiteToFooterPage(footerToGenerate.content), 'utf8');
+    for (footer of footersToGenerate) {
+        fs.writeFileSync(footer.fileLocation, addSiteToFooterPage(footer.content, footer.displayName), 'utf8');
     }
 }
 
-function addSiteToFooterPage(footerHtmlContent) {
-    return `${createHead({ pageType: utils.PAGE_TYPES.FOOTERPAGE })}
+function addSiteToFooterPage(footerHtmlContent, footerDisplayName) {
+    return `${createHead(footerDisplayName, true)}
     <body>
         ${createNavbar()}
         <main>
