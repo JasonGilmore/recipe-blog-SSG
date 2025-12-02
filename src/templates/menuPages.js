@@ -17,7 +17,7 @@ function generateMenuPages(postMetaGroupedByType) {
 // Create a site page for the content type
 function createMenuPage(contentName, postMeta) {
     return `
-        ${createHead({ pageType: utils.PAGE_TYPES.MENUPAGE })}
+        ${createHead(contentName, true)}
         <body>
             ${createNavbar()}
             <main>

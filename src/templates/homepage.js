@@ -3,6 +3,7 @@ const path = require('node:path');
 const createHead = require('./head.js');
 const createNavbar = require('./navbar.js');
 const createSiteWelcome = require('./siteWelcome.js');
+const siteContent = require('./siteContent.json');
 const createPostCards = require('./postCards.js');
 const footerHandler = require('./footer.js');
 const utils = require('../utils.js');
@@ -12,7 +13,7 @@ function generateHomepage(recentPosts) {
 }
 
 function createHomepage(recentPosts) {
-    return `${createHead({ pageType: utils.PAGE_TYPES.HOMEPAGE })}
+    return `${createHead(siteContent.siteName, false, siteContent.secondaryIntroduction)}
     <body>
         ${createNavbar()}
         <main>
