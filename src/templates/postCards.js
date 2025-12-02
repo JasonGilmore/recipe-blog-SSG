@@ -14,7 +14,7 @@ function createPostCard(post, isHomePage) {
             <a href="/${post.contentFolder}/${post.filename}">
                 <article class="post-thumbnail">
                     ${isHomePage ? `<div class="typeIcon">${type.toLowerCase()}</div>` : ''}
-                    <img src="/${post.contentFolder}/${post.filename}/${post.image}" alt="" />
+                    <img loading="lazy" src="/${post.contentFolder}/${post.filename}/${post.image}" alt="" />
                     <p class="post-thumbnail-title">${post.title}</p>
                     <p class="post-thumbnail-description">${post.description}</p>
                 </article>
