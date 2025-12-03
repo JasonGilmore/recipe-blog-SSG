@@ -93,7 +93,7 @@ function processMarkdownFiles(allPostFiles, postContentDirectory, contentFolder,
             .replaceAll('</table>', '</table></div>')
             .replaceAll('<p>{recipeboxstart}</p>', '<div class="recipe-box">')
             .replaceAll('<p>{recipeboxend}</p>', '</div>');
-        const fullSitePage = generatePost(htmlContent, content.attributes.title, content.attributes.description);
+        const fullSitePage = generatePost(htmlContent, content.attributes.title, content.attributes.description, contentFolder, fileName, content.attributes.image);
         fs.writeFileSync(path.join(outputDirectory, contentFolderName, contentFolderName + '.html'), fullSitePage, 'utf8');
     } else {
         throw new Error(`Missing markdown file for ${fileName}`);

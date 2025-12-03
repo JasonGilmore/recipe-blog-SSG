@@ -3,9 +3,10 @@ const createNavbar = require('./navbar.js');
 const footerHandler = require('./footer.js');
 const utils = require('../utils.js');
 
-function createPost(postContent, postDisplayName, postDescription) {
+function createPost(postContent, postDisplayName, postDescription, postContentDirectory, postName, postImage) {
+    const postDirectory = `/${postContentDirectory}/${postName}`;
     return `
-        ${createHead(postDisplayName, true, postDescription)}
+        ${createHead(postDisplayName, true, postDescription, 'article', postDirectory, `${postDirectory}/${postImage}`)}
         <body>
             ${createNavbar()}
             <main>

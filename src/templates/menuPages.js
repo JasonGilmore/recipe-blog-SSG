@@ -8,16 +8,16 @@ const utils = require('../utils.js');
 
 function generateMenuPages(postMetaGroupedByType) {
     for (let contentName of Object.keys(postMetaGroupedByType)) {
-        const contentFolder = postMetaGroupedByType[contentName][0].contentFolder;
-        const menuPageFilePath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, contentFolder + '/' + 'index.html');
-        fs.writeFileSync(menuPageFilePath, createMenuPage(contentName, postMetaGroupedByType[contentName]), 'utf8');
+        const contentFolderName = postMetaGroupedByType[contentName][0].contentFolder;
+        const menuPageFilePath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, contentFolderName + '/' + 'index.html');
+        fs.writeFileSync(menuPageFilePath, createMenuPage(contentName, postMetaGroupedByType[contentName], contentFolderName), 'utf8');
     }
 }
 
 // Create a site page for the content type
-function createMenuPage(contentName, postMeta) {
+function createMenuPage(contentName, postMeta, contentPageName) {
     return `
-        ${createHead(contentName, true)}
+        ${createHead(contentName, true, null, 'website', `/${contentPageName}/`, null)}
         <body>
             ${createNavbar()}
             <main>

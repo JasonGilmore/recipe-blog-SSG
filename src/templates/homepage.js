@@ -13,7 +13,7 @@ function generateHomepage(recentPosts) {
 }
 
 function createHomepage(recentPosts) {
-    return `${createHead(siteContent.siteName, false, siteContent.secondaryIntroduction)}
+    return `${createHead(siteContent.siteName, false, siteContent.secondaryIntroduction, 'website', null, null)}
     <body>
         ${createNavbar()}
         <main>
