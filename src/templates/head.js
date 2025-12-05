@@ -3,7 +3,7 @@ const utils = require('../utils.js');
 
 function createHead(pageTitle, appendSiteName, pageDescription, pageType, relativeUrl, relativeImage) {
     const title = appendSiteName ? `${pageTitle} | ${siteContent.siteName}` : pageTitle;
-    const mainImageUrl = siteContent.siteUrl + '/images/site-assets/' + siteContent.mainImage;
+    const heroImageUrl = siteContent.siteUrl + '/images/site-assets/' + siteContent.heroImage;
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -15,7 +15,7 @@ function createHead(pageTitle, appendSiteName, pageDescription, pageType, relati
 
         <meta property="og:title" content="${title}" />
         <meta property="og:type" content="${pageType}" />
-        <meta property="og:image" content="${relativeImage ? siteContent.siteUrl + relativeImage : mainImageUrl}" />
+        <meta property="og:image" content="${relativeImage ? siteContent.siteUrl + relativeImage : heroImageUrl}" />
         <meta property="og:url" content="${siteContent.siteUrl + (relativeUrl ? relativeUrl : '')}" />
         ${pageDescription ? `<meta property="og:description" content="${pageDescription}" />` : ''}
 

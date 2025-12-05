@@ -53,6 +53,17 @@ app.use((req, res, next) => {
     next();
 });
 
+// Allow cross origin request to image files for link preview tools
+// Image files are from the images folder (for favicon and other images) and each post's icon image
+app.use((req, res, next) => {
+    const isIconImage = srcUtils.allowedImageExtensions.some((suffix) => req.path.endsWith('-icon' + suffix));
+    const isImageFolder = req.path.startsWith('/images/');
+    if (isIconImage || isImageFolder) {
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    }
+    next();
+});
+
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
 
 const server = app.listen(port, () => {

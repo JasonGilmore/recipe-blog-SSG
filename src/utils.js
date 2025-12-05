@@ -48,10 +48,27 @@ function prepareDirectory(directory) {
     if (!fs.existsSync(directory)) {
         fs.mkdirSync(directory);
     } else {
-        fs.rmSync(directory, { recursive: true, force: true });
-        fs.mkdirSync(directory);
+        clearDirectoryExceptSome(directory);
     }
 }
+
+function clearDirectoryExceptSome(directory) {
+    const doNotClear = ['robots.txt'];
+    const directoryItems = fs.readdirSync(directory, { withFileTypes: true });
+    for (const item of directoryItems) {
+        if (doNotClear.includes(item.name)) {
+            continue;
+        }
+        const fullPath = path.join(directory, item.name);
+        if (item.isDirectory()) {
+            fs.rmSync(fullPath, { recursive: true, force: true });
+        } else {
+            fs.unlinkSync(fullPath);
+        }
+    }
+}
+
+const allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
 
 function removeLastS(word) {
     return removeLast(word, 's');
@@ -76,6 +93,7 @@ module.exports = {
     siteConfig,
     validateConfigurations,
     prepareDirectory,
+    allowedImageExtensions,
     removeLastS,
     removelastSlash,
 };

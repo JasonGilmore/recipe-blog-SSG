@@ -104,9 +104,7 @@ function processMarkdownFiles(allPostFiles, postContentDirectory, contentFolder,
 // Exif removal is synchronous as part of the static site generation since it is fast enough (total generation of ~150ms)
 // and simplifies code. If this becomes noticeably slower as the site grows, consider changing to an asynchronous approach
 function processContentImages(allPostFiles, contentDirectory, outputDirectory, contentFolderName) {
-    const allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
-
-    const allContentItemImages = allPostFiles.filter((filename) => allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
+    const allContentItemImages = allPostFiles.filter((filename) => utils.allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
     allContentItemImages.forEach((imageFile) => {
         const imageFilePath = path.join(contentDirectory, contentFolderName, imageFile);
         const imageOutputPath = path.join(outputDirectory, contentFolderName, imageFile);
