@@ -25,6 +25,7 @@ app.use(
 
 if (srcUtils.siteConfig.enableVisitCounter) {
     const visitCounter = require('./lib/visitCounter.js');
+    app.use(express.json());
     app.use(visitCounter.middleware);
     visitCounter.startAutoSave();
 }

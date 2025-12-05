@@ -15,6 +15,7 @@ function createPost(postContent, postDisplayName, postDescription, postContentDi
                 </div>
             </main>
             ${footerHandler.createFooter()}
+            ${utils.siteConfig.enableVisitCounter ? `<script src=/${utils.JS_FOLDER}/postTrack.js></script>` : ''}
         </body>
 
     </html>
