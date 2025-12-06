@@ -12,7 +12,7 @@ function createNavbar() {
             <div class="navbar-wide-grouping">
                 <!-- Nav bar full width for medium and large devices -->
                 <a href="/" class="website-name">${siteContent.siteName}</a>
-                ${contentTypes.map((contentType) => `<a href="/${contentType.contentFolder}">${contentType.contentName}</a>`).join(' ')}
+                ${contentTypes.map((contentType) => `<a href="/${contentType.contentFolder}/">${contentType.contentName}</a>`).join(' ')}
             </div>
             <div class="navbar-small-grouping">
             <!-- Nav bar burger mode for small devices -->
@@ -25,7 +25,7 @@ function createNavbar() {
                     <a href="/" class="website-name">${siteContent.siteName}</a>
                 </div>
                 <div class="navbar-small-links">
-                    ${contentTypes.map((contentType) => `<a href="/${contentType.contentFolder}">${contentType.contentName}</a>`).join(' ')}
+                    ${contentTypes.map((contentType) => `<a href="/${contentType.contentFolder}/">${contentType.contentName}</a>`).join(' ')}
                 </div>
             </div>
         </nav>
