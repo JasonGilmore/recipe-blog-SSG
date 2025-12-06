@@ -11,11 +11,6 @@ app.set('trust proxy', true);
 
 // Precompute paths for cache control
 const contentTypePaths = Object.keys(srcUtils.siteConfig.content).map((ct) => `/${ct}/`);
-const assetPaths = ['/js', '/images', '/css'];
-
-const CACHE_MAX_AGE_SECONDS = 86400; // 1 day
-const CONTENT_CACHE_HEADER = `public, max-age=${CACHE_MAX_AGE_SECONDS}, must-revalidate`;
-const NO_CACHE_HEADER = 'no-cache';
 
 app.use(
     helmet({
@@ -44,12 +39,17 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
     const path = req.path;
 
-    // Check if is content, noting that site pages like /recipes/ should not be included as they may have updated content
-    const isContent = contentTypePaths.some((prefix) => path.startsWith(prefix) && path.length > prefix.length);
-    const isAsset = assetPaths.some((prefix) => path.startsWith(prefix));
-
-    // Don't cache other content as it may change such as home page, content pages and footers
-    res.setHeader('Cache-Control', isContent || isAsset ? CONTENT_CACHE_HEADER : NO_CACHE_HEADER);
+    // Cache images for 3 days
+    const isImage = srcUtils.allowedImageExtensions.some((ext) => path.endsWith(ext));
+    if (isImage || path.endsWith('.ico')) {
+        res.setHeader('Cache-Control', 'public, max-age=259200, must-revalidate');
+    } else if (path.endsWith('.js') || path.endsWith('.css')) {
+        // Cache static assets for 15 minutes
+        res.setHeader('Cache-Control', 'public, max-age=900, must-revalidate');
+    } else {
+        // All other content such as html pages do not cache
+        res.setHeader('Cache-Control', 'no-cache');
+    }
 
     next();
 });
