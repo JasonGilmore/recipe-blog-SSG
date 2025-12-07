@@ -8,7 +8,7 @@ const footerHandler = require('./templates/footer.js');
 const generatePost = require('./templates/posts.js');
 const generateHomepage = require('./templates/homepage.js');
 const generateAssets = require('./templates/assetsHandler.js');
-const generateMenuPages = require('./templates/menuPages.js');
+const generateMainPages = require('./templates/mainPages.js');
 
 const timerLabel = 'Generate site';
 console.time(timerLabel);
@@ -26,7 +26,7 @@ const recentPosts = getRecentPosts(postMetaGroupedByType, 5);
 
 // Generate the rest of the site
 generateHomepage(recentPosts);
-generateMenuPages(postMetaGroupedByType);
+generateMainPages(postMetaGroupedByType);
 generateAssets();
 
 console.timeEnd(timerLabel);
