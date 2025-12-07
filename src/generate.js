@@ -85,7 +85,7 @@ function processMarkdownFiles(allPostFiles, postContentDirectory, contentFolder,
         postMeta.push({ ...content.attributes, filename: fileName });
 
         let htmlContent = marked.parse(content.body);
-        // Replace the relative image urls, add image css and add other css to the content
+        // Replace the relative image urls, add css and other formatting features
         htmlContent = htmlContent
             .replaceAll('src="./', `src="/${contentFolder}/${contentFolderName}/`)
             .replaceAll('<img ', '<img loading="lazy" class="content-image" ')
@@ -94,6 +94,15 @@ function processMarkdownFiles(allPostFiles, postContentDirectory, contentFolder,
             .replaceAll('<p>{recipeboxstart}</p>', '<div id="recipe" class="recipe-box">')
             .replaceAll('<p>{recipeboxend}</p>', '</div>')
             .replaceAll('{jumptorecipebox}', '<button class="jump-to-recipe" type="button"><span class="arrow-down"></span> Jump to recipe</button>');
+
+        // Update checkboxes so they are active and text is crossed out on check
+        let checkboxIdCounter = 1;
+        htmlContent = htmlContent.replaceAll(/<li><input disabled="" type="checkbox">(.*?)(?=<\/li>|<ul>)/g, (match, text) => {
+            const id = `checkbox-${checkboxIdCounter}`;
+            checkboxIdCounter++;
+            return `<li class="ingredient-item-checkbox"><input type="checkbox" class="test" id="${id}"> <label for="${id}">${text}</label>`;
+        });
+
         const fullSitePage = generatePost(htmlContent, content.attributes.title, content.attributes.description, contentFolder, fileName, content.attributes.image);
         fs.writeFileSync(path.join(outputDirectory, contentFolderName, contentFolderName + '.html'), fullSitePage, 'utf8');
     } else {

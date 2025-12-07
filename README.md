@@ -126,10 +126,6 @@ This project supports a few post-specific conveniences for writing recipes and f
 {recipeboxend}
 ```
 
-### Jump to recipe
-
--   To add a jump to recipe button, add the `{jumptorecipebox}` marker anywhere in the content. This will generate a button that, when clicked, scrolls the page to the start of the first recipe box.
-
 ### Tables
 
 -   Markdown tables are styled for improved readability. Write standard Markdown tables and the style will be applied automatically.
@@ -142,6 +138,11 @@ Example:
 | Flour      | 500 g  |
 | Water      | 350 g  |
 ```
+
+### Additional Features
+
+-   **Jump to recipe**: Add a jump to recipe button by adding the `{jumptorecipebox}` marker anywhere in the content. This will generate a button that, when clicked, scrolls the page to the start of the first recipe box.
+-   **Ingredient checkboxes**: Add checkboxes for ingredients using markdown task list syntax `- [ ]`. These will be styled and will cross out the text when checked.
 
 ## Visit Counter
 
