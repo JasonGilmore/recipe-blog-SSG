@@ -101,19 +101,6 @@ This project supports a few post-specific conveniences for writing recipes and f
 -   This supports local previewing while writing content.
 -   On build the generator copies those images into the output directory and rewrites the image references in the generated HTML, so they point to the copied asset in the public site.
 
-### Tables
-
--   Markdown tables are automatically styled by the site CSS for improved readability. Write standard Markdown tables and the style will be applied on build.
-
-Example:
-
-```markdown
-| Ingredient | Amount |
-| ---------- | ------ |
-| Flour      | 500 g  |
-| Water      | 350 g  |
-```
-
 ### Recipe box markers
 
 -   Wrap recipe-specific content in the recipe box markers to produce a styled recipe block:
@@ -137,6 +124,23 @@ Example:
 2. ...
 
 {recipeboxend}
+```
+
+### Jump to recipe
+
+-   To add a jump to recipe button, add the `{jumptorecipebox}` marker anywhere in the content. This will generate a button that, when clicked, scrolls the page to the start of the first recipe box.
+
+### Tables
+
+-   Markdown tables are styled for improved readability. Write standard Markdown tables and the style will be applied automatically.
+
+Example:
+
+```markdown
+| Ingredient | Amount |
+| ---------- | ------ |
+| Flour      | 500 g  |
+| Water      | 350 g  |
 ```
 
 ## Visit Counter

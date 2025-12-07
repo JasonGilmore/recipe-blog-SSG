@@ -91,8 +91,9 @@ function processMarkdownFiles(allPostFiles, postContentDirectory, contentFolder,
             .replaceAll('<img ', '<img loading="lazy" class="content-image" ')
             .replaceAll('<table>', '<div class="table-wrapper"><table>')
             .replaceAll('</table>', '</table></div>')
-            .replaceAll('<p>{recipeboxstart}</p>', '<div class="recipe-box">')
-            .replaceAll('<p>{recipeboxend}</p>', '</div>');
+            .replaceAll('<p>{recipeboxstart}</p>', '<div id="recipe" class="recipe-box">')
+            .replaceAll('<p>{recipeboxend}</p>', '</div>')
+            .replaceAll('{jumptorecipebox}', '<button class="jump-to-recipe" type="button"><span class="arrow-down"></span> Jump to recipe</button>');
         const fullSitePage = generatePost(htmlContent, content.attributes.title, content.attributes.description, contentFolder, fileName, content.attributes.image);
         fs.writeFileSync(path.join(outputDirectory, contentFolderName, contentFolderName + '.html'), fullSitePage, 'utf8');
     } else {

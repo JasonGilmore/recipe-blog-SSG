@@ -241,6 +241,35 @@ main {
     padding: 20px 25px;
     border-radius: 4px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    scroll-margin-top: 80px;
+}
+
+.jump-to-recipe {
+    cursor: pointer;
+    padding: 5px 8px;
+    font-size: 1.1rem;
+    color: white;
+    background-color: #ff8800;
+    border: none;
+    border-radius: 3px;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2), 0 4px 16px 0 rgba(0, 0, 0, 0.19);
+}
+
+.jump-to-recipe:hover {
+    background-color: #cd6d00;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.3), 0 4px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+.arrow-down {
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    margin-bottom: 3px;
+    margin-left: 2px;
+    margin-right: 3px;
 }
 
 .recipe-box .content-image {
