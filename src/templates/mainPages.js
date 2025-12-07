@@ -5,8 +5,9 @@ const createNavbar = require('./navbar.js');
 const createPosts = require('./postCards.js');
 const footerHandler = require('./footer.js');
 const utils = require('../utils.js');
+const siteContent = require('./siteContent.json');
 
-function generateMenuPages(postMetaGroupedByType) {
+function generateMainPages(postMetaGroupedByType) {
     for (let contentName of Object.keys(postMetaGroupedByType)) {
         const contentFolderName = postMetaGroupedByType[contentName][0].contentFolder;
         const menuPageFilePath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, contentFolderName + '/' + 'index.html');
@@ -16,14 +17,15 @@ function generateMenuPages(postMetaGroupedByType) {
 
 // Create a site page for the content type
 function createMenuPage(contentName, postMeta, contentPageName) {
+    const pageImageName = contentPageName + 'Image';
+    const pageImage = siteContent[pageImageName];
     return `
         ${createHead(contentName, true, null, 'website', `/${contentPageName}/`, null)}
         <body>
             ${createNavbar()}
             <main>
-                <div class="intro">
-                    <h1 class="intro-text-header">${contentName}</h1>
-                </div>
+                <h1 class="menu-page-title">${contentName}</h1>
+                ${pageImage ? `<div class="menu-page-image"><img loading="lazy" src="${utils.IMAGE_ASSETS_FOLDER}/${pageImage}" alt="" /></div>` : ''}
                 ${createPosts(postMeta)}
             </main>
 
@@ -34,4 +36,4 @@ function createMenuPage(contentName, postMeta, contentPageName) {
     `;
 }
 
-module.exports = generateMenuPages;
+module.exports = generateMainPages;

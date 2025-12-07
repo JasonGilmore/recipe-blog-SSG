@@ -41,6 +41,7 @@ Create a siteContent.json file within the [`src/templates/`](src/templates/) dir
 -   **secondaryIntroduction**: the secondary introduction text, used on the homepage after the main introduction.
 -   **siteUrl**: the url of the website.
 -   **heroImage**: the name of the main image in the [`src/templates/images/`](src/templates/images/) directory.
+-   **[content type name]Image (such as recipesImage)**: the name of an image in the [`src/templates/images/`](src/templates/images/) directory, to display as a small icon at the top of the specific main content page.
 
 ## Content structure
 
