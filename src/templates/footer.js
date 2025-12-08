@@ -40,7 +40,7 @@ function addSiteToFooterPage(footerHtmlContent, footerDisplayName, fileName) {
     <body>
         ${createNavbar()}
         <main>
-            <div class="content-page-container">
+            <div class="content-page-container break-word">
                 ${footerHtmlContent}
             </div>
         </main>
