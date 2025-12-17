@@ -40,7 +40,8 @@ Create a siteContent.json file within the [`src/templates/`](src/templates/) dir
 -   **mainIntroduction**: the main introduction text, used on the homepage.
 -   **secondaryIntroduction**: the secondary introduction text, used on the homepage after the main introduction.
 -   **siteUrl**: the url of the website.
--   **heroImage**: the name of the main image in the [`src/templates/images/`](src/templates/images/) directory.
+-   **heroImage**: the name of the main image in the [`src/templates/images/`](src/templates/images/) directory, used for the homepage hero image.
+-   **heroImageSmall**: the name of a smaller sized version of the hero image (<300KB) in the [`src/templates/images/`](src/templates/images/) directory, used for og image previews to conform to image size limits.
 -   **[content type name]Image (such as recipesImage)**: the name of an image in the [`src/templates/images/`](src/templates/images/) directory, to display as a small icon at the top of the specific main content page.
 
 ## Content structure
@@ -75,11 +76,11 @@ Front-matter is used to define metadata for site generation.
 
 Front-matter for posts:
 
--   **title**: the name of the post for display on site cards.
--   **description**: the description of the post for display on site cards.
+-   **title**: the name of the post for display on site cards and og link previews.
+-   **description**: the description of the post for display on site cards and og link previews.
 -   **date**: used for home page card sorting.
--   **image**: the image of the post for display on site cards.
-    -   Ensure the image name ends with "-icon" so it can be displayed correctly when linking to the post.
+-   **image**: the image of the post for display on site cards and og link previews.
+    -   Ensure the image is <300KB to conform to image size limits for previews.
 
 Front-matter for footers:
 
