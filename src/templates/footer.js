@@ -36,7 +36,15 @@ function generateFooters() {
 }
 
 function addSiteToFooterPage(footerHtmlContent, footerDisplayName, fileName) {
-    return `${createHead(footerDisplayName, true, null, 'article', `/${fileName}`, null)}
+    const head = createHead({
+        pageTitle: `${footerDisplayName} | ${utils.siteContent.siteName}`,
+        pageDescription: null,
+        pageType: 'article',
+        relativeUrl: `/${fileName}`,
+        relativeImage: null,
+    });
+
+    return `${head}
     <body>
         ${createNavbar()}
         <main>

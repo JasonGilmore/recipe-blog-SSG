@@ -5,8 +5,16 @@ const utils = require('../utils.js');
 
 function createPost(postContent, postDisplayName, postDescription, postContentDirectory, postName, postImage) {
     const postDirectory = `/${postContentDirectory}/${postName}`;
+    const head = createHead({
+        pageTitle: `${postDisplayName} | ${utils.siteContent.siteName}`,
+        pageDescription: postDescription,
+        pageType: 'article',
+        relativeUrl: postDirectory,
+        relativeImage: `${postDirectory}/${postImage}`,
+    });
+
     return `
-        ${createHead(postDisplayName, true, postDescription, 'article', postDirectory, `${postDirectory}/${postImage}`)}
+        ${head}
         <body>
             ${createNavbar()}
             <main>

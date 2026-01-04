@@ -1,5 +1,6 @@
 const path = require('node:path');
 const fs = require('node:fs');
+const siteContent = require('./templates/siteContent.json');
 let siteConfig;
 
 const PAGE_TYPES = {
@@ -83,6 +84,7 @@ function removeLast(word, text) {
 }
 
 module.exports = {
+    siteContent,
     PAGE_TYPES,
     PUBLIC_OUTPUT_DIRECTORY,
     CONTENT_DIRECTORY,

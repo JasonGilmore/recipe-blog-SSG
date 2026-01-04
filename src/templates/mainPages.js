@@ -5,7 +5,6 @@ const createNavbar = require('./navbar.js');
 const createPosts = require('./postCards.js');
 const footerHandler = require('./footer.js');
 const utils = require('../utils.js');
-const siteContent = require('./siteContent.json');
 
 function generateMainPages(postMetaGroupedByType) {
     for (let contentName of Object.keys(postMetaGroupedByType)) {
@@ -21,9 +20,17 @@ function createMenuPage(contentName, postMeta, contentPageName) {
     postMeta.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
 
     const pageImageName = contentPageName + 'Image';
-    const pageImage = siteContent[pageImageName];
+    const pageImage = utils.siteContent[pageImageName];
+    const head = createHead({
+        pageTitle: `${contentName} | ${utils.siteContent.siteName}`,
+        pageDescription: null,
+        pageType: 'website',
+        relativeUrl: `/${contentPageName}/`,
+        relativeImage: null,
+    });
+
     return `
-        ${createHead(contentName, true, null, 'website', `/${contentPageName}/`, null)}
+        ${head}
         <body>
             ${createNavbar()}
             <main>
