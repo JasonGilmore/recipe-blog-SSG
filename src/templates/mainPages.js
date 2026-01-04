@@ -18,7 +18,7 @@ function generateMainPages(postMetaGroupedByType) {
 // Create a site page for the content type
 function createMenuPage(contentName, postMeta, contentPageName) {
     // Sort posts by created date descending
-    postMeta.sort((a, b) => new Date(b.date) - new Date(a.date));
+    postMeta.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
 
     const pageImageName = contentPageName + 'Image';
     const pageImage = siteContent[pageImageName];

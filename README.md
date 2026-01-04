@@ -78,7 +78,7 @@ Front-matter for posts:
 
 -   **title**: the name of the post for display on site cards and og link previews.
 -   **description**: the description of the post for display on site cards and og link previews.
--   **date**: used for home page card sorting.
+-   **date**: the date in ISO format for recent post sorting.
 -   **image**: the image of the post for display on site cards and og link previews.
     -   Ensure the image is <300KB to conform to image size limits for previews.
 

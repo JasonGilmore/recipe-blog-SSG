@@ -142,6 +142,6 @@ function getRecentPosts(postMetaGroupedByType, numberOfPosts) {
         allPosts.push(...postMetaGroupedByType[contentType]);
     }
     // Sort posts by created date descending
-    allPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+    allPosts.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
     return allPosts.length < numberOfPosts ? allPosts : allPosts.slice(0, numberOfPosts);
 }
