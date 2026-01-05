@@ -1,16 +1,13 @@
-const express = require('express');
-const app = express();
-const helmet = require('helmet');
 const path = require('node:path');
+const express = require('express');
+const helmet = require('helmet');
 const srcUtils = require('./src/utils.js');
 const utils = require('./lib/utils.js');
-const port = process.env.PORT || 3000;
 
+const port = process.env.PORT || 3000;
+const app = express();
 srcUtils.validateConfigurations();
 app.set('trust proxy', true);
-
-// Precompute paths for cache control
-const contentTypePaths = Object.keys(srcUtils.siteConfig.content).map((ct) => `/${ct}/`);
 
 app.use(
     helmet({
@@ -25,11 +22,11 @@ if (srcUtils.siteConfig.enableVisitCounter) {
     visitCounter.startAutoSave();
 }
 
-// Rewrite content paths
+// Rewrite post paths
 // When "/recipes/bread" serve "/recipes/bread/bread.html"
 app.use((req, res, next) => {
-    const { isContentItem, postName } = utils.parseContentRequest(req.path);
-    if (isContentItem) {
+    const { isPost, postName } = utils.parsePostRequest(req.path);
+    if (isPost) {
         req.url = `${req.url}/${postName}.html`;
     }
     next();

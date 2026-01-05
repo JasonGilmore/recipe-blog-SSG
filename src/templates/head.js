@@ -18,7 +18,6 @@ function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativ
         <meta property="og:url" content="${utils.siteContent.siteUrl + (relativeUrl ? relativeUrl : '')}" />
         ${pageDescription ? `<meta property="og:description" content="${pageDescription}" />` : ''}
 
-
         <link rel="icon" type="image/x-icon" href="${utils.IMAGE_ASSETS_FOLDER}/favicon.ico" />
         <link rel="stylesheet" href="/css/main.css" />
         ${`<script src=/${utils.JS_FOLDER}/navbar.js></script>`}

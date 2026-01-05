@@ -1,16 +1,9 @@
 const path = require('node:path');
 const fs = require('node:fs');
 const siteContent = require('./templates/siteContent.json');
-let siteConfig;
-
-const PAGE_TYPES = {
-    POST: 'post',
-    HOMEPAGE: 'homepage',
-    MENUPAGE: 'menupage',
-    FOOTERPAGE: 'footer',
-};
 
 // Fallback to default config if config not present
+let siteConfig;
 const configPath = path.join(__dirname, 'config.json');
 const defaultConfigPath = path.join(__dirname, 'config.default.json');
 if (fs.existsSync(configPath)) {
@@ -28,13 +21,13 @@ const CONTENT_DIRECTORY = path.join(__dirname, '../', siteConfig.contentDirector
 const FOOTER_DIRECTORY = path.join(CONTENT_DIRECTORY, 'footers');
 
 function validateConfigurations() {
-    if (!siteConfig.content) {
-        throw new Error('Config file missing required sections: content');
+    if (!siteConfig.postTypes) {
+        throw new Error('Config file missing required sections: postTypes');
     }
 
-    for (const contentType in siteConfig.content) {
-        if (!siteConfig.content[contentType].contentFolder || !siteConfig.content[contentType].contentName) {
-            throw new Error(`Config type ${contentType} missing required sections. Check contains contentName and contentFolder.`);
+    for (const postType in siteConfig.postTypes) {
+        if (!siteConfig.postTypes[postType].postTypeDisplayName || !siteConfig.postTypes[postType].postTypeDirectory) {
+            throw new Error(`Config type ${postType} missing required sections. Check contains postTypeDisplayName and postTypeDirectory.`);
         }
     }
 }
@@ -75,17 +68,12 @@ function removeLastS(word) {
     return removeLast(word, 's');
 }
 
-function removelastSlash(word) {
-    return removeLast(word, '/');
-}
-
 function removeLast(word, text) {
     return word.lastIndexOf(text) === word.length - 1 ? word.slice(0, word.length - 1) : word;
 }
 
 module.exports = {
     siteContent,
-    PAGE_TYPES,
     PUBLIC_OUTPUT_DIRECTORY,
     CONTENT_DIRECTORY,
     FOOTER_DIRECTORY,
@@ -97,5 +85,4 @@ module.exports = {
     prepareDirectory,
     allowedImageExtensions,
     removeLastS,
-    removelastSlash,
 };
