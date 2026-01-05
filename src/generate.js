@@ -62,7 +62,7 @@ function generatePosts(postTypeDirectory, postTypeDirectoryName, postTypeOutputD
     let postMeta = [];
 
     // Generate posts
-    // Content structure is content directory > post type directory > post folder > post.md + images
+    // Content structure is content directory > post type directory > post directory > post.md + images
     postDirectoryNames.forEach((postDirectoryName) => {
         const postDirectory = path.join(postTypeDirectory, postDirectoryName);
         const postOutputDirectory = path.join(postTypeOutputDirectory, postDirectoryName);
