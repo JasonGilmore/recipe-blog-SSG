@@ -1,6 +1,6 @@
-const utils = require('../utils.js');
 const fs = require('node:fs');
 const path = require('node:path');
+const utils = require('../utils.js');
 
 function generateAssets() {
     const PUBLIC_OUTPUT_DIRECTORY = utils.PUBLIC_OUTPUT_DIRECTORY;

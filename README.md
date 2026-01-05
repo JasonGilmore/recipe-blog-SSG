@@ -1,12 +1,12 @@
 # Recipe Blog Static Site Generator
 
-A small static site generator for publishing recipes and food blogs. Write content in Markdown and publish a static HTML site. Designed to run behind a reverse proxy.
+A small static site generator for publishing recipe and food blogs. Write content in Markdown and publish a static HTML site. Designed to run behind a reverse proxy.
 
 ## Features
 
 -   Convert Markdown posts with front-matter into HTML pages.
 -   Configurable site structure and navigation via `src/config.json` (overrides [`src/config.default.json`](src/config.default.json)).
--   Generate homepage, menu pages and post pages using simple templating (see [`src/templates/`](src/templates)).
+-   Generate homepage, top-level pages and post pages using simple templating (see [`src/templates/`](src/templates)).
 -   Copy and sanitize image assets (Exif removal).
 -   Simple visit counter feature.
 
@@ -32,7 +32,7 @@ A small static site generator for publishing recipes and food blogs. Write conte
 
 ## Configuration
 
-The site generator reads default settings from [`src/config.default.json`](src/config.default.json). To customize content and output directories and content structure (which controls navigation tabs), create `src/config.json` which will override the defaults.
+The site generator reads default settings from [`src/config.default.json`](src/config.default.json). To customize content and output directories and post types (which controls top-level pages), create `src/config.json` which will override the defaults.
 
 Create a siteContent.json file within the [`src/templates/`](src/templates/) directory for key site information including a reference to the homepage image. Place the homepage image and a favicon into the [`src/templates/images/`](src/templates/images/) directory. siteContent.json supports the following fields:
 
@@ -42,12 +42,12 @@ Create a siteContent.json file within the [`src/templates/`](src/templates/) dir
 -   **siteUrl**: the url of the website.
 -   **heroImage**: the name of the main image in the [`src/templates/images/`](src/templates/images/) directory, used for the homepage hero image.
 -   **heroImageSmall**: the name of a smaller sized version of the hero image (<300KB) in the [`src/templates/images/`](src/templates/images/) directory, used for og image previews to conform to image size limits.
--   **[content type name]Image (such as recipesImage)**: the name of an image in the [`src/templates/images/`](src/templates/images/) directory, to display as a small icon at the top of the specific main content page.
+-   **[post type name]Image (such as recipesImage)**: the name of an image in the [`src/templates/images/`](src/templates/images/) directory, to display as a small icon at the top of top-level page.
 
 ## Content structure
 
 -   The content root is the folder configured by `contentDirectory` in the configuration.
--   Each top-level section (e.g. `recipes`, `blogs`) should contain post folders. Each post folder contains a Markdown file (post) and optional assets (images).
+-   Each post type (e.g. `recipes`, `blogs`) should contain a post folder for each post. Each post folder contains a Markdown file (post) and optional assets (images).
 -   Footer content lives in the `footers` directory. Each footer is a single Markdown file and is automatically included in the footer on the site.
 
 Example folder structure:
@@ -78,9 +78,9 @@ Front-matter for posts:
 
 -   **title**: the name of the post for display on site cards and og link previews.
 -   **description**: the description of the post for display on site cards and og link previews.
--   **date**: used for home page card sorting.
+-   **date**: the date in ISO format for recent post sorting.
 -   **image**: the image of the post for display on site cards and og link previews.
-    -   Ensure the image is <300KB to conform to image size limits for previews.
+    -   Ensure the image is <300KB to conform to image size limits for link previews.
 
 Front-matter for footers:
 

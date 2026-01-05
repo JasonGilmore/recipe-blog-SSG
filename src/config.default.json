@@ -1,14 +1,14 @@
 {
     "contentDirectory": "content",
     "outputDirectory": "public",
-    "content": {
+    "postTypes": {
         "recipes": {
-            "contentName": "Recipes",
-            "contentFolder": "recipes"
+            "postTypeDisplayName": "Recipes",
+            "postTypeDirectory": "recipes"
         },
         "blogs": {
-            "contentName": "Blogs",
-            "contentFolder": "blogs"
+            "postTypeDisplayName": "Blogs",
+            "postTypeDirectory": "blogs"
         }
     },
     "enableVisitCounter": true

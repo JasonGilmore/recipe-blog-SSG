@@ -1,18 +1,16 @@
 const utils = require('../utils.js');
-const siteContent = require('./siteContent.json');
 
 function createNavbar() {
-    // Add content type info into an array so it can be looped while generating the navbar
-    const contentTypes = [];
-    Object.entries(utils.siteConfig.content).forEach(([key, value]) => {
-        contentTypes.push(value);
+    const postTypeInfo = [];
+    Object.entries(utils.siteConfig.postTypes).forEach(([key, value]) => {
+        postTypeInfo.push(value);
     });
 
     return `<nav class="nav-bar">
             <div class="navbar-wide-grouping">
                 <!-- Nav bar full width for medium and large devices -->
-                <a href="/" class="website-name">${siteContent.siteName}</a>
-                ${contentTypes.map((contentType) => `<a href="/${contentType.contentFolder}/">${contentType.contentName}</a>`).join(' ')}
+                <a href="/" class="website-name">${utils.siteContent.siteName}</a>
+                ${postTypeInfo.map((postType) => `<a href="/${postType.postTypeDirectory}/">${postType.postTypeDisplayName}</a>`).join(' ')}
             </div>
             <div class="navbar-small-grouping">
             <!-- Nav bar burger mode for small devices -->
@@ -22,10 +20,10 @@ function createNavbar() {
                         <div class="bar2"></div>
                         <div class="bar3"></div>
                     </div>
-                    <a href="/" class="website-name">${siteContent.siteName}</a>
+                    <a href="/" class="website-name">${utils.siteContent.siteName}</a>
                 </div>
                 <div class="navbar-small-links">
-                    ${contentTypes.map((contentType) => `<a href="/${contentType.contentFolder}/">${contentType.contentName}</a>`).join(' ')}
+                    ${postTypeInfo.map((postType) => `<a href="/${postType.postTypeDirectory}/">${postType.postTypeDisplayName}</a>`).join(' ')}
                 </div>
             </div>
         </nav>
