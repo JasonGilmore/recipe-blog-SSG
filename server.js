@@ -25,7 +25,7 @@ if (srcUtils.siteConfig.enableVisitCounter) {
 // Rewrite post paths
 // When "/recipes/bread" serve "/recipes/bread/bread.html"
 app.use((req, res, next) => {
-    const { isPost, postName } = utils.parsePostRequest(req.path);
+    const { isPost, postName } = utils.parseRequest(req.path);
     if (isPost) {
         req.url = `${req.url}/${postName}.html`;
     }

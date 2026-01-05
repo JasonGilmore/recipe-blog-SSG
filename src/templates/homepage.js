@@ -28,6 +28,7 @@ function createHomepage(recentPosts) {
             ${createPostCards(recentPosts, true)}
         </main>
         ${footerHandler.createFooter()}
+        ${utils.siteConfig.enableVisitCounter ? `<script src=/${utils.JS_FOLDER}/postTrack.js></script>` : ''}
     </body>
 </html>`;
 }

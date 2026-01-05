@@ -23,8 +23,8 @@ function createPost(postHtml, postAttributes, postTypeDirectoryName, postName) {
                 </div>
             </main>
             ${footerHandler.createFooter()}
-            ${utils.siteConfig.enableVisitCounter ? `<script src=/${utils.JS_FOLDER}/postTrack.js></script>` : ''}
             <script src=/${utils.JS_FOLDER}/posts.js></script>
+            ${utils.siteConfig.enableVisitCounter ? `<script src=/${utils.JS_FOLDER}/postTrack.js></script>` : ''}
         </body>
 
     </html>

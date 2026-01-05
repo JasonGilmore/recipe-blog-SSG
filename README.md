@@ -147,26 +147,34 @@ Example:
 
 ## Visit Counter
 
-This generator includes an optional visit counter to track post views and unique site visitors.
+This generator includes an optional visit counter to track site visits.
 
 -   Visit counting is enabled by default but can be customised via the `enableVisitCounter` property in the configuration. Simple numeric data is stored, persisted in `data/visitCounts.json`.
--   Post views are incremented indefinitely, and unique visitor counts are counted per day. Unique visitor counts are rotated so only the last 30 days of visits are kept.
--   For counting post views a simple client-side JavaScript tracking is used. For counting unique visitors, hashed ip address and user agent are stored and reset each day. If you require stricter privacy, disable this feature.
+-   totalPostHits are incremented indefinitely, and visit stats are captured daily. Daily visit stats are rotated so only the last 30 days of visits are kept.
+-   For counting totalPostHits, homepageHits and postHits a simple client-side JavaScript tracking is used. For counting unique visitors, hashed ip address and user agent are stored and reset each day. If you require stricter privacy, disable this feature.
 -   Example:
 
 ```json
 {
-    "recipes": {
-        "fruit-tart": 15,
-        "sourdough": 20
+    "totalPostHits": {
+        "recipes": {
+            "fruit-tart": 15,
+            "sourdough": 20
+        },
+        "blogs": {
+            "howto-pie-crust": 10,
+            "howot-layer-cakes": 5
+        }
     },
-    "blogs": {
-        "howto-pie-crust": 15,
-        "howot-layer-cakes": 35
+    "2026-01-04": {
+        "uniqueAppHits": 40,
+        "homepageHits": 15,
+        "postHits": 35
     },
-    "uniqueVisits": {
-        "2025-11-14": 25,
-        "2025-11-15": 30
+    "2026-01-05": {
+        "uniqueAppHits": 25,
+        "homepageHits": 10,
+        "postHits": 15
     }
 }
 ```
