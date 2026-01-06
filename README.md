@@ -102,9 +102,9 @@ This project supports a few post-specific conveniences for writing recipes and f
 -   This supports local previewing while writing content.
 -   On build the generator copies those images into the output directory and rewrites the image references in the generated HTML, so they point to the copied asset in the public site.
 
-### Recipe box markers
+### Recipe and box layout blocks
 
--   Wrap recipe-specific content in the recipe box markers to produce a styled recipe block:
+-   Wrap recipe-specific content in the recipe box layout block to produce a styled recipe block:
     -   Start marker: `{recipeboxstart}`
     -   End marker: `{recipeboxend}`
 -   Anything between these markers is rendered as a single recipe block.
@@ -126,6 +126,8 @@ This project supports a few post-specific conveniences for writing recipes and f
 
 {recipeboxend}
 ```
+
+Use `{lightstyleboxstart} {lightstyleboxend}` and `{darkstyleboxstart} {darkstyleboxend}` for additional styled layout blocks to group content.
 
 ### Tables
 
