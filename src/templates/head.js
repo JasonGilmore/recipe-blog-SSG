@@ -20,7 +20,7 @@ function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativ
 
         <link rel="icon" type="image/x-icon" href="${utils.IMAGE_ASSETS_FOLDER}/favicon.ico" />
         <link rel="stylesheet" href="/css/main.css" />
-        ${`<script src=/${utils.JS_FOLDER}/navbar.js></script>`}
+        <script src=/${utils.JS_FOLDER}/navbar.js></script>
     </head>
     `;
 }

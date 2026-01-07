@@ -39,6 +39,8 @@ main {
     z-index: 1000;
     background-color: rgb(230, 230, 230);
     font-size: 1.6rem;
+    border-top: 2px solid var(--accent-colour);
+    border-bottom: 1px solid rgb(228, 228, 228);
 }
 
 .navbar-wide-grouping {
@@ -57,6 +59,8 @@ main {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
+    justify-content: space-between;
+    padding-right: 15px;
 }
 
 .navbar-small-links {
@@ -64,34 +68,54 @@ main {
     display: none;
     flex-direction: column;
     flex-wrap: nowrap;
-    text-align: left;
+    text-align: right;
+    font-size: 1.5rem;
+    border-top: 2px solid var(--accent-colour);
 }
 
 .navbar-small-links-active {
     display: flex;
 }
 
-.nav-bar a {
+.name-header {
     padding: 10px 30px;
+    margin-right: 40px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.name-header h1 {
+    margin: 0;
+    padding: 0;
+    font-size: 1.6rem;
+}
+
+.name-header img {
+    padding-right: 10px;
+    max-height: 1.8rem;
+}
+
+.top-level-links {
+    padding: 10px 30px;
+}
+
+.top-level-links, .name-header {
     text-decoration: none;
     color: black;
 }
 
-.website-name {
-    margin-right: 40px;
-    text-align: center;
-}
-
 .nav-bar a:hover {
-    background-color: rgb(180, 180, 180);
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
 .burger-container {
     margin: auto 0px;
     display: inline-block;
     cursor: pointer;
-    padding-left: 10px;
-    padding-right: 20px;
 }
 
 .bar1,
@@ -395,16 +419,21 @@ ul:has(> .ingredient-item-checkbox) {
         display: none;
     }
 
-    .burger-container {
-        padding-right: 5px;
-    }
-
-    .nav-bar a {
+    .name-header {
         padding: 10px 10px;
+        margin-right: 0;
     }
 
-    .website-name {
-        margin-right: 0px;
+    .name-header h1 {
+        font-size: clamp(1rem, 7vw, 1.5rem);
+    }
+
+    .name-header img {
+        height: clamp(1rem, 7vw, 1.8rem);
+    }
+
+    .navbar-small-links {
+        font-size: 1.4rem;
     }
 
     .intro-image {
