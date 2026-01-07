@@ -40,7 +40,7 @@ function createFooterPage(footerHtmlContent, footerDisplayName, fileName) {
     const head = createHead({
         pageTitle: `${footerDisplayName} | ${utils.siteContent.siteName}`,
         pageDescription: null,
-        pageType: 'article',
+        pageType: utils.PAGE_TYPES.FOOTER,
         relativeUrl: `/${fileName}`,
         relativeImage: null,
     });
@@ -49,7 +49,7 @@ function createFooterPage(footerHtmlContent, footerDisplayName, fileName) {
     <body>
         ${createNavbar()}
         <main>
-            <div class="content-page-container break-word">
+            <div class="footer-content-page-container break-word">
                 ${footerHtmlContent}
             </div>
         </main>

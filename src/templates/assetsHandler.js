@@ -12,16 +12,16 @@ function generateAssets() {
     const jsFolder = path.join(__dirname, 'js');
     const jsOutput = path.join(PUBLIC_OUTPUT_DIRECTORY, utils.JS_FOLDER);
     fs.mkdirSync(jsOutput);
-    const postTracking = 'postTrack.js';
+    const pageTracking = 'pageTrack.js';
     const directoryItems = fs.readdirSync(jsFolder);
     for (const item of directoryItems) {
-        if (item !== postTracking) {
+        if (item !== pageTracking) {
             fs.cpSync(path.join(jsFolder, item), path.join(jsOutput, item));
         }
     }
 
     if (utils.siteConfig.enableVisitCounter) {
-        fs.cpSync(path.join(jsFolder, postTracking), path.join(jsOutput, postTracking));
+        fs.cpSync(path.join(jsFolder, pageTracking), path.join(jsOutput, pageTracking));
     }
 }
 

@@ -1,0 +1,169 @@
+.content-page-container {
+    max-width: 1200px;
+    width: clamp(600px, 65%, 952px);
+    margin: auto;
+    font-size: 1.2rem;
+}
+
+.content-image {
+    display: block;
+    margin: 5px auto;
+    border-radius: 4px;
+    width: 75%;
+    height: auto;
+}
+
+.recipe-box {
+    border: 1px solid #b5b5b5;
+    margin: 40px 20px;
+    padding: 20px 25px;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: var(--recipe-box-background);
+    scroll-margin-top: 80px;
+}
+
+.light-style-box {
+    border: 1px solid #b5b5b5;
+    margin: 40px 20px;
+    padding: 20px 25px;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: var(--style-box-light);
+}
+
+.dark-style-box {
+    border: 1px solid #b5b5b5;
+    margin: 40px 20px;
+    padding: 20px 25px;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: var(--style-box-dark);
+}
+
+.jump-to-recipe {
+    cursor: pointer;
+    padding: 5px 8px;
+    font-size: 1.1rem;
+    color: black;
+    background-color: var(--accent-colour);
+    border: none;
+    border-radius: 3px;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2), 0 4px 16px 0 rgba(0, 0, 0, 0.19);
+}
+
+.jump-to-recipe:hover {
+    background-color: var(--accent-colour-dark);
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.3), 0 4px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+.arrow-down {
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    margin-bottom: 3px;
+    margin-left: 2px;
+    margin-right: 3px;
+}
+
+.recipe-box .content-image,
+.light-style-box .content-image,
+.dark-style-box .content-image {
+    width: 60%;
+}
+
+.recipe-box h2,
+.light-style-box h2,
+.dark-style-box h2 {
+    margin-top: 5px;
+}
+
+input[type="checkbox"] {
+    accent-color: var(--accent-colour);
+}
+
+input[type="checkbox"]:checked+label {
+    text-decoration: line-through;
+}
+
+/* Line through sub lists when parent is checked */
+input[type="checkbox"]:checked+label+ul {
+    text-decoration: line-through;
+}
+
+input[type="checkbox"] {
+    transform: scale(1.3);
+    margin: 5px;
+}
+
+/* Don't display bullet point where checkbox is displayed */
+.ingredient-item-checkbox {
+    list-style: none;
+}
+
+/* Since bullet points are not displayed for checkboxes, remove some of the padding on parent ul */
+ul:has(> .ingredient-item-checkbox) {
+    padding-left: 25px;
+}
+
+.content-page-container .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #e5e7eb;
+    padding: 15px;
+
+    /* Display a subtle shadow on the left or right side of the table to indicate there is more content to scroll to*/
+    background: linear-gradient(to right, white 30%, rgba(255, 255, 255, 0)),
+        linear-gradient(to right, rgba(255, 255, 255, 0), white 70%) 100% 0,
+        radial-gradient(farthest-side at 0 50%, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0)),
+        radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0)) 100% 0;
+    background-repeat: no-repeat;
+    background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+    background-attachment: local, local, scroll, scroll;
+}
+
+.content-page-container table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.content-page-container thead th {
+    font-weight: bold;
+    border-bottom: 2px solid grey;
+    text-align: left;
+    padding: 5px 10px;
+    white-space: nowrap;
+}
+
+.content-page-container tbody td {
+    border-bottom: 1px solid grey;
+    padding: 5px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.content-page-container table tr:hover {
+    background-color: rgb(235, 235, 235);
+}
+
+/* Small device */
+@media (max-width: 767px) {
+    .content-page-container {
+        width: 95%;
+    }
+
+    .recipe-box, .light-style-box, .dark-style-box {
+        margin: 40px 10px;
+        padding: 20px 15px;
+    }
+}
+
+/* Medium device */
+@media (min-width: 768px) and (max-width: 991px) {
+    .content-page-container {
+        width: 80%;
+    }
+}

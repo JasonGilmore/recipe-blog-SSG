@@ -32,6 +32,21 @@ function validateConfigurations() {
     }
 }
 
+let cacheBustValue;
+function setCacheBust(val) {
+    cacheBustValue = val;
+}
+function getCacheBustQuery() {
+    return cacheBustValue ? `?v=${cacheBustValue}` : '';
+}
+
+const PAGE_TYPES = {
+    POST: 'post',
+    FOOTER: 'footer',
+    TOP_LEVEL: 'top-level',
+    HOMEPAGE: 'homepage',
+};
+
 // Creates the directory if not present, and clears all contents
 function prepareDirectory(directory) {
     // Directory must be a valid output directory
@@ -77,6 +92,9 @@ module.exports = {
     PUBLIC_OUTPUT_DIRECTORY,
     CONTENT_DIRECTORY,
     FOOTER_DIRECTORY,
+    setCacheBust,
+    getCacheBustQuery,
+    PAGE_TYPES,
     IMAGE_ASSETS_FOLDER,
     CSS_FOLDER,
     JS_FOLDER,

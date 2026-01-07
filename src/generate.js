@@ -16,6 +16,9 @@ console.time(timerLabel);
 utils.validateConfigurations();
 utils.prepareDirectory(utils.PUBLIC_OUTPUT_DIRECTORY);
 
+utils.setCacheBust(Date.now().toString());
+generateAssets();
+
 // Generate the footer first so it can be added to all site pages
 footerHandler.generateFooters();
 
@@ -27,7 +30,6 @@ const recentPosts = getRecentPosts(postMetaGroupedByType, 5);
 // Generate the rest of the site
 generateHomepage(recentPosts);
 generateTopLevelPages(postMetaGroupedByType);
-generateAssets();
 
 console.timeEnd(timerLabel);
 

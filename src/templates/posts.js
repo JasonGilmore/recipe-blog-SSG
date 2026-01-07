@@ -8,7 +8,7 @@ function createPost(postHtml, postAttributes, postTypeDirectoryName, postName) {
     const head = createHead({
         pageTitle: `${postAttributes.title} | ${utils.siteContent.siteName}`,
         pageDescription: postAttributes.description,
-        pageType: 'article',
+        pageType: utils.PAGE_TYPES.POST,
         relativeUrl: postDirectory,
         relativeImage: `${postDirectory}/${postAttributes.image}`,
     });
@@ -23,8 +23,8 @@ function createPost(postHtml, postAttributes, postTypeDirectoryName, postName) {
                 </div>
             </main>
             ${footerHandler.createFooter()}
-            <script src=/${utils.JS_FOLDER}/posts.js></script>
-            ${utils.siteConfig.enableVisitCounter ? `<script src=/${utils.JS_FOLDER}/postTrack.js></script>` : ''}
+            <script src=/${utils.JS_FOLDER}/posts.js${utils.getCacheBustQuery()}></script>
+            ${utils.siteConfig.enableVisitCounter ? `<script src=/${utils.JS_FOLDER}/pageTrack.js${utils.getCacheBustQuery()}></script>` : ''}
         </body>
 
     </html>

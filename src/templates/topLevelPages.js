@@ -24,7 +24,7 @@ function createTopLevelPage(postTypeDisplayName, postMeta, postTypeDirectoryName
     const head = createHead({
         pageTitle: `${postTypeDisplayName} | ${utils.siteContent.siteName}`,
         pageDescription: null,
-        pageType: 'website',
+        pageType: utils.PAGE_TYPES.TOP_LEVEL,
         relativeUrl: `/${postTypeDirectoryName}/`,
         relativeImage: null,
     });
@@ -34,8 +34,8 @@ function createTopLevelPage(postTypeDisplayName, postMeta, postTypeDirectoryName
         <body>
             ${createNavbar()}
             <main>
-                <h1 class="menu-page-title">${postTypeDisplayName}</h1>
-                ${topLevelIcon ? `<div class="menu-page-image"><img src="${utils.IMAGE_ASSETS_FOLDER}/${topLevelIcon}" alt="" /></div>` : ''}
+                <h1 class="toplevel-page-title">${postTypeDisplayName}</h1>
+                ${topLevelIcon ? `<div class="toplevel-page-image"><img src="${utils.IMAGE_ASSETS_FOLDER}/${topLevelIcon}" alt="" /></div>` : ''}
                 ${createPosts(postMeta)}
             </main>
 

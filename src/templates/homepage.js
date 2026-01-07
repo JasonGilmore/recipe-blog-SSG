@@ -15,7 +15,7 @@ function createHomepage(recentPosts) {
     const head = createHead({
         pageTitle: utils.siteContent.siteName,
         pageDescription: utils.siteContent.secondaryIntroduction,
-        pageType: 'website',
+        pageType: utils.PAGE_TYPES.HOMEPAGE,
         relativeUrl: null,
         relativeImage: null,
     });
@@ -28,7 +28,7 @@ function createHomepage(recentPosts) {
             ${createPostCards(recentPosts, true)}
         </main>
         ${footerHandler.createFooter()}
-        ${utils.siteConfig.enableVisitCounter ? `<script src=/${utils.JS_FOLDER}/postTrack.js></script>` : ''}
+        ${utils.siteConfig.enableVisitCounter ? `<script src=/${utils.JS_FOLDER}/pageTrack.js${utils.getCacheBustQuery()}></script>` : ''}
     </body>
 </html>`;
 }
