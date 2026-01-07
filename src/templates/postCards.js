@@ -14,7 +14,7 @@ function createPostCard(post, showPostType) {
             <a href="/${post.postTypeDirectoryName}/${post.filename}">
                 <article class="post-thumbnail">
                     ${showPostType ? `<div class="typeIcon">${type.toLowerCase()}</div>` : ''}
-                    <img loading="lazy" src="/${post.postTypeDirectoryName}/${post.filename}/${post.image}" alt="" />
+                    <img src="/${post.postTypeDirectoryName}/${post.filename}/${post.image}" alt="" />
                     <p class="post-thumbnail-title">${post.title}</p>
                     <p class="post-thumbnail-description">${post.description}</p>
                 </article>

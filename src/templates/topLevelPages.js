@@ -35,7 +35,7 @@ function createTopLevelPage(postTypeDisplayName, postMeta, postTypeDirectoryName
             ${createNavbar()}
             <main>
                 <h1 class="menu-page-title">${postTypeDisplayName}</h1>
-                ${topLevelIcon ? `<div class="menu-page-image"><img loading="lazy" src="${utils.IMAGE_ASSETS_FOLDER}/${topLevelIcon}" alt="" /></div>` : ''}
+                ${topLevelIcon ? `<div class="menu-page-image"><img src="${utils.IMAGE_ASSETS_FOLDER}/${topLevelIcon}" alt="" /></div>` : ''}
                 ${createPosts(postMeta)}
             </main>
 

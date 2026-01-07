@@ -6,33 +6,33 @@ function createNavbar() {
         postTypeInfo.push(value);
     });
 
-    let siteNameHeader = `<a href="/" class="name-header">${
-        utils.siteContent.siteIcon ? `<img loading="lazy" src="${utils.IMAGE_ASSETS_FOLDER}/${utils.siteContent.siteIcon}" alt="" />` : ''
+    let siteTitleBlock = `<a href="/" class="site-title-block">${
+        utils.siteContent.siteIcon ? `<img fetchpriority="high" src="${utils.IMAGE_ASSETS_FOLDER}/${utils.siteContent.siteIcon}" alt="" />` : ''
     }<h1>${utils.siteContent.siteName}</h1></a>`;
 
-    let topLevelLinks = postTypeInfo.map((postType) => `<a href="/${postType.postTypeDirectory}/" class="top-level-links">${postType.postTypeDisplayName}</a>`).join(' ');
+    let topLevelLinks = `${postTypeInfo.map((postType) => `<a href="/${postType.postTypeDirectory}/" class="top-level-links">${postType.postTypeDisplayName}</a>`).join(' ')}`;
 
-    return `<nav class="nav-bar">
-            <div class="navbar-wide-grouping">
-                <!-- Nav bar full width for medium and large devices -->
-                ${siteNameHeader}
-                ${topLevelLinks}
+    return `<header class="site-header">
+            <div class="header-wide-grouping">
+                <!-- Header full width for medium and large devices -->
+                ${siteTitleBlock}
+                <nav class="header-wide-nav">${topLevelLinks}</nav>
             </div>
-            <div class="navbar-small-grouping">
-            <!-- Nav bar burger mode for small devices -->
-                <div class="navbar-small-heading">
-                    ${siteNameHeader}
+            <div class="header-small-grouping">
+            <!-- Header burger mode for small devices -->
+                <div class="header-small-heading">
+                    ${siteTitleBlock}
                     <div class="burger-container" tabindex="0" role="button" aria-label="Open menu" aria-expanded="false">
                         <div class="bar1"></div>
                         <div class="bar2"></div>
                         <div class="bar3"></div>
                     </div>
                 </div>
-                <div class="navbar-small-links">
-                    ${topLevelLinks}
+                <div class="header-small-links">
+                    <nav class="header-small-nav">${topLevelLinks}</nav>
                 </div>
             </div>
-        </nav>
+        </header>
 `;
 }
 

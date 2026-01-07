@@ -113,7 +113,6 @@ function processMarkdownFile({ allPostFiles, postDirectory, postTypeDirectoryNam
 function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
     processedHtml = htmlContent
         .replaceAll('src="./', `src="/${postTypeDirectoryName}/${postDirectoryName}/`)
-        .replaceAll('<img ', '<img loading="lazy" class="content-image" ')
         .replaceAll('<table>', '<div class="table-wrapper"><table>')
         .replaceAll('</table>', '</table></div>')
         .replaceAll('<p>{recipeboxstart}</p>', '<div id="recipe" class="recipe-box">')
@@ -123,6 +122,10 @@ function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
         .replaceAll('<p>{lightstyleboxend}</p>', '</div>')
         .replaceAll('<p>{darkstyleboxstart}</p>', '<div class="dark-style-box">')
         .replaceAll('<p>{darkstyleboxend}</p>', '</div>');
+
+    // The first image should be a priority to optimise LCP and avoid layout shifts
+    processedHtml = processedHtml.replace('<img', '<img fetchpriority="high" class="content-image"');
+    processedHtml = processedHtml.replaceAll('<img src=', '<img loading="lazy" class="content-image" src=');
 
     // Update checkboxes so they are active and text is crossed out on check
     let checkboxIdCounter = 1;

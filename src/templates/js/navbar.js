@@ -1,9 +1,9 @@
 function toggleBurger() {
     let burgerContainer = document.querySelector('.burger-container');
-    let navbarLinks = document.querySelector('.navbar-small-links');
+    let navbarLinks = document.querySelector('.header-small-nav');
     burgerContainer.classList.toggle('burger-select');
     burgerContainer.setAttribute('aria-expanded', !(burgerContainer.getAttribute('aria-expanded') === 'true'));
-    navbarLinks.classList.toggle('navbar-small-links-active');
+    navbarLinks.classList.toggle('header-small-nav-active');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
