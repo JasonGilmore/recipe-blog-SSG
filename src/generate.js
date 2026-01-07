@@ -118,7 +118,11 @@ function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
         .replaceAll('</table>', '</table></div>')
         .replaceAll('<p>{recipeboxstart}</p>', '<div id="recipe" class="recipe-box">')
         .replaceAll('<p>{recipeboxend}</p>', '</div>')
-        .replaceAll('{jumptorecipebox}', '<button class="jump-to-recipe" type="button"><span class="arrow-down"></span> Jump to recipe</button>');
+        .replaceAll('{jumptorecipebox}', '<button class="jump-to-recipe" type="button"><span class="arrow-down"></span> Jump to recipe</button>')
+        .replaceAll('<p>{lightstyleboxstart}</p>', '<div class="light-style-box">')
+        .replaceAll('<p>{lightstyleboxend}</p>', '</div>')
+        .replaceAll('<p>{darkstyleboxstart}</p>', '<div class="dark-style-box">')
+        .replaceAll('<p>{darkstyleboxend}</p>', '</div>');
 
     // Update checkboxes so they are active and text is crossed out on check
     let checkboxIdCounter = 1;
