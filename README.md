@@ -42,6 +42,7 @@ Create a siteContent.json file within the [`src/templates/`](src/templates/) dir
 -   **siteUrl**: the url of the website.
 -   **heroImage**: the name of the main image in the [`src/templates/images/`](src/templates/images/) directory, used for the homepage hero image.
 -   **heroImageSmall**: the name of a smaller sized version of the hero image (<300KB) in the [`src/templates/images/`](src/templates/images/) directory, used for og image previews to conform to image size limits.
+-   **heroImageAlt**: alt text for the hero images.
 -   **[post type name]Image (such as recipesImage)**: the name of an image in the [`src/templates/images/`](src/templates/images/) directory, to display as a small icon at the top of top-level page.
 
 ## Content structure

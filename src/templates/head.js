@@ -3,6 +3,7 @@ const utils = require('../utils.js');
 function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativeImage }) {
     const heroImageOgUrl = utils.siteContent.siteUrl + '/images/site-assets/' + utils.siteContent.heroImageSmall;
     const contentType = getOgTypeForPage(pageType);
+    const pageUrl = utils.siteContent.siteUrl + (relativeUrl ? relativeUrl : '');
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -16,8 +17,9 @@ function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativ
         <meta property="og:site_name" content="${utils.siteContent.siteName}" />
         <meta property="og:type" content="${contentType}" />
         <meta property="og:image" content="${relativeImage ? utils.siteContent.siteUrl + relativeImage : heroImageOgUrl}" />
-        <meta property="og:url" content="${utils.siteContent.siteUrl + (relativeUrl ? relativeUrl : '')}" />
+        <meta property="og:url" content="${pageUrl}" />
         ${pageDescription ? `<meta property="og:description" content="${pageDescription}" />` : ''}
+        <link rel="canonical" href="${pageUrl}" />
 
         <link rel="icon" type="image/x-icon" href="${utils.IMAGE_ASSETS_FOLDER}/favicon.ico" />
         <link rel="stylesheet" href="/css/main.css${utils.getCacheBustQuery()}" />

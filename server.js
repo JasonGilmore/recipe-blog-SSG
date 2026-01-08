@@ -22,11 +22,11 @@ if (srcUtils.siteConfig.enableVisitCounter) {
     visitCounter.startAutoSave();
 }
 
-// Rewrite post paths
+// Rewrite canonical post paths
 // When "/recipes/bread" serve "/recipes/bread/bread.html"
 app.use((req, res, next) => {
-    const { isPost, postName } = utils.parseRequest(req.path);
-    if (isPost) {
+    const { isPost, postName, isCanonicalPostPath } = utils.parseRequest(req.path);
+    if (isPost && isCanonicalPostPath) {
         req.url = `${req.url}/${postName}.html`;
     }
     next();
