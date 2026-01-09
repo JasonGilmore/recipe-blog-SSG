@@ -79,6 +79,10 @@ function clearDirectoryExceptSome(directory) {
 
 const allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
 
+function getPostTypeConfig(postType) {
+    return siteConfig.postTypes[postType];
+}
+
 function removeLastS(word) {
     return removeLast(word, 's');
 }
@@ -102,5 +106,6 @@ module.exports = {
     validateConfigurations,
     prepareDirectory,
     allowedImageExtensions,
+    getPostTypeConfig,
     removeLastS,
 };

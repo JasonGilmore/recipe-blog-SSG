@@ -7,7 +7,7 @@ A small static site generator for publishing recipe and food blogs. Write conten
 -   Convert Markdown posts with front-matter into HTML pages.
 -   Configurable site structure and navigation via `src/config.json` (overrides [`src/config.default.json`](src/config.default.json)).
 -   Generate homepage, top-level pages and post pages using simple templating (see [`src/templates/`](src/templates)).
--   Copy and sanitize image assets (Exif removal).
+-   Copy and sanitize image assets (Exif removal for JPG/JPEG).
 -   Simple visit counter feature.
 
 ## Quick start
@@ -36,10 +36,10 @@ The site generator reads default settings from [`src/config.default.json`](src/c
 
 Create a siteContent.json file within the [`src/templates/`](src/templates/) directory for key site information including a reference to the homepage image. Place the homepage image and a favicon into the [`src/templates/images/`](src/templates/images/) directory. siteContent.json supports the following fields:
 
--   **siteName**: the name of the site, used in the navigation bar.
+-   **siteName**: the site name.
 -   **mainIntroduction**: the main introduction text, used on the homepage.
 -   **secondaryIntroduction**: the secondary introduction text, used on the homepage after the main introduction.
--   **siteUrl**: the url of the website.
+-   **siteUrl**: the site url.
 -   **heroImage**: the name of the main image in the [`src/templates/images/`](src/templates/images/) directory, used for the homepage hero image.
 -   **heroImageSmall**: the name of a smaller sized version of the hero image (<300KB) in the [`src/templates/images/`](src/templates/images/) directory, used for og image previews to conform to image size limits.
 -   **heroImageAlt**: alt text for the hero images.
@@ -73,12 +73,13 @@ content/
 
 ## Front-matter
 
-Front-matter is used to define metadata for site generation.
+Front-matter is used to define metadata for site generation and structured data markup generation.
 
 Front-matter for posts:
 
 -   **title**: the name of the post for display on site cards and og link previews.
 -   **description**: the description of the post for display on site cards and og link previews.
+-   **keywords**: comma separated keywords related to the post.
 -   **date**: the date in ISO format for recent post sorting.
 -   **image**: the image of the post for display on site cards and og link previews.
     -   Ensure the image is <300KB to conform to image size limits for link previews.

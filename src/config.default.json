@@ -4,11 +4,13 @@
     "postTypes": {
         "recipes": {
             "postTypeDisplayName": "Recipes",
-            "postTypeDirectory": "recipes"
+            "postTypeDirectory": "recipes",
+            "structuredDataContentType": "Recipe"
         },
         "blogs": {
             "postTypeDisplayName": "Blogs",
-            "postTypeDirectory": "blogs"
+            "postTypeDirectory": "blogs",
+            "structuredDataContentType": "BlogPosting"
         }
     },
     "enableVisitCounter": true

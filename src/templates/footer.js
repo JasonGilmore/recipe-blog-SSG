@@ -3,6 +3,7 @@ const path = require('node:path');
 const fm = require('front-matter');
 const marked = require('marked');
 const utils = require('../utils.js');
+const structuredDataMarkup = require('./structuredDataMarkup.js');
 const createHead = require('./head.js');
 const createNavbar = require('./navbar.js');
 
@@ -37,12 +38,15 @@ function generateFooters() {
 }
 
 function createFooterPage(footerHtmlContent, footerDisplayName, fileName) {
+    const relativeUrl = `/${fileName}`;
+    const structuredData = structuredDataMarkup.createGenericPageData(footerDisplayName, relativeUrl);
     const head = createHead({
-        pageTitle: `${footerDisplayName} | ${utils.siteContent.siteName}`,
+        pageTitle: footerDisplayName,
         pageDescription: null,
         pageType: utils.PAGE_TYPES.FOOTER,
-        relativeUrl: `/${fileName}`,
+        relativeUrl: relativeUrl,
         relativeImage: null,
+        structuredData,
     });
 
     return `${head}

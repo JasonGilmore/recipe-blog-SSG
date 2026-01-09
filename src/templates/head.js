@@ -1,6 +1,6 @@
 const utils = require('../utils.js');
 
-function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativeImage }) {
+function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativeImage, structuredData }) {
     const heroImageOgUrl = utils.siteContent.siteUrl + '/images/site-assets/' + utils.siteContent.heroImageSmall;
     const contentType = getOgTypeForPage(pageType);
     const pageUrl = utils.siteContent.siteUrl + (relativeUrl ? relativeUrl : '');
@@ -25,6 +25,8 @@ function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativ
         <link rel="stylesheet" href="/css/main.css${utils.getCacheBustQuery()}" />
         <script src=/${utils.JS_FOLDER}/navbar.js${utils.getCacheBustQuery()}></script>
         ${pageType === utils.PAGE_TYPES.POST ? `<link rel="stylesheet" href="/css/post.css${utils.getCacheBustQuery()}" />` : ''}
+
+        ${structuredData ? structuredData : ''}
     </head>
     `;
 }

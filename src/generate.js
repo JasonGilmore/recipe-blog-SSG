@@ -37,18 +37,17 @@ console.timeEnd(timerLabel);
 // Returns all post metadata grouped by post type
 function generateContent() {
     let postMetaGroupedByType = {};
-    const postTypeInfo = utils.siteConfig.postTypes;
+    const allPostTypeConfigs = utils.siteConfig.postTypes;
 
-    for (let postType in postTypeInfo) {
-        const postTypeDirectoryName = postTypeInfo[postType].postTypeDirectory;
-        const postTypeDirectory = path.join(utils.CONTENT_DIRECTORY, postTypeDirectoryName);
-        const postTypeOutputDirectory = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, postTypeDirectoryName);
-
-        utils.prepareDirectory(postTypeOutputDirectory);
-        let generatedPostMeta = generatePosts(postTypeDirectory, postTypeDirectoryName, postTypeOutputDirectory);
-        // Add the post type to the post metadata
-        const postTypeName = postTypeInfo[postType].postTypeDisplayName;
-        postMetaGroupedByType[postTypeName] = generatedPostMeta.map((post) => ({ ...post, postTypeToDisplay: postTypeName, postTypeDirectoryName: postTypeDirectoryName }));
+    for (let postType in allPostTypeConfigs) {
+        const postTypeConfig = allPostTypeConfigs[postType];
+        let generatedPostMeta = generatePosts(postType);
+        // Add additional properties to post metadata
+        postMetaGroupedByType[postType] = generatedPostMeta.map((post) => ({
+            ...post,
+            postTypeToDisplay: postTypeConfig.postTypeDisplayName,
+            postTypeDirectoryName: postTypeConfig.postTypeDirectory,
+        }));
     }
 
     return postMetaGroupedByType;
@@ -56,9 +55,15 @@ function generateContent() {
 
 // Generates the posts for a single post type, converting .md files to .html and saving in the post type output directory
 // Returns an array of objects, where each object is the post metadata
-function generatePosts(postTypeDirectory, postTypeDirectoryName, postTypeOutputDirectory) {
-    // Read all folder names for the posts
-    const postDirectoryNames = fs.readdirSync(postTypeDirectory, 'utf8');
+function generatePosts(postType) {
+    // Prepare directories
+    const postTypeConfig = utils.getPostTypeConfig(postType);
+    const postTypePath = path.join(utils.CONTENT_DIRECTORY, postTypeConfig.postTypeDirectory);
+    const postTypeOutputPath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, postTypeConfig.postTypeDirectory);
+    utils.prepareDirectory(postTypeOutputPath);
+
+    // Read all inner directory names (the posts) for the post type
+    const postDirectoryNames = fs.readdirSync(postTypePath, 'utf8');
 
     // Collect all post metadata for use in generating site
     let postMeta = [];
@@ -66,20 +71,20 @@ function generatePosts(postTypeDirectory, postTypeDirectoryName, postTypeOutputD
     // Generate posts
     // Content structure is content directory > post type directory > post directory > post.md + images
     postDirectoryNames.forEach((postDirectoryName) => {
-        const postDirectory = path.join(postTypeDirectory, postDirectoryName);
-        const postOutputDirectory = path.join(postTypeOutputDirectory, postDirectoryName);
-        const allPostFiles = fs.readdirSync(postDirectory, 'utf8');
+        const postDirectoryPath = path.join(postTypePath, postDirectoryName);
+        const postOutputDirectoryPath = path.join(postTypeOutputPath, postDirectoryName);
+        const allPostFiles = fs.readdirSync(postDirectoryPath, 'utf8');
         // Create an output folder for the post, within the post type folder
-        fs.mkdirSync(postOutputDirectory);
+        fs.mkdirSync(postOutputDirectoryPath);
 
         // Process the post
         const postContext = {
+            postTypeConfig,
             allPostFiles,
-            postTypeDirectoryName,
-            postTypeDirectory,
-            postTypeOutputDirectory,
+            postTypePath,
+            postTypeOutputPath,
             postDirectoryName,
-            postDirectory,
+            postDirectoryPath,
         };
         const generatedMeta = processMarkdownFile(postContext);
         postMeta.push(generatedMeta);
@@ -91,19 +96,21 @@ function generatePosts(postTypeDirectory, postTypeDirectoryName, postTypeOutputD
 
 // Generate the html page from the md file
 // Return metadata about the post (post .md filename and front-matter attributes)
-function processMarkdownFile({ allPostFiles, postDirectory, postTypeDirectoryName, postDirectoryName, postTypeOutputDirectory }) {
+function processMarkdownFile({ postTypeConfig, allPostFiles, postDirectoryPath, postDirectoryName, postTypeOutputPath }) {
+    const postTypeDirectoryName = postTypeConfig.postTypeDirectory;
+
     // Retrieve and format post html and front-matter attributes
     const markdownFilename = allPostFiles.find((file) => path.extname(file).toLowerCase() === '.md');
     if (markdownFilename) {
         const fileName = markdownFilename.slice(0, -3);
-        const fileContent = fs.readFileSync(path.join(postDirectory, markdownFilename), 'utf8');
+        const fileContent = fs.readFileSync(path.join(postDirectoryPath, markdownFilename), 'utf8');
         const content = fm(fileContent);
         let rawPostHtml = marked.parse(content.body);
         htmlContent = formatPostHtml(rawPostHtml, postTypeDirectoryName, postDirectoryName);
 
         // Generate the post site page
-        const postPage = generatePost(htmlContent, content.attributes, postTypeDirectoryName, fileName);
-        const postFilePath = path.join(postTypeOutputDirectory, postDirectoryName, fileName + '.html');
+        const postPage = generatePost(postTypeConfig, htmlContent, content.attributes, postTypeDirectoryName, fileName);
+        const postFilePath = path.join(postTypeOutputPath, postDirectoryName, fileName + '.html');
         fs.writeFileSync(postFilePath, postPage, 'utf8');
         return { ...content.attributes, filename: fileName };
     } else {
@@ -142,11 +149,11 @@ function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
 // Copy any images from their post directory to the output directory, including with Exif removal
 // Exif removal is synchronous as part of the static site generation since it is fast enough (total generation of ~150ms)
 // and simplifies code. If this becomes noticeably slower as the site grows, consider changing to an asynchronous approach
-function processPostImages({ allPostFiles, postTypeOutputDirectory, postDirectoryName, postDirectory }) {
+function processPostImages({ allPostFiles, postTypeOutputPath, postDirectoryName, postDirectoryPath }) {
     const postImages = allPostFiles.filter((filename) => utils.allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
     postImages.forEach((image) => {
-        const imagePath = path.join(postDirectory, image);
-        const imageOutputPath = path.join(postTypeOutputDirectory, postDirectoryName, image);
+        const imagePath = path.join(postDirectoryPath, image);
+        const imageOutputPath = path.join(postTypeOutputPath, postDirectoryName, image);
 
         // If contain exif data, remove and write the new image, otherwise copy the image
         const fileType = path.extname(imagePath).toLowerCase();

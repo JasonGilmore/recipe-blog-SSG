@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const utils = require('../utils.js');
+const structuredDataMarkup = require('./structuredDataMarkup.js');
 const createHead = require('./head.js');
 const createNavbar = require('./navbar.js');
 const createSiteWelcome = require('./siteWelcome.js');
@@ -12,12 +13,14 @@ function generateHomepage(recentPosts) {
 }
 
 function createHomepage(recentPosts) {
+    const structuredData = structuredDataMarkup.createHomepageData();
     const head = createHead({
         pageTitle: utils.siteContent.siteName,
         pageDescription: utils.siteContent.secondaryIntroduction,
         pageType: utils.PAGE_TYPES.HOMEPAGE,
         relativeUrl: null,
         relativeImage: null,
+        structuredData,
     });
 
     return `${head}

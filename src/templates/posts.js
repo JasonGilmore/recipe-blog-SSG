@@ -1,16 +1,19 @@
+const structuredDataMarkup = require('./structuredDataMarkup.js');
 const createHead = require('./head.js');
 const utils = require('../utils.js');
 const createNavbar = require('./navbar.js');
 const footerHandler = require('./footer.js');
 
-function createPost(postHtml, postAttributes, postTypeDirectoryName, postName) {
+function createPost(postTypeConfig, postHtml, postAttributes, postTypeDirectoryName, postName) {
     const postDirectory = `/${postTypeDirectoryName}/${postName}`;
+    const structuredData = structuredDataMarkup.createPostData(postTypeConfig, postAttributes, postDirectory);
     const head = createHead({
-        pageTitle: `${postAttributes.title} | ${utils.siteContent.siteName}`,
+        pageTitle: postAttributes.title,
         pageDescription: postAttributes.description,
         pageType: utils.PAGE_TYPES.POST,
         relativeUrl: postDirectory,
         relativeImage: `${postDirectory}/${postAttributes.image}`,
+        structuredData,
     });
 
     return `
