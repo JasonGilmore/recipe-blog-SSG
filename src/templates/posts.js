@@ -2,6 +2,7 @@ const structuredDataMarkup = require('./structuredDataMarkup.js');
 const createHead = require('./head.js');
 const utils = require('../utils.js');
 const createNavbar = require('./navbar.js');
+const templateHelper = require('./templateHelper.js');
 const footerHandler = require('./footer.js');
 
 function createPost(postTypeConfig, postHtml, postAttributes, postTypeDirectoryName, postName) {
@@ -23,6 +24,11 @@ function createPost(postTypeConfig, postHtml, postAttributes, postTypeDirectoryN
             <main>
                 <div class="content-page-container">
                     ${postHtml}
+
+                    <button id="goToTop" class="flex-centre" aria-label="Go to top" title="Go to top">
+                        ${templateHelper.getUpArrow()}
+                    </button>
+
                 </div>
             </main>
             ${footerHandler.createFooter()}

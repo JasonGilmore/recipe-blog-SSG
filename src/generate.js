@@ -4,11 +4,12 @@ const fm = require('front-matter');
 const marked = require('marked');
 const piexif = require('piexifjs');
 const utils = require('./utils.js');
+const generateAssets = require('./templates/assetsHandler.js');
 const footerHandler = require('./templates/footer.js');
 const generateHomepage = require('./templates/homepage.js');
 const generateTopLevelPages = require('./templates/topLevelPages.js');
-const generateAssets = require('./templates/assetsHandler.js');
 const generatePost = require('./templates/posts.js');
+const templateHelper = require('./templates/templateHelper.js');
 
 const timerLabel = 'Generate site';
 console.time(timerLabel);
@@ -126,7 +127,7 @@ function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
         .replaceAll('</table>', '</table></div>')
         .replaceAll('<p>{recipeboxstart}</p>', '<div id="recipe" class="recipe-box">')
         .replaceAll('<p>{recipeboxend}</p>', '</div>')
-        .replaceAll('{jumptorecipebox}', '<button class="jump-to-recipe" type="button"><span class="arrow-down"></span> Jump to recipe</button>')
+        .replaceAll('{jumptorecipebox}', `<button class="jump-to-recipe flex-centre" type="button">${templateHelper.getDownArrow()} Jump to recipe</button>`)
         .replaceAll('<p>{lightstyleboxstart}</p>', '<div class="light-style-box">')
         .replaceAll('<p>{lightstyleboxend}</p>', '</div>')
         .replaceAll('<p>{darkstyleboxstart}</p>', '<div class="dark-style-box">')
