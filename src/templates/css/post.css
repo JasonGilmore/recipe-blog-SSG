@@ -29,7 +29,7 @@
     padding: 20px 25px;
     border-radius: 4px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: var(--style-box-light);
+    background-color: var(--light-box-background);
 }
 
 .dark-style-box {
@@ -38,7 +38,7 @@
     padding: 20px 25px;
     border-radius: 4px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: var(--style-box-dark);
+    background-color: var(--dark-box-background);
 }
 
 .jump-to-recipe {

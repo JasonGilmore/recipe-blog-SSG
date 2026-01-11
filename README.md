@@ -39,6 +39,7 @@ Create a siteContent.json file within the [`src/templates/`](src/templates/) dir
 -   **siteName**: the site name.
 -   **mainIntroduction**: the main introduction text, used on the homepage.
 -   **secondaryIntroduction**: the secondary introduction text, used on the homepage after the main introduction.
+-   **theme**: an object containing design tokens to apply CSS compatible colour values (RGB, Hex etc.). Supported keys include accent-colour, accent-colour-dark, recipe-box-background, light-box-background, dark-box-background.
 -   **siteUrl**: the site url.
 -   **heroImage**: the name of the main image in the [`src/templates/images/`](src/templates/images/) directory, used for the homepage hero image.
 -   **heroImageSmall**: the name of a smaller sized version of the hero image (<300KB) in the [`src/templates/images/`](src/templates/images/) directory, used for og image previews to conform to image size limits.

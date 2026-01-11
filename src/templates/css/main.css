@@ -1,9 +1,9 @@
 :root {
-    --accent-colour: #ff8800;
-    --accent-colour-dark: #cd6d00;
-    --recipe-box-background: rgb(255, 240, 230);
-    --style-box-light: rgb(255, 250, 240);
-    --style-box-dark: rgb(255, 220, 184);
+    --accent-colour: #theme;
+    --accent-colour-dark: #theme;
+    --recipe-box-background: #theme;
+    --light-box-background: #theme;
+    --dark-box-background: #theme;
 }
 
 * {
