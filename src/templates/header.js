@@ -1,6 +1,6 @@
 const utils = require('../utils.js');
 
-function createNavbar() {
+function createHeader() {
     const postTypeInfo = [];
     Object.entries(utils.siteConfig.postTypes).forEach(([key, value]) => {
         postTypeInfo.push(value);
@@ -36,4 +36,4 @@ function createNavbar() {
 `;
 }
 
-module.exports = createNavbar;
+module.exports = createHeader;

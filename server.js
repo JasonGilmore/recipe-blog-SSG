@@ -41,8 +41,8 @@ app.use((req, res, next) => {
     if (isImage || path.endsWith('.ico')) {
         res.setHeader('Cache-Control', 'public, max-age=259200, must-revalidate');
     } else if (path.endsWith('.js') || path.endsWith('.css')) {
-        // Cache static assets for 1 day - build step performs cache busting
-        res.setHeader('Cache-Control', 'public, max-age=86400, must-revalidate');
+        // Cache static assets for 3 days - build step performs cache busting
+        res.setHeader('Cache-Control', 'public, max-age=259200, must-revalidate');
     } else {
         // All other content such as html pages do not cache
         res.setHeader('Cache-Control', 'no-cache');

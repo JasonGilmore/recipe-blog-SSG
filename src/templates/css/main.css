@@ -99,8 +99,10 @@ main {
 }
 
 .site-title-block img {
-    padding-right: 10px;
-    max-height: 1.8rem;
+    margin-right: 10px;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
 }
 
 .top-level-links {
@@ -127,7 +129,7 @@ main {
 .bar1,
 .bar2,
 .bar3 {
-    width: 35px;
+    width: 32px;
     height: 5px;
     background-color: black;
     margin: 6px 0;
@@ -299,11 +301,12 @@ main {
     }
 
     .site-title-block h1 {
-        font-size: clamp(1rem, 7vw, 1.5rem);
+        font-size: clamp(1rem, 6.5vw, 1.5rem);
     }
 
     .site-title-block img {
-        height: clamp(1rem, 7vw, 1.8rem);
+        margin-right: clamp(1px, 2.5vw, 10px);
+        height: clamp(18px, 8.5vw, 32px);
     }
 
     .header-small-links {

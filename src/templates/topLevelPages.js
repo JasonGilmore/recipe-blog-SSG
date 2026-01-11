@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const utils = require('../utils.js');
 const structuredDataMarkup = require('./structuredDataMarkup.js');
 const createHead = require('./head.js');
-const createNavbar = require('./navbar.js');
+const createHeader = require('./header.js');
 const createPosts = require('./postCards.js');
 const footerHandler = require('./footer.js');
 
@@ -35,7 +35,7 @@ function createTopLevelPage(postTypeConfig, postMetaList) {
     return `
         ${head}
         <body>
-            ${createNavbar()}
+            ${createHeader()}
             <main>
                 <h1 class="toplevel-page-title">${postTypeConfig.postTypeDisplayName}</h1>
                 ${topLevelIcon ? `<div class="toplevel-page-image"><img src="${utils.IMAGE_ASSETS_FOLDER}/${topLevelIcon}" alt="" /></div>` : ''}

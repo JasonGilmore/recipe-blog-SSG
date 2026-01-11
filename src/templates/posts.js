@@ -1,7 +1,7 @@
 const structuredDataMarkup = require('./structuredDataMarkup.js');
 const createHead = require('./head.js');
 const utils = require('../utils.js');
-const createNavbar = require('./navbar.js');
+const createHeader = require('./header.js');
 const templateHelper = require('./templateHelper.js');
 const footerHandler = require('./footer.js');
 
@@ -20,7 +20,7 @@ function createPost(postTypeConfig, postHtml, postAttributes, postTypeDirectoryN
     return `
         ${head}
         <body>
-            ${createNavbar()}
+            ${createHeader()}
             <main>
                 <div class="content-page-container">
                     ${postHtml}

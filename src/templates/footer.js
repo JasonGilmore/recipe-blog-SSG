@@ -5,7 +5,7 @@ const marked = require('marked');
 const utils = require('../utils.js');
 const structuredDataMarkup = require('./structuredDataMarkup.js');
 const createHead = require('./head.js');
-const createNavbar = require('./navbar.js');
+const createHeader = require('./header.js');
 
 let footerItems = [];
 
@@ -51,7 +51,7 @@ function createFooterPage(footerHtmlContent, footerDisplayName, fileName) {
 
     return `${head}
     <body>
-        ${createNavbar()}
+        ${createHeader()}
         <main>
             <div class="footer-content-page-container break-word">
                 ${footerHtmlContent}

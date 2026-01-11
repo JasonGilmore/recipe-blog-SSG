@@ -3,7 +3,7 @@ const path = require('node:path');
 const utils = require('../utils.js');
 const structuredDataMarkup = require('./structuredDataMarkup.js');
 const createHead = require('./head.js');
-const createNavbar = require('./navbar.js');
+const createHeader = require('./header.js');
 const createSiteWelcome = require('./siteWelcome.js');
 const createPostCards = require('./postCards.js');
 const footerHandler = require('./footer.js');
@@ -25,7 +25,7 @@ function createHomepage(recentPosts) {
 
     return `${head}
     <body>
-        ${createNavbar()}
+        ${createHeader()}
         <main>
             ${createSiteWelcome()}
             ${createPostCards(recentPosts, true)}
