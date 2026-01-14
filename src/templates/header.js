@@ -8,7 +8,7 @@ function createHeader() {
 
     const siteIconHashPath = utils.siteContent.siteIcon ? utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/${utils.siteContent.siteIcon}`) : '';
     const siteIconHtml = siteIconHashPath ? `<img fetchpriority="high" src="${siteIconHashPath}" alt="" />` : '';
-    const siteTitleBlock = `<a href="/" class="site-title-block">${siteIconHtml}<h1>${utils.siteContent.siteName}</h1></a>`;
+    const siteTitleBlock = `<a href="/" class="site-title-block">${siteIconHtml}<div>${utils.siteContent.siteName}</div></a>`;
     const topLevelLinks = `${postTypeInfo.map((postType) => `<a href="/${postType.postTypeDirectory}/" class="top-level-links">${postType.postTypeDisplayName}</a>`).join(' ')}`;
 
     return `<header class="site-header">

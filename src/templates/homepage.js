@@ -4,7 +4,6 @@ const utils = require('../utils.js');
 const structuredDataMarkup = require('./structuredDataMarkup.js');
 const createHead = require('./head.js');
 const createHeader = require('./header.js');
-const createSiteWelcome = require('./siteWelcome.js');
 const createPostCards = require('./postCards.js');
 const footerHandler = require('./footer.js');
 
@@ -24,12 +23,22 @@ function createHomepage(recentPosts) {
     });
 
     const pageTrackHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/pageTrack.js`);
+    const heroImageHashPath = utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/${utils.siteContent.heroImage}`);
+
     return `${head}
     <body>
         ${createHeader()}
         <main>
-            ${createSiteWelcome()}
-            ${createPostCards(recentPosts, true)}
+            <div class="page-intro">
+                <div class="page-intro-image">
+                    <img fetchpriority="high" src="${heroImageHashPath}" alt="${utils.siteContent.heroImageAlt}" />
+                </div>
+                <div class="page-intro-text-container">
+                    <h1 class="page-intro-title">${utils.siteContent.mainIntroduction}</h1>
+                    <h2 class="page-intro-secondary-title">${utils.siteContent.secondaryIntroduction}</h2>
+                </div>
+            </div>
+            ${createPostCards(recentPosts, true, 'h3')}
         </main>
         ${footerHandler.createFooter()}
         ${utils.siteConfig.enableVisitCounter ? `<script src="${pageTrackHashPath}"></script>` : ''}

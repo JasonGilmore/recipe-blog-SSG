@@ -30,7 +30,7 @@ function createHomepageData() {
     }</script>`;
 }
 
-function createTopLevelData(postTypeConfig) {
+function createTopLevelData(postTypeConfig, pageDescription) {
     return `<script type="application/ld+json">
     {
         "${SCHEMA_CONTEXT}",
@@ -39,6 +39,7 @@ function createTopLevelData(postTypeConfig) {
                 "@type": "WebPage",
                 "url": "${utils.siteContent.siteUrl}/${postTypeConfig.postTypeDirectory}/",
                 "name": "${postTypeConfig.postTypeDisplayName}",
+                ${pageDescription ? `"description": "${pageDescription}",` : ''}
                 "isPartOf": {
                     "@type": "WebSite",
                     "@id": "${WEBSITE_ID}"
