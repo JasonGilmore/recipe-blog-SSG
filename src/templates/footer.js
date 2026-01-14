@@ -20,25 +20,25 @@ function generateFooters() {
     let footersToGenerate = [];
 
     for (footerFile of footerFiles) {
-        const fileName = footerFile.slice(0, -3);
+        const filename = footerFile.slice(0, -3);
         const footerContent = fs.readFileSync(path.join(utils.FOOTER_DIRECTORY, footerFile), 'utf8');
         const content = fm(footerContent);
         const htmlContent = marked.parse(content.body);
-        let footerOutputPath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, fileName + '.html');
+        let footerOutputPath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, filename + '.html');
 
         // Create the files after the loop is completed, so the footer pages can have the footer added using footerItems
         const displayName = content.attributes.displayName;
-        footersToGenerate.push({ footerOutputPath, content: htmlContent, displayName, fileName });
-        footerItems.push({ location: '/' + fileName, displayName, order: content.attributes.order });
+        footersToGenerate.push({ footerOutputPath, content: htmlContent, displayName, filename });
+        footerItems.push({ location: '/' + filename, displayName, order: content.attributes.order });
     }
 
     for (footer of footersToGenerate) {
-        fs.writeFileSync(footer.footerOutputPath, createFooterPage(footer.content, footer.displayName, footer.fileName), 'utf8');
+        fs.writeFileSync(footer.footerOutputPath, createFooterPage(footer.content, footer.displayName, footer.filename), 'utf8');
     }
 }
 
-function createFooterPage(footerHtmlContent, footerDisplayName, fileName) {
-    const relativeUrl = `/${fileName}`;
+function createFooterPage(footerHtmlContent, footerDisplayName, filename) {
+    const relativeUrl = `/${filename}`;
     const structuredData = structuredDataMarkup.createGenericPageData(footerDisplayName, relativeUrl);
     const head = createHead({
         pageTitle: footerDisplayName,

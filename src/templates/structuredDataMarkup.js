@@ -51,19 +51,19 @@ function createTopLevelData(postTypeConfig) {
 
 function createPostData(postTypeConfig, postAttributes, relativePostFolderPath) {
     const structuredDataType = postTypeConfig.structuredDataContentType;
-    const imageLocation = utils.siteContent.siteUrl + relativePostFolderPath + '/' + postAttributes.image;
+    const imageHashPath = utils.siteContent.siteUrl + utils.getHashPath(`${relativePostFolderPath}/${postAttributes.image}`);
     const parentDirectory = `/${postTypeConfig.postTypeDirectory}/`;
     let mainEntityData = null;
 
     switch (structuredDataType) {
         case 'Recipe':
-            mainEntityData = getRecipeData(parentDirectory, postAttributes, imageLocation);
+            mainEntityData = getRecipeData(parentDirectory, postAttributes, imageHashPath);
             break;
         case 'BlogPosting':
-            mainEntityData = getBlogData(parentDirectory, postAttributes, imageLocation);
+            mainEntityData = getBlogData(parentDirectory, postAttributes, imageHashPath);
             break;
         default:
-            mainEntityData = getGenericPostData(parentDirectory, postAttributes, imageLocation);
+            mainEntityData = getGenericPostData(parentDirectory, postAttributes, imageHashPath);
     }
 
     return `<script type="application/ld+json">

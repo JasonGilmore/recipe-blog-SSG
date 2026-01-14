@@ -1,9 +1,16 @@
 const utils = require('../utils.js');
 
 function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativeImage, structuredData }) {
-    const heroImageOgUrl = utils.siteContent.siteUrl + '/images/site-assets/' + utils.siteContent.heroImageSmall;
     const contentType = getOgTypeForPage(pageType);
     const pageUrl = utils.siteContent.siteUrl + (relativeUrl ? relativeUrl : '');
+
+    // Resolve hash asset paths
+    const heroImageOgHashUrl = utils.siteContent.siteUrl + utils.getHashPath('/images/site-assets/' + utils.siteContent.heroImageSmall);
+    const ogImageHashPath = utils.getHashPath(`${relativeImage ? utils.siteContent.siteUrl + utils.getHashPath(relativeImage) : heroImageOgHashUrl}`);
+    const faviconHashPath = utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/favicon.ico`);
+    const mainCssHashPath = utils.getHashPath('/css/main.css');
+    const navbarJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/navbar.js`);
+    const postCssHashPath = utils.getHashPath('/css/post.css');
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -16,15 +23,15 @@ function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativ
         <meta property="og:title" content="${pageTitle}" />
         <meta property="og:site_name" content="${utils.siteContent.siteName}" />
         <meta property="og:type" content="${contentType}" />
-        <meta property="og:image" content="${relativeImage ? utils.siteContent.siteUrl + relativeImage : heroImageOgUrl}" />
+        <meta property="og:image" content="${ogImageHashPath}" />
         <meta property="og:url" content="${pageUrl}" />
         ${pageDescription ? `<meta property="og:description" content="${pageDescription}" />` : ''}
         <link rel="canonical" href="${pageUrl}" />
 
-        <link rel="icon" type="image/x-icon" href="${utils.IMAGE_ASSETS_FOLDER}/favicon.ico" />
-        <link rel="stylesheet" href="/css/main.css${utils.getCacheBustQuery()}" />
-        <script src=/${utils.JS_FOLDER}/navbar.js${utils.getCacheBustQuery()}></script>
-        ${pageType === utils.PAGE_TYPES.POST ? `<link rel="stylesheet" href="/css/post.css${utils.getCacheBustQuery()}" />` : ''}
+        <link rel="icon" type="image/x-icon" href="${faviconHashPath}" />
+        <link rel="stylesheet" href="${mainCssHashPath}" />
+        <script src="${navbarJsHashPath}"></script>
+        ${pageType === utils.PAGE_TYPES.POST ? `<link rel="stylesheet" href="${postCssHashPath}" />` : ''}
 
         ${structuredData ? structuredData : ''}
     </head>

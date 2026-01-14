@@ -8,6 +8,7 @@ A small static site generator for publishing recipe and food blogs. Write conten
 -   Configurable site structure and navigation via `src/config.json` (overrides [`src/config.default.json`](src/config.default.json)).
 -   Generate homepage, top-level pages and post pages using simple templating (see [`src/templates/`](src/templates)).
 -   Copy and sanitize image assets (Exif removal for JPG/JPEG).
+-   Generate content hash filenames for images and site assets, for reliable cache busting.
 -   Simple visit counter feature.
 
 ## Quick start

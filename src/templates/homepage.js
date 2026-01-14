@@ -23,6 +23,7 @@ function createHomepage(recentPosts) {
         structuredData,
     });
 
+    const pageTrackHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/pageTrack.js`);
     return `${head}
     <body>
         ${createHeader()}
@@ -31,7 +32,7 @@ function createHomepage(recentPosts) {
             ${createPostCards(recentPosts, true)}
         </main>
         ${footerHandler.createFooter()}
-        ${utils.siteConfig.enableVisitCounter ? `<script src=/${utils.JS_FOLDER}/pageTrack.js${utils.getCacheBustQuery()}></script>` : ''}
+        ${utils.siteConfig.enableVisitCounter ? `<script src="${pageTrackHashPath}"></script>` : ''}
     </body>
 </html>`;
 }

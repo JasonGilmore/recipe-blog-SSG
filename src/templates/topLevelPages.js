@@ -20,8 +20,10 @@ function createTopLevelPage(postTypeConfig, postMetaList) {
     // Sort posts by created date descending
     postMetaList.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
 
-    const topLevelIconName = postTypeConfig.postTypeDirectory + 'Image';
-    const topLevelIcon = utils.siteContent[topLevelIconName];
+    // Get the top level icon filename from siteContent if present, by retrieving [post type directory name]Image
+    const topLevelIconFilename = utils.siteContent[`${postTypeConfig.postTypeDirectory}Image`];
+    const topLevelIconHashPath = utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/${topLevelIconFilename}`);
+
     const structuredData = structuredDataMarkup.createTopLevelData(postTypeConfig);
     const head = createHead({
         pageTitle: postTypeConfig.postTypeDisplayName,
@@ -38,7 +40,7 @@ function createTopLevelPage(postTypeConfig, postMetaList) {
             ${createHeader()}
             <main>
                 <h1 class="toplevel-page-title">${postTypeConfig.postTypeDisplayName}</h1>
-                ${topLevelIcon ? `<div class="toplevel-page-image"><img src="${utils.IMAGE_ASSETS_FOLDER}/${topLevelIcon}" alt="" /></div>` : ''}
+                ${topLevelIconFilename ? `<div class="toplevel-page-image"><img src="${topLevelIconHashPath}" alt="" /></div>` : ''}
                 ${createPosts(postMetaList)}
             </main>
 

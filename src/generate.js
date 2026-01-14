@@ -4,10 +4,10 @@ const fm = require('front-matter');
 const marked = require('marked');
 const piexif = require('piexifjs');
 const utils = require('./utils.js');
-const generateAssets = require('./templates/assetsHandler.js');
 const footerHandler = require('./templates/footer.js');
 const generateHomepage = require('./templates/homepage.js');
 const generateTopLevelPages = require('./templates/topLevelPages.js');
+const generateAssets = require('./templates/assetsHandler.js');
 const generatePost = require('./templates/posts.js');
 const templateHelper = require('./templates/templateHelper.js');
 
@@ -17,10 +17,10 @@ console.time(timerLabel);
 utils.validateConfigurations();
 utils.prepareDirectory(utils.PUBLIC_OUTPUT_DIRECTORY);
 
-utils.setCacheBust(Date.now().toString());
+// Generate assets upfront to use filename content hash for cache busting
 generateAssets();
 
-// Generate the footer first so it can be added to all site pages
+// Generate footers upfront so they can be added to all site pages
 footerHandler.generateFooters();
 
 // Generate posts and get a list of all post metadata, grouped by post type
@@ -78,7 +78,7 @@ function generatePosts(postType) {
         // Create an output folder for the post, within the post type folder
         fs.mkdirSync(postOutputDirectoryPath);
 
-        // Process the post
+        // Process post images first so content hash filenames can be used in the post page
         const postContext = {
             postTypeConfig,
             allPostFiles,
@@ -87,74 +87,28 @@ function generatePosts(postType) {
             postDirectoryName,
             postDirectoryPath,
         };
+        processPostImages(postContext);
         const generatedMeta = processMarkdownFile(postContext);
         postMeta.push(generatedMeta);
-        processPostImages(postContext);
     });
 
     return postMeta;
 }
 
-// Generate the html page from the md file
-// Return metadata about the post (post .md filename and front-matter attributes)
-function processMarkdownFile({ postTypeConfig, allPostFiles, postDirectoryPath, postDirectoryName, postTypeOutputPath }) {
-    const postTypeDirectoryName = postTypeConfig.postTypeDirectory;
-
-    // Retrieve and format post html and front-matter attributes
-    const markdownFilename = allPostFiles.find((file) => path.extname(file).toLowerCase() === '.md');
-    if (markdownFilename) {
-        const fileName = markdownFilename.slice(0, -3);
-        const fileContent = fs.readFileSync(path.join(postDirectoryPath, markdownFilename), 'utf8');
-        const content = fm(fileContent);
-        let rawPostHtml = marked.parse(content.body);
-        htmlContent = formatPostHtml(rawPostHtml, postTypeDirectoryName, postDirectoryName);
-
-        // Generate the post site page
-        const postPage = generatePost(postTypeConfig, htmlContent, content.attributes, postTypeDirectoryName, fileName);
-        const postFilePath = path.join(postTypeOutputPath, postDirectoryName, fileName + '.html');
-        fs.writeFileSync(postFilePath, postPage, 'utf8');
-        return { ...content.attributes, filename: fileName };
-    } else {
-        throw new Error(`Missing markdown file for ${fileName}`);
-    }
-}
-
-// Replace the relative image urls, add css and other formatting features
-function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
-    processedHtml = htmlContent
-        .replaceAll('src="./', `src="/${postTypeDirectoryName}/${postDirectoryName}/`)
-        .replaceAll('<table>', '<div class="table-wrapper"><table>')
-        .replaceAll('</table>', '</table></div>')
-        .replaceAll('<p>{recipeboxstart}</p>', '<div id="recipe" class="recipe-box">')
-        .replaceAll('<p>{recipeboxend}</p>', '</div>')
-        .replaceAll('{jumptorecipebox}', `<button class="jump-to-recipe flex-centre" type="button">${templateHelper.getDownArrow()} Jump to recipe</button>`)
-        .replaceAll('<p>{lightstyleboxstart}</p>', '<div class="light-style-box">')
-        .replaceAll('<p>{lightstyleboxend}</p>', '</div>')
-        .replaceAll('<p>{darkstyleboxstart}</p>', '<div class="dark-style-box">')
-        .replaceAll('<p>{darkstyleboxend}</p>', '</div>');
-
-    // The first image should be a priority to optimise LCP and avoid layout shifts
-    processedHtml = processedHtml.replace('<img', '<img fetchpriority="high" class="content-image"');
-    processedHtml = processedHtml.replaceAll('<img src=', '<img loading="lazy" class="content-image" src=');
-
-    // Update checkboxes so they are active and text is crossed out on check
-    let checkboxIdCounter = 1;
-    processedHtml = processedHtml.replaceAll(/<li><input disabled="" type="checkbox">(.*?)(?=<\/li>|<ul>)/g, (match, text) => {
-        const id = `checkbox-${checkboxIdCounter}`;
-        checkboxIdCounter++;
-        return `<li class="ingredient-item-checkbox"><input type="checkbox" class="test" id="${id}"> <label for="${id}">${text}</label>`;
-    });
-    return processedHtml;
-}
-
-// Copy any images from their post directory to the output directory, including with Exif removal
-// Exif removal is synchronous as part of the static site generation since it is fast enough (total generation of ~150ms)
-// and simplifies code. If this becomes noticeably slower as the site grows, consider changing to an asynchronous approach
+// Copy any images from their post directory to the output directory, including with Exif removal and content hash filenames
 function processPostImages({ allPostFiles, postTypeOutputPath, postDirectoryName, postDirectoryPath }) {
     const postImages = allPostFiles.filter((filename) => utils.allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
+
     postImages.forEach((image) => {
         const imagePath = path.join(postDirectoryPath, image);
-        const imageOutputPath = path.join(postTypeOutputPath, postDirectoryName, image);
+        const ext = path.extname(image);
+        const base = path.basename(image, ext);
+
+        // Compute content hash details
+        const hash = utils.getFileHash(imagePath);
+        const hashFilename = utils.getHashFilename(base, hash, ext);
+        const logicalImageOutputPath = path.join(postTypeOutputPath, postDirectoryName, image);
+        const imageOutputPath = path.join(postTypeOutputPath, postDirectoryName, hashFilename);
 
         // If contain exif data, remove and write the new image, otherwise copy the image
         const fileType = path.extname(imagePath).toLowerCase();
@@ -178,7 +132,67 @@ function processPostImages({ allPostFiles, postTypeOutputPath, postDirectoryName
         if (!wasProcessed) {
             fs.copyFileSync(imagePath, imageOutputPath);
         }
+        utils.setHashPath(logicalImageOutputPath, imageOutputPath);
     });
+}
+
+// Generate the html page from the md file
+// Return metadata about the post (post .md filename and front-matter attributes)
+function processMarkdownFile({ postTypeConfig, allPostFiles, postDirectoryPath, postDirectoryName, postTypeOutputPath }) {
+    const postTypeDirectoryName = postTypeConfig.postTypeDirectory;
+
+    // Retrieve and format post html and front-matter attributes
+    const markdownFilename = allPostFiles.find((file) => path.extname(file).toLowerCase() === '.md');
+    if (markdownFilename) {
+        const filename = markdownFilename.slice(0, -3);
+        const fileContent = fs.readFileSync(path.join(postDirectoryPath, markdownFilename), 'utf8');
+        const content = fm(fileContent);
+        let rawPostHtml = marked.parse(content.body);
+        htmlContent = formatPostHtml(rawPostHtml, postTypeDirectoryName, postDirectoryName);
+
+        // Generate the post site page
+        const postPage = generatePost(postTypeConfig, htmlContent, content.attributes, postTypeDirectoryName, filename);
+        const postFilePath = path.join(postTypeOutputPath, postDirectoryName, filename + '.html');
+        fs.writeFileSync(postFilePath, postPage, 'utf8');
+        return { ...content.attributes, filename: filename };
+    } else {
+        throw new Error(`Missing markdown file for ${filename}`);
+    }
+}
+
+// Replace the relative image urls, add css and other formatting features
+function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
+    const folderPath = `/${postTypeDirectoryName}/${postDirectoryName}/`;
+
+    htmlContent = htmlContent
+        .replaceAll('src="./', `src="${folderPath}`)
+        .replaceAll('<table>', '<div class="table-wrapper"><table>')
+        .replaceAll('</table>', '</table></div>')
+        .replaceAll('<p>{recipeboxstart}</p>', '<div id="recipe" class="recipe-box">')
+        .replaceAll('<p>{recipeboxend}</p>', '</div>')
+        .replaceAll('{jumptorecipebox}', `<button class="jump-to-recipe flex-centre" type="button">${templateHelper.getDownArrow()} Jump to recipe</button>`)
+        .replaceAll('<p>{lightstyleboxstart}</p>', '<div class="light-style-box">')
+        .replaceAll('<p>{lightstyleboxend}</p>', '</div>')
+        .replaceAll('<p>{darkstyleboxstart}</p>', '<div class="dark-style-box">')
+        .replaceAll('<p>{darkstyleboxend}</p>', '</div>');
+
+    // Update image references to use the content hash filename
+    Object.entries(utils.getHashPaths()).forEach(([logical, hash]) => {
+        htmlContent = htmlContent.replaceAll(`src="${logical}`, `src="${hash}`);
+    });
+
+    // The first image should be a priority to optimise LCP and avoid layout shifts
+    htmlContent = htmlContent.replace('<img', '<img fetchpriority="high" class="content-image"');
+    htmlContent = htmlContent.replaceAll('<img src=', '<img loading="lazy" class="content-image" src=');
+
+    // Update checkboxes so they are active and text is crossed out on check
+    let checkboxIdCounter = 1;
+    htmlContent = htmlContent.replaceAll(/<li><input disabled="" type="checkbox">(.*?)(?=<\/li>|<ul>)/g, (match, text) => {
+        const id = `checkbox-${checkboxIdCounter}`;
+        checkboxIdCounter++;
+        return `<li class="ingredient-item-checkbox"><input type="checkbox" class="test" id="${id}"> <label for="${id}">${text}</label>`;
+    });
+    return htmlContent;
 }
 
 // Get an array of the most recent posts across all post types

@@ -36,13 +36,14 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
     const path = req.path;
 
-    // Cache images for 3 days
+    // Images and assets use content hash filenames for cache busting
+    // Cache images for 5 days
     const isImage = srcUtils.allowedImageExtensions.some((ext) => path.endsWith(ext));
     if (isImage || path.endsWith('.ico')) {
-        res.setHeader('Cache-Control', 'public, max-age=259200, must-revalidate');
+        res.setHeader('Cache-Control', 'public, max-age=432000, must-revalidate');
     } else if (path.endsWith('.js') || path.endsWith('.css')) {
-        // Cache static assets for 3 days - build step performs cache busting
-        res.setHeader('Cache-Control', 'public, max-age=259200, must-revalidate');
+        // Cache static assets for 5 days
+        res.setHeader('Cache-Control', 'public, max-age=432000, must-revalidate');
     } else {
         // All other content such as html pages do not cache
         res.setHeader('Cache-Control', 'no-cache');
@@ -54,10 +55,13 @@ app.use((req, res, next) => {
 // Allow cross origin request to image files for link preview tools
 // Image files are from the images folder (for favicon and other images) and each post's icon image
 app.use((req, res, next) => {
-    const isIconImage = srcUtils.allowedImageExtensions.some((suffix) => req.path.endsWith('-icon' + suffix));
-    const isImageFolder = req.path.startsWith('/images/');
-    if (isIconImage || isImageFolder) {
-        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    const isImage = srcUtils.allowedImageExtensions.some((suffix) => req.path.endsWith(suffix)) || req.path.endsWith('.ico');
+    if (isImage) {
+        const isIconImage = req.path.includes('-icon');
+        const isImageFolder = req.path.startsWith(`/${srcUtils.IMAGE_ASSETS_FOLDER}`);
+        if (isIconImage || isImageFolder) {
+            res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+        }
     }
     next();
 });

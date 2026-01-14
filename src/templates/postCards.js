@@ -10,11 +10,13 @@ function createPostCards(posts, isHomePage) {
 
 function createPostCard(post, showPostType) {
     let type = utils.removeLastS(post.postTypeToDisplay);
+    const imageHashPath = utils.getHashPath(`/${post.postTypeDirectoryName}/${post.filename}/${post.image}`);
+
     return `
             <a href="/${post.postTypeDirectoryName}/${post.filename}">
                 <article class="post-thumbnail">
                     ${showPostType ? `<div class="type-icon">${type.toLowerCase()}</div>` : ''}
-                    <img src="/${post.postTypeDirectoryName}/${post.filename}/${post.image}" alt="" />
+                    <img src="${imageHashPath}" alt="" />
                     <p class="post-thumbnail-title">${post.title}</p>
                     <p class="post-thumbnail-description">${post.description}</p>
                 </article>

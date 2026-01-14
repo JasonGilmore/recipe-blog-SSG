@@ -27,8 +27,8 @@ function generateAssets() {
     });
 }
 
-// Process an asset directory. processFn is optional and can return:
-// String (to write content), Boolean (true to copy, false to skip)
+// Process an asset directory and generate content hash filenames
+// processFn is optional and can return: String (to write content), Boolean (true to copy, false to skip)
 function processAssets(srcDir, destDir, processFn) {
     if (!fs.existsSync(srcDir)) {
         return;
@@ -37,13 +37,24 @@ function processAssets(srcDir, destDir, processFn) {
     fs.mkdirSync(destDir, { recursive: true });
     fs.readdirSync(srcDir).forEach((item) => {
         const srcPath = path.join(srcDir, item);
-        const destPath = path.join(destDir, item);
+        const ext = path.extname(item);
+        const base = path.basename(item, ext);
 
         const processResult = processFn ? processFn(item, srcPath) : true;
-        if (typeof processResult === 'string') {
-            fs.writeFileSync(destPath, processResult);
-        } else if (processResult === true) {
-            fs.cpSync(srcPath, destPath);
+        const isString = typeof processResult === 'string';
+        const isTrue = processResult === true;
+
+        if (isString || isTrue) {
+            const hash = isString ? utils.getStringHash(processResult) : utils.getFileHash(srcPath);
+            const hashFilename = utils.getHashFilename(base, hash, ext);
+            const hashDestPath = path.join(destDir, hashFilename);
+
+            if (isString) {
+                fs.writeFileSync(hashDestPath, processResult, 'utf8');
+            } else {
+                fs.cpSync(srcPath, hashDestPath);
+            }
+            utils.setHashPath(path.join(destDir, item), hashDestPath);
         }
     });
 }

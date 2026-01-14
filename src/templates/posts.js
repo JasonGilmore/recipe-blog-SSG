@@ -17,6 +17,9 @@ function createPost(postTypeConfig, postHtml, postAttributes, postTypeDirectoryN
         structuredData,
     });
 
+    const postsJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/posts.js`);
+    const pageTrackJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/pageTrack.js`);
+
     return `
         ${head}
         <body>
@@ -32,8 +35,8 @@ function createPost(postTypeConfig, postHtml, postAttributes, postTypeDirectoryN
                 </div>
             </main>
             ${footerHandler.createFooter()}
-            <script src=/${utils.JS_FOLDER}/posts.js${utils.getCacheBustQuery()}></script>
-            ${utils.siteConfig.enableVisitCounter ? `<script src=/${utils.JS_FOLDER}/pageTrack.js${utils.getCacheBustQuery()}></script>` : ''}
+            <script src="${postsJsHashPath}"></script>
+            ${utils.siteConfig.enableVisitCounter ? `<script src="${pageTrackJsHashPath}"></script>` : ''}
         </body>
 
     </html>
