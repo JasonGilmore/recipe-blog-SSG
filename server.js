@@ -25,9 +25,11 @@ if (srcUtils.siteConfig.enableVisitCounter) {
 // Rewrite canonical post paths
 // When "/recipes/bread" serve "/recipes/bread/bread.html"
 app.use((req, res, next) => {
-    const { isPost, postName, isCanonicalPostPath } = utils.parseRequest(req.path);
+    const { isPost, isCanonicalPostPath, matchedPostType, postName } = utils.parseRequest(req.path);
     if (isPost && isCanonicalPostPath) {
-        req.url = `${req.url}/${postName}.html`;
+        const newPath = `/${matchedPostType}/${postName}/${postName}`;
+        const queryString = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+        req.url = newPath + queryString;
     }
     next();
 });

@@ -158,6 +158,7 @@ This generator includes an optional visit counter to track site visits.
 
 -   Visit counting is enabled by default but can be customised via the `enableVisitCounter` property in the configuration. Simple numeric data is stored, persisted in `data/visitCounts.json`.
 -   totalPostHits are incremented indefinitely, and visit stats are captured daily. Daily visit stats are rotated so only the last 30 days of visits are kept.
+-   To prevent internal testing inflating visit counting, counting is bypassed if the url search string contains the parameter `test=true`.
 -   For counting totalPostHits, homepageHits and postHits a simple client-side JavaScript tracking is used. For counting unique visitors, hashed ip address and user agent are stored and reset each day. If you require stricter privacy, disable this feature.
 -   Example:
 

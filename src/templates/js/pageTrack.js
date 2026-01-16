@@ -6,7 +6,7 @@ window.addEventListener('load', () => {
         },
         body: JSON.stringify({
             event: 'pageview',
-            pathname: window.location.pathname,
+            pathname: window.location.pathname + window.location.search,
         }),
     });
 });
