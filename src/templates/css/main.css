@@ -173,12 +173,15 @@ main {
 }
 
 .page-intro-title {
-    padding-top: 15px;
+    margin-top: 25px;
+    margin-bottom: 25px;
     font-size: 2.5rem;
     font-weight: normal;
 }
 
 .page-intro-secondary-title {
+    margin-top: 20px;
+    margin-bottom: 20px;
     font-size: 1.5rem;
 }
 
@@ -308,12 +311,26 @@ main {
         font-size: 1.4rem;
     }
 
+    .page-intro {
+        margin-bottom: 15px;
+    }
+
     .page-intro-image {
         height: 40vw;
     }
 
     .page-intro-text-container {
         width: 95%;
+    }
+
+    .page-intro-title {
+        line-height: 1.4;
+    }
+
+    .page-intro-secondary-title {
+        line-height: 1.4;
+        margin-top: 20px;
+        margin-bottom: 20px;
     }
 
     .post-thumbnail-container {
