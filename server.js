@@ -15,7 +15,7 @@ app.use(
     })
 );
 
-if (srcUtils.siteConfig.enableVisitCounter) {
+if (srcUtils.isFeatureEnabled('enableVisitCounter')) {
     const visitCounter = require('./lib/visitCounter.js');
     app.use(express.json());
     app.use(visitCounter.middleware);

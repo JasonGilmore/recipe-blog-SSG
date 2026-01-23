@@ -36,7 +36,7 @@ function createPost(postTypeConfig, postHtml, postAttributes, postTypeDirectoryN
             </main>
             ${footerHandler.createFooter()}
             <script src="${postsJsHashPath}"></script>
-            ${utils.siteConfig.enableVisitCounter ? `<script src="${pageTrackJsHashPath}"></script>` : ''}
+            ${utils.isFeatureEnabled('enableVisitCounter') ? `<script src="${pageTrackJsHashPath}"></script>` : ''}
         </body>
 
     </html>

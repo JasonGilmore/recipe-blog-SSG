@@ -21,18 +21,22 @@ function generateAssets() {
     });
 
     // JS
-    // Only copy client side post tracking if tracking is enabled
+    // Only copy feature scripts if enabled
     processAssets(path.join(__dirname, 'js'), path.join(utils.PUBLIC_OUTPUT_DIRECTORY, utils.JS_FOLDER), (item) => {
-        return item === 'pageTrack.js' ? utils.siteConfig.enableVisitCounter : true;
+        if (item === 'search.js') {
+            return generateSearchJs();
+        }
+        if (item === 'pageTrack.js') {
+            return utils.isFeatureEnabled('enableVisitCounter');
+        }
+        return true;
     });
 }
 
 // Process an asset directory and generate content hash filenames
 // processFn is optional and can return: String (to write content), Boolean (true to copy, false to skip)
 function processAssets(srcDir, destDir, processFn) {
-    if (!fs.existsSync(srcDir)) {
-        return;
-    }
+    if (!fs.existsSync(srcDir)) return;
 
     fs.mkdirSync(destDir, { recursive: true });
     fs.readdirSync(srcDir).forEach((item) => {
@@ -57,6 +61,26 @@ function processAssets(srcDir, destDir, processFn) {
             utils.setHashPath(path.join(destDir, item), hashDestPath);
         }
     });
+}
+
+// Generate search script and inject search index location
+function generateSearchJs() {
+    if (!utils.isFeatureEnabled('enableSearch')) return false;
+
+    const searchIndexHashPath = utils.getHashPath(`/${utils.SEARCH_INDEX_FILENAME}`);
+    const searchJsPath = path.join('js', 'search.js');
+    let searchJs = fs.readFileSync(path.join(__dirname, searchJsPath), 'utf8');
+
+    // Update placeholders
+    searchJs = searchJs.replace('#SEARCH_INDEX_PLACEHOLDER', searchIndexHashPath);
+    searchJs = utils.siteContent.searchPlaceholders
+        ? searchJs.replace("'#SEARCH_PLACEHOLDERS'", JSON.stringify(utils.siteContent.searchPlaceholders))
+        : searchJs.replace('#SEARCH_PLACEHOLDERS', 'Search...');
+
+    const filename = utils.getHashFilename('search', utils.getStringHash(searchJs), '.js');
+    const searchJsOutputPath = path.join(path.join(utils.PUBLIC_OUTPUT_DIRECTORY, utils.JS_FOLDER), filename);
+    fs.writeFileSync(searchJsOutputPath, searchJs, 'utf8');
+    utils.setHashPath(searchJsPath, searchJsOutputPath);
 }
 
 module.exports = generateAssets;

@@ -16,6 +16,7 @@ if (fs.existsSync(configPath)) {
 const CSS_FOLDER = 'css';
 const JS_FOLDER = 'js';
 const IMAGE_ASSETS_FOLDER = 'images/site-assets';
+const SEARCH_INDEX_FILENAME = 'search-index.json';
 
 const PUBLIC_OUTPUT_DIRECTORY = path.join(__dirname, '../', siteConfig.outputDirectory);
 const CONTENT_DIRECTORY = path.join(__dirname, '../', siteConfig.contentDirectory);
@@ -121,6 +122,10 @@ function getPostTypeConfig(postType) {
     return siteConfig.postTypes[postType];
 }
 
+function isFeatureEnabled(feature) {
+    return !!siteConfig[feature];
+}
+
 function removeLastS(word) {
     return removeLast(word, 's');
 }
@@ -136,6 +141,7 @@ module.exports = {
     FOOTER_DIRECTORY,
     PAGE_TYPES,
     IMAGE_ASSETS_FOLDER,
+    SEARCH_INDEX_FILENAME,
     CSS_FOLDER,
     JS_FOLDER,
     siteConfig,
@@ -149,5 +155,6 @@ module.exports = {
     getHashPaths,
     allowedImageExtensions,
     getPostTypeConfig,
+    isFeatureEnabled,
     removeLastS,
 };
