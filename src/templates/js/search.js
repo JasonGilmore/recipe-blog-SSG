@@ -122,7 +122,7 @@ async function performSearch(query) {
         return;
     }
 
-    const LIMIT = 8;
+    const LIMIT = 6;
     let exceedResults = false;
 
     // Search and enforce literal string searching
