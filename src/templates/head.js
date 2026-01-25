@@ -11,7 +11,7 @@ function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativ
     const mainCssHashPath = utils.getHashPath('/css/main.css');
     const headerJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/header.js`);
     const postCssHashPath = utils.getHashPath('/css/post.css');
-    const searchJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/search.js`);
+    const searchJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/${utils.SEARCH_JS_FILENAME}`);
 
     return `<!DOCTYPE html>
 <html lang="en">

@@ -18,11 +18,11 @@ utils.validateConfigurations();
 utils.prepareDirectory(utils.PUBLIC_OUTPUT_DIRECTORY);
 
 // Preparation tasks for buliding site
-// Each post meta contains front-matter attributes plus additional properties link, imageHashPath and postType
+// Each post meta contains front-matter attributes plus additional properties link, imageHashPath, postType and mdFilename
 const allPostMeta = prepareSiteGeneration();
 
 if (utils.isFeatureEnabled('enableSearch')) {
-    templateHelper.generateSearchIndex(allPostMeta);
+    templateHelper.generateSearchData(allPostMeta);
 }
 
 // Generate assets upfront to use filename content hash for cache busting
@@ -97,7 +97,7 @@ function getPostMeta(postDirPath, postType, postDirName, allPostFiles) {
     const imageOutputPath = `/${postTypeConfig.postTypeDirectory}/${postDirName}/${image}`;
     const link = `/${postTypeConfig.postTypeDirectory}/${postDirName}`;
     const imageHashPath = utils.getHashPath(imageOutputPath);
-    return { ...restAttributes, link, imageHashPath, postType };
+    return { ...restAttributes, link, imageHashPath, postType, mdFilename };
 }
 
 function getPostImages(postFiles) {

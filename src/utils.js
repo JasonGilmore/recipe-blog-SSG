@@ -16,7 +16,8 @@ if (fs.existsSync(configPath)) {
 const CSS_FOLDER = 'css';
 const JS_FOLDER = 'js';
 const IMAGE_ASSETS_FOLDER = 'images/site-assets';
-const SEARCH_INDEX_FILENAME = 'search-index.json';
+const SEARCH_JS_FILENAME = 'search.js';
+const SEARCH_DATA_FILENAME = 'search-data.json';
 
 const PUBLIC_OUTPUT_DIRECTORY = path.join(__dirname, '../', siteConfig.outputDirectory);
 const CONTENT_DIRECTORY = path.join(__dirname, '../', siteConfig.contentDirectory);
@@ -116,6 +117,20 @@ function normalisePath(filePath) {
     return normalisedPath.startsWith('/') ? normalisedPath : '/' + normalisedPath;
 }
 
+function writeHashFile(stringContent, filename, outputDir) {
+    const hash = getStringHash(stringContent);
+    const [base, ext] = filename.split('.');
+    const hashFilename = getHashFilename(base, hash, `.${ext}`);
+
+    fs.mkdirSync(outputDir, { recursive: true });
+
+    // Store hash and write file
+    const logicalPath = path.join(outputDir, filename);
+    const hashPath = path.join(outputDir, hashFilename);
+    setHashPath(logicalPath, hashPath);
+    fs.writeFileSync(hashPath, stringContent, 'utf8');
+}
+
 const allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
 
 function getPostTypeConfig(postType) {
@@ -141,7 +156,8 @@ module.exports = {
     FOOTER_DIRECTORY,
     PAGE_TYPES,
     IMAGE_ASSETS_FOLDER,
-    SEARCH_INDEX_FILENAME,
+    SEARCH_JS_FILENAME,
+    SEARCH_DATA_FILENAME,
     CSS_FOLDER,
     JS_FOLDER,
     siteConfig,
@@ -153,6 +169,7 @@ module.exports = {
     getHashPath,
     setHashPath,
     getHashPaths,
+    writeHashFile,
     allowedImageExtensions,
     getPostTypeConfig,
     isFeatureEnabled,

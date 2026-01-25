@@ -1,5 +1,7 @@
 const path = require('node:path');
 const fs = require('node:fs');
+const lunr = require('lunr');
+const fm = require('front-matter');
 const utils = require('../utils.js');
 
 function getUpArrow() {
@@ -58,31 +60,80 @@ function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
     return htmlContent;
 }
 
-// Index is generated in created date descending order
-function generateSearchIndex(allPostMeta) {
-    allPostMeta.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
-    const index = allPostMeta.map((post) => {
-        const keywords = `${post.category} ${post.keywords} ${post.postType}`;
-        return {
-            title: post.title,
-            description: post.description,
-            link: post.link,
-            imageHashPath: post.imageHashPath,
-            keywords: keywords.toLowerCase(),
+// Create the index and a data store for result metadata
+function generateSearchData(allPostMeta) {
+    const store = allPostMeta.reduce((acc, postMeta) => {
+        acc[postMeta.link] = {
+            link: postMeta.link,
+            title: postMeta.title,
+            description: postMeta.description,
+            imageHashPath: postMeta.imageHashPath,
         };
+        return acc;
+    }, {});
+
+    var idx = lunr(function () {
+        this.ref('link');
+        this.field('title', { boost: 5 });
+        this.field('description');
+        this.field('keywords');
+        this.field('category');
+        this.field('content');
+
+        allPostMeta.forEach((postMeta) => {
+            const contentPath = path.join(utils.CONTENT_DIRECTORY, postMeta.link, postMeta.mdFilename);
+            const content = cleanMarkdown(fm(fs.readFileSync(contentPath, 'utf8')).body);
+            this.add({
+                link: postMeta.link,
+                title: normalise(postMeta.title),
+                description: normalise(postMeta.description),
+                keywords: normalise(postMeta.keywords),
+                category: postMeta.category,
+                content: normalise(content),
+            });
+        });
     });
 
-    // Generate index filename hash
-    const searchIndex = JSON.stringify(index);
-    const hash = utils.getStringHash(searchIndex);
-    const [base, ext] = utils.SEARCH_INDEX_FILENAME.split('.');
-    const hashFilename = utils.getHashFilename(base, hash, `.${ext}`);
+    const searchDataObj = {
+        index: idx,
+        store: store,
+    };
 
-    // Store hash and write index
-    const logicalPath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, utils.SEARCH_INDEX_FILENAME);
-    const hashPath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, hashFilename);
-    utils.setHashPath(logicalPath, hashPath);
-    fs.writeFileSync(hashPath, searchIndex, 'utf8');
+    utils.writeHashFile(JSON.stringify(searchDataObj), utils.SEARCH_DATA_FILENAME, utils.PUBLIC_OUTPUT_DIRECTORY);
+}
+
+// Remove accent marks
+function normalise(text) {
+    if (!text) return text;
+    return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+// Remove unecessary content, reduces raw index size by ~12%
+function cleanMarkdown(markdown) {
+    if (!markdown) return markdown;
+
+    return (
+        markdown
+            // Comments
+            .replace(/^<!.*$/gm, '')
+            // Image links
+            .replace(/!\[(.*?)\]\(.*?\)/g, '$1')
+            // Links, keep anchor text
+            .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+            // Placeholder content
+            .replace(/\{.*?\}/g, '')
+            // Words containing numbers
+            .replace(/[^\s]*\d[^\s]*/g, '')
+            // Table characters. Matches | and lines like |---| or ---|---
+            .replace(/[|]|-{2,}/g, ' ')
+            // Task lists
+            .replace(/\[\s\]/g, '')
+            // Points
+            .replace(/\\\*/g, '')
+            // Remaining markdown symbols
+            .replace(/[#*_>`~:\|\-\(\)]/g, ' ')
+            .trim()
+    );
 }
 
 module.exports = {
@@ -90,5 +141,5 @@ module.exports = {
     getDownArrow,
     getSearchIcon,
     formatPostHtml,
-    generateSearchIndex,
+    generateSearchData,
 };

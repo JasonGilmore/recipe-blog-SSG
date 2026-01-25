@@ -42,16 +42,16 @@ function createHeader() {
 }
 
 function generateSearch() {
-    return `<dialog class="search-dialog" closedby="any">
+    return `<dialog id="search-dialog" class="search-dialog" closedby="any">
                 <div class="search-container">
                     <div class="search-header">
-                        <input type="search" class="search-input" autocomplete="off" autofocus></input>
+                        <input type="search" class="search-input" autocomplete="off" autofocus aria-label="Enter search term" aria-controls="searchResults"></input>
                         <div class="close-search" tabindex="0" title="Close" role="button" aria-label="Close search">
                             <div class="bar1"></div>
                             <div class="bar2"></div>
                         </div>
                     </div>
-                    <div class="search-results"></div>
+                    <div id="searchResults" class="search-results" role="region" aria-label="Search results"></div>
                 </div>
             </dialog>`;
 }

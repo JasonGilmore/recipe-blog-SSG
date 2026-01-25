@@ -2,9 +2,12 @@ let searchDialog = null;
 let searchResultsContainer = null;
 let searchInput = null;
 let placeholders = '#SEARCH_PLACEHOLDERS';
+
 let searchTimeout = null;
-let searchIndexPromise = null;
-let promiseRetries = 0;
+let searchIndex = null;
+let searchStore = null;
+let searchPromise = null;
+let searchFailures = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Handle open dialog
@@ -64,69 +67,73 @@ function showSearch() {
     }
 
     // Preload the search index
-    getSearchIndex();
+    searchPromise = prepareSearch();
 }
 
-// Retrieve the search index once and cache the results. If failed, will retry once on perform search or reopen dialog
-function getSearchIndex() {
-    const url = '#SEARCH_INDEX_PLACEHOLDER';
-    if (searchIndexPromise) return searchIndexPromise;
+// Retrieve the search data (index + store) and initialise search. Allows 1 retry on next prepareSearch
+// Check readiness with searchIndex, as failure will return a resolved promise of null
+async function prepareSearch() {
+    const dataUrl = '#SEARCH_INDEX_PLACEHOLDER';
 
-    searchIndexPromise = fetch(url)
-        .then((res) => {
-            if (!res.ok) throw new Error('Error retrieving index.');
-            // todo consider need to validate resopnse, otherwise not iterable err thrown later
-            if (!res) throw new Error('Search index empty.');
-            return res.json();
-        })
-        .catch((err) => {
-            if (promiseRetries < 1) {
-                promiseRetries++;
-                searchIndexPromise = null;
-            }
-        });
+    if (searchIndex || searchFailures > 1) return;
+    if (searchPromise) return searchPromise;
 
-    return searchIndexPromise;
+    try {
+        const response = await fetch(dataUrl);
+        const data = await response.json();
+
+        searchIndex = lunr.Index.load(data.index);
+        searchStore = data.store;
+    } catch (err) {
+        searchFailures++;
+        searchIndex = null;
+        searchPromise = null;
+    }
 }
 
 async function performSearch(query) {
-    const cleanQuery = query.toLowerCase().trim();
-    if (!cleanQuery) {
-        searchResultsContainer.innerHTML = '';
-        return;
-    }
-
-    const data = await getSearchIndex();
-    if (!data) {
+    // Ensure search is ready
+    await prepareSearch();
+    if (!searchIndex) {
         searchResultsContainer.innerHTML = '';
         addMessageResult('Unable to retrieve search results. Please try again.');
         return;
     }
 
-    const matches = [];
+    // Search index is already normalised
+    const cleanQuery = query
+        .toLowerCase()
+        .trim()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+
+    if (!cleanQuery) {
+        searchResultsContainer.innerHTML = '';
+        return;
+    }
+
     const LIMIT = 4; // todo update to 10 or another number
     let exceedResults = false;
 
-    for (const post of data) {
-        // todo refine search for priority results on title and description
-        if (`${post.title.toLowerCase()} ${post.description.toLowerCase()} ${post.keywords}`.includes(cleanQuery)) {
-            if (matches.length === LIMIT) {
-                exceedResults = true;
-                break;
-            }
-            matches.push(post);
-        }
+    // Search and escape special characters to enforce literal string searching
+    const escapedQuery = cleanQuery.replace(/([\*\:\^\~\+\-])/g, '\\$1');
+    let results = searchIndex.query((q) => q.term(escapedQuery));
+
+    if (results.length > LIMIT) {
+        results = results.slice(0, LIMIT);
+        exceedResults = true;
     }
 
     // Render results
     searchResultsContainer.innerHTML = '';
-    if (matches.length === 0) {
+    if (results.length === 0) {
         addMessageResult("We couldn't find anything matching your search.");
         return;
     }
 
     const fragment = document.createDocumentFragment();
-    matches.forEach((match, index) => {
+    results.forEach((result, index) => {
+        const match = searchStore[result.ref];
         fragment.appendChild(createResultItem(match, index, query));
     });
     searchResultsContainer.appendChild(fragment);
@@ -137,7 +144,7 @@ async function performSearch(query) {
 }
 
 function addMessageResult(message) {
-    const messageDiv = document.createElement('div');
+    const messageDiv = document.createElement('p');
     messageDiv.classList.add('search-result-message');
     messageDiv.textContent = message;
     searchResultsContainer.appendChild(messageDiv);
@@ -159,7 +166,7 @@ function createResultItem(result, index, query) {
     textDiv.classList.add('text-container');
 
     // Title
-    const title = document.createElement('p');
+    const title = document.createElement('h2');
     title.classList.add('result-title');
     title.innerHTML = toSafeHighlightedText(result.title, query);
 
@@ -182,7 +189,7 @@ function toSafeHighlightedText(text, query) {
     helperDiv.textContent = text;
     const safeText = helperDiv.innerHTML;
 
-    if (!query || query.length < 3) return text;
+    if (!query || query.length < 3 || !text) return safeText;
 
     helperDiv.textContent = query;
     const safeQuery = RegExp.escape(helperDiv.innerHTML);

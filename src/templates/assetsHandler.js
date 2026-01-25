@@ -23,8 +23,8 @@ function generateAssets() {
     // JS
     // Only copy feature scripts if enabled
     processAssets(path.join(__dirname, 'js'), path.join(utils.PUBLIC_OUTPUT_DIRECTORY, utils.JS_FOLDER), (item) => {
-        if (item === 'search.js') {
-            return generateSearchJs();
+        if (item === utils.SEARCH_JS_FILENAME) {
+            return generateSearchBundle();
         }
         if (item === 'pageTrack.js') {
             return utils.isFeatureEnabled('enableVisitCounter');
@@ -63,24 +63,32 @@ function processAssets(srcDir, destDir, processFn) {
     });
 }
 
-// Generate search script and inject search index location
-function generateSearchJs() {
+// Inject search index location and search input placeholders
+// Inject the search library - for version consistency and CDN dependency removal
+// Search index already generated from generate.js
+function generateSearchBundle() {
     if (!utils.isFeatureEnabled('enableSearch')) return false;
 
-    const searchIndexHashPath = utils.getHashPath(`/${utils.SEARCH_INDEX_FILENAME}`);
-    const searchJsPath = path.join('js', 'search.js');
+    const searchIndexHashPath = utils.getHashPath(`/${utils.SEARCH_DATA_FILENAME}`);
+    const searchJsPath = path.join(utils.JS_FOLDER, utils.SEARCH_JS_FILENAME);
     let searchJs = fs.readFileSync(path.join(__dirname, searchJsPath), 'utf8');
 
     // Update placeholders
     searchJs = searchJs.replace('#SEARCH_INDEX_PLACEHOLDER', searchIndexHashPath);
     searchJs = utils.siteContent.searchPlaceholders
         ? searchJs.replace("'#SEARCH_PLACEHOLDERS'", JSON.stringify(utils.siteContent.searchPlaceholders))
-        : searchJs.replace('#SEARCH_PLACEHOLDERS', 'Search...');
+        : searchJs.replace('#SEARCH_PLACEHOLDERS', 'Search site...');
+    searchJs = searchJs.replace("'#SEARCH_TRACK_PLACEHOLDER'", utils.isFeatureEnabled('enableVisitCounter'));
 
-    const filename = utils.getHashFilename('search', utils.getStringHash(searchJs), '.js');
-    const searchJsOutputPath = path.join(path.join(utils.PUBLIC_OUTPUT_DIRECTORY, utils.JS_FOLDER), filename);
-    fs.writeFileSync(searchJsOutputPath, searchJs, 'utf8');
-    utils.setHashPath(searchJsPath, searchJsOutputPath);
+    // Inject search library
+    const libraryPath = path.join(__dirname, '..', '..', 'node_modules', 'lunr', 'lunr.min.js');
+    if (!fs.existsSync(libraryPath)) {
+        throw new Error('Could not locate search library for search generation.');
+    }
+    const library = fs.readFileSync(libraryPath, 'utf8');
+
+    const bundle = searchJs + '\n\n' + library;
+    return bundle;
 }
 
 module.exports = generateAssets;
