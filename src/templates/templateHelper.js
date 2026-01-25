@@ -61,6 +61,7 @@ function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
 }
 
 // Create the index and a data store for result metadata
+// Compression is omitted here, ideally handled by a reverse proxy
 function generateSearchData(allPostMeta) {
     const store = allPostMeta.reduce((acc, postMeta) => {
         acc[postMeta.link] = {
@@ -88,7 +89,7 @@ function generateSearchData(allPostMeta) {
                 title: normalise(postMeta.title),
                 description: normalise(postMeta.description),
                 keywords: normalise(postMeta.keywords),
-                category: postMeta.category,
+                category: normalise(postMeta.category),
                 content: normalise(content),
             });
         });
@@ -116,7 +117,7 @@ function cleanMarkdown(markdown) {
         markdown
             // Comments
             .replace(/^<!.*$/gm, '')
-            // Image links
+            // Image links, keep anchor text
             .replace(/!\[(.*?)\]\(.*?\)/g, '$1')
             // Links, keep anchor text
             .replace(/\[(.*?)\]\(.*?\)/g, '$1')

@@ -117,14 +117,13 @@ function normalisePath(filePath) {
     return normalisedPath.startsWith('/') ? normalisedPath : '/' + normalisedPath;
 }
 
+// Store hash and write file from string
 function writeHashFile(stringContent, filename, outputDir) {
     const hash = getStringHash(stringContent);
     const [base, ext] = filename.split('.');
     const hashFilename = getHashFilename(base, hash, `.${ext}`);
-
     fs.mkdirSync(outputDir, { recursive: true });
 
-    // Store hash and write file
     const logicalPath = path.join(outputDir, filename);
     const hashPath = path.join(outputDir, hashFilename);
     setHashPath(logicalPath, hashPath);

@@ -56,30 +56,30 @@ function prepareSiteGeneration() {
             const postDirPath = path.join(postTypePath, postDirName);
             const allPostFiles = fs.readdirSync(postDirPath, 'utf8');
             const postDirOutputPath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, postTypeConfig.postTypeDirectory, postDirName);
-            setImageHashPath(postDirPath, postDirOutputPath, allPostFiles);
+            setImageHashPaths(postDirPath, postDirOutputPath, allPostFiles);
             allPostMeta.push(getPostMeta(postDirPath, postType, postDirName, allPostFiles));
         });
     }
     return allPostMeta;
 }
 
-// Set image filename hash for one post directory
-function setImageHashPath(postDirPath, postDirOutputPath, postFiles) {
+// Set image filename hashes for images in one post directory
+function setImageHashPaths(postDirPath, postDirOutputPath, postFiles) {
     const postImages = getPostImages(postFiles);
 
     postImages.forEach((image) => {
-        const hashFilename = computeImageHash(postDirPath, image);
+        const hashFilename = getFileHashName(postDirPath, image);
         const logicalImageOutputPath = path.join(postDirOutputPath, image);
         const imageOutputPath = path.join(postDirOutputPath, hashFilename);
         utils.setHashPath(logicalImageOutputPath, imageOutputPath);
     });
 }
 
-// Compute the image hash and return the hash filename
-function computeImageHash(postDirPath, image) {
-    const imagePath = path.join(postDirPath, image);
-    const ext = path.extname(image);
-    const base = path.basename(image, ext);
+// Compute the hash and return the hash filename
+function getFileHashName(postDirPath, filename) {
+    const imagePath = path.join(postDirPath, filename);
+    const ext = path.extname(filename);
+    const base = path.basename(filename, ext);
 
     return utils.getHashFilename(base, utils.getFileHash(imagePath), ext);
 }
@@ -163,7 +163,7 @@ function processPostImages({ postType, allPostFiles, postTypeOutputPath, postDir
 
         // If image hash already computed use the path, otherwise generate
         if (!utils.getHashPaths()[logicalOutputPath]) {
-            utils.setHashPath(logicalOutputPath, path.join(postTypeOutputPath, postDirectoryName, computeImageHash(postDirectoryPath, image)));
+            utils.setHashPath(logicalOutputPath, path.join(postTypeOutputPath, postDirectoryName, getFileHashName(postDirectoryPath, image)));
         }
         const hashOutputPathFull = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, utils.getHashPath(logicalOutputPath));
 
