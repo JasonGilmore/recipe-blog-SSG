@@ -122,7 +122,7 @@ async function performSearch(query) {
         return;
     }
 
-    const LIMIT = 4; // todo update to 10 or another number
+    const LIMIT = 8;
     let exceedResults = false;
 
     // Search and enforce literal string searching
