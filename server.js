@@ -17,7 +17,7 @@ app.use(
 
 if (srcUtils.isFeatureEnabled('enableVisitCounter')) {
     const visitCounter = require('./lib/visitCounter.js');
-    app.use(express.json());
+    app.use(express.json({ limit: '1kb' }));
     app.use(visitCounter.middleware);
     visitCounter.startAutoSave();
 }

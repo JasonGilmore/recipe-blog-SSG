@@ -9,6 +9,9 @@ let searchStore = null;
 let searchPromise = null;
 let searchFailures = 0;
 
+const searchTrack = '#SEARCH_TRACK_PLACEHOLDER';
+let searchTrackTimeout = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     // Handle open dialog
     document.addEventListener('click', (e) => {
@@ -44,7 +47,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         searchTimeout = setTimeout(() => {
             performSearch(event.target.value);
-        }, 350);
+        }, 400);
+
+        if (searchTrack) {
+            clearTimeout(searchTrackTimeout);
+            searchTrackTimeout = setTimeout(() => {
+                trackSearch(event.target.value);
+            }, 2000);
+        }
     });
 
     // If touch device using virtual keyboard, hide the keyboard on enter since search results already shown
@@ -115,9 +125,9 @@ async function performSearch(query) {
     const LIMIT = 4; // todo update to 10 or another number
     let exceedResults = false;
 
-    // Search and escape special characters to enforce literal string searching
-    const escapedQuery = cleanQuery.replace(/([\*\:\^\~\+\-])/g, '\\$1');
-    let results = searchIndex.query((q) => q.term(escapedQuery));
+    // Search and enforce literal string searching
+    const queryWithoutSpecial = cleanQuery.replace(/([\*\:\^\~\+\-])/g, '');
+    let results = searchIndex.search(queryWithoutSpecial);
 
     if (results.length > LIMIT) {
         results = results.slice(0, LIMIT);
@@ -207,4 +217,18 @@ function closeBurger() {
         burgerContainer.setAttribute('aria-expanded', 'false');
         headerLinks.classList.remove('header-small-nav-active');
     }
+}
+
+function trackSearch(query) {
+    fetch('/track-event', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            event: 'search',
+            query: query,
+            pathname: window.location.pathname + window.location.search,
+        }),
+    });
 }

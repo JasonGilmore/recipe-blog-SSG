@@ -74,9 +74,9 @@ function generateSearchData(allPostMeta) {
 
     var idx = lunr(function () {
         this.ref('link');
-        this.field('title', { boost: 5 });
-        this.field('description');
+        this.field('title', { boost: 10 });
         this.field('keywords');
+        this.field('description');
         this.field('category');
         this.field('content');
 
