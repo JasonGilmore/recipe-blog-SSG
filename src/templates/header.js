@@ -1,6 +1,8 @@
 const utils = require('../utils.js');
+const templateHelper = require('./templateHelper.js');
 
 function createHeader() {
+    const isSearchEnabled = utils.isFeatureEnabled('enableSearch');
     const postTypeInfo = [];
     Object.entries(utils.siteConfig.postTypes).forEach(([key, value]) => {
         postTypeInfo.push(value);
@@ -9,7 +11,10 @@ function createHeader() {
     const siteIconHashPath = utils.siteContent.siteIcon ? utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/${utils.siteContent.siteIcon}`) : '';
     const siteIconHtml = siteIconHashPath ? `<img fetchpriority="high" src="${siteIconHashPath}" alt="" />` : '';
     const siteTitleBlock = `<a href="/" class="site-title-block">${siteIconHtml}<div>${utils.siteContent.siteName}</div></a>`;
-    const topLevelLinks = `${postTypeInfo.map((postType) => `<a href="/${postType.postTypeDirectory}/" class="top-level-links">${postType.postTypeDisplayName}</a>`).join(' ')}`;
+    let topLevelLinks = `${postTypeInfo.map((postType) => `<a href="/${postType.postTypeDirectory}/" class="top-level-links">${postType.postTypeDisplayName}</a>`).join(' ')}`;
+    if (isSearchEnabled) {
+        topLevelLinks = topLevelLinks + `<button type="button" class="top-level-links search-button">${templateHelper.getSearchIcon()} Search</button>`;
+    }
 
     return `<header class="site-header">
             <div class="header-wide-grouping">
@@ -32,7 +37,23 @@ function createHeader() {
                 </div>
             </div>
         </header>
+        ${isSearchEnabled ? generateSearch() : ''}
 `;
+}
+
+function generateSearch() {
+    return `<dialog id="search-dialog" class="search-dialog" closedby="any">
+                <div class="search-container">
+                    <div class="search-header">
+                        <input type="search" class="search-input" autocomplete="off" autofocus aria-label="Enter search term" aria-controls="searchResults"></input>
+                        <div class="close-search" tabindex="0" title="Close" role="button" aria-label="Close search">
+                            <div class="bar1"></div>
+                            <div class="bar2"></div>
+                        </div>
+                    </div>
+                    <div id="searchResults" class="search-results" role="region" aria-label="Search results"></div>
+                </div>
+            </dialog>`;
 }
 
 module.exports = createHeader;

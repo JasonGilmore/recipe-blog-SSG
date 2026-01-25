@@ -21,18 +21,22 @@ function generateAssets() {
     });
 
     // JS
-    // Only copy client side post tracking if tracking is enabled
+    // Only copy feature scripts if enabled
     processAssets(path.join(__dirname, 'js'), path.join(utils.PUBLIC_OUTPUT_DIRECTORY, utils.JS_FOLDER), (item) => {
-        return item === 'pageTrack.js' ? utils.siteConfig.enableVisitCounter : true;
+        if (item === utils.SEARCH_JS_FILENAME) {
+            return generateSearchBundle();
+        }
+        if (item === 'pageTrack.js') {
+            return utils.isFeatureEnabled('enableVisitCounter');
+        }
+        return true;
     });
 }
 
 // Process an asset directory and generate content hash filenames
 // processFn is optional and can return: String (to write content), Boolean (true to copy, false to skip)
 function processAssets(srcDir, destDir, processFn) {
-    if (!fs.existsSync(srcDir)) {
-        return;
-    }
+    if (!fs.existsSync(srcDir)) return;
 
     fs.mkdirSync(destDir, { recursive: true });
     fs.readdirSync(srcDir).forEach((item) => {
@@ -57,6 +61,34 @@ function processAssets(srcDir, destDir, processFn) {
             utils.setHashPath(path.join(destDir, item), hashDestPath);
         }
     });
+}
+
+// Inject search index location and search input placeholders
+// Inject the search library - for version consistency and CDN dependency removal
+// Search index already generated from generate.js
+function generateSearchBundle() {
+    if (!utils.isFeatureEnabled('enableSearch')) return false;
+
+    const searchIndexHashPath = utils.getHashPath(`/${utils.SEARCH_DATA_FILENAME}`);
+    const searchJsPath = path.join(utils.JS_FOLDER, utils.SEARCH_JS_FILENAME);
+    let searchJs = fs.readFileSync(path.join(__dirname, searchJsPath), 'utf8');
+
+    // Update placeholders
+    searchJs = searchJs.replace('#SEARCH_INDEX_PLACEHOLDER', searchIndexHashPath);
+    searchJs = utils.siteContent.searchPlaceholders
+        ? searchJs.replace("'#SEARCH_PLACEHOLDERS'", JSON.stringify(utils.siteContent.searchPlaceholders))
+        : searchJs.replace('#SEARCH_PLACEHOLDERS', 'Search site...');
+    searchJs = searchJs.replace("'#SEARCH_TRACK_PLACEHOLDER'", utils.isFeatureEnabled('enableVisitCounter'));
+
+    // Inject search library
+    const libraryPath = path.join(__dirname, '..', '..', 'node_modules', 'lunr', 'lunr.min.js');
+    if (!fs.existsSync(libraryPath)) {
+        throw new Error('Could not locate search library for search generation.');
+    }
+    const library = fs.readFileSync(libraryPath, 'utf8');
+
+    const bundle = searchJs + '\n\n' + library;
+    return bundle;
 }
 
 module.exports = generateAssets;

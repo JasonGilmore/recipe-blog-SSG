@@ -4,12 +4,13 @@ A small static site generator for publishing recipe and food blogs. Write conten
 
 ## Features
 
--   Convert Markdown posts with front-matter into HTML pages.
--   Configurable site structure and navigation via `src/config.json` (overrides [`src/config.default.json`](src/config.default.json)).
--   Generate homepage, top-level pages and post pages using simple templating (see [`src/templates/`](src/templates)).
--   Copy and sanitize image assets (Exif removal for JPG/JPEG).
--   Generate content hash filenames for images and site assets, for reliable cache busting.
--   Simple visit counter feature.
+- Convert Markdown posts with front-matter into HTML pages.
+- Configurable site structure and navigation via `src/config.json` (overrides [`src/config.default.json`](src/config.default.json)).
+- Generate homepage, top-level pages and post pages using simple templating (see [`src/templates/`](src/templates)).
+- Copy and sanitize image assets (Exif removal for JPG/JPEG).
+- Generate content hash filenames for images and site assets, for reliable cache busting.
+- Simple visit counting.
+- Client-side search.
 
 ## Quick start
 
@@ -33,26 +34,28 @@ A small static site generator for publishing recipe and food blogs. Write conten
 
 ## Configuration
 
-The site generator reads default settings from [`src/config.default.json`](src/config.default.json). To customize content and output directories and post types (which controls top-level pages), create `src/config.json` which will override the defaults.
+The site generator reads default settings from [`src/config.default.json`](src/config.default.json). To customize content and output directories, post types (which controls top-level pages) and feature toggles, create `src/config.json` which will override the defaults.
 
 Create a siteContent.json file within the [`src/templates/`](src/templates/) directory for key site information including a reference to the homepage image. Place the homepage image and a favicon into the [`src/templates/images/`](src/templates/images/) directory. siteContent.json supports the following fields:
 
--   **siteName**: the site name.
--   **mainIntroduction**: the main introduction text, used on the homepage.
--   **secondaryIntroduction**: the secondary introduction text, used on the homepage after the main introduction.
--   **theme**: an object containing design tokens to apply CSS compatible colour values (RGB, Hex etc.). Supported keys include accent-colour, accent-colour-dark, recipe-box-background, light-box-background, dark-box-background.
--   **siteUrl**: the site url.
--   **heroImage**: the name of the main image in the [`src/templates/images/`](src/templates/images/) directory, used for the homepage hero image.
--   **heroImageSmall**: the name of a smaller sized version of the hero image (<300KB) in the [`src/templates/images/`](src/templates/images/) directory, used for og image previews to conform to image size limits.
--   **heroImageAlt**: alt text for the hero images.
--   **[post type name]Image (such as recipesImage)**: optional, the name of an image in the [`src/templates/images/`](src/templates/images/) directory, to display as a small icon below the top-level page heading.
--   **[post type name]Description (such as recipesDescription)**: optional, descriptive text to display at the top of the top-level page as well as head markup.
+- **siteName**: the site name.
+- **mainIntroduction**: the main introduction text, used on the homepage.
+- **secondaryIntroduction**: the secondary introduction text, used on the homepage after the main introduction.
+- **theme**: an object containing design tokens to apply CSS compatible colour values (RGB, Hex etc.). Supported keys include accent-colour, accent-colour-dark, recipe-box-background, light-box-background, dark-box-background.
+- **siteUrl**: the site url.
+- **siteIcon**: optional, a small icon to display in the site header.
+- **heroImage**: the name of the main image in the [`src/templates/images/`](src/templates/images/) directory, used for the homepage hero image.
+- **heroImageSmall**: the name of a smaller sized version of the hero image (<300KB) in the [`src/templates/images/`](src/templates/images/) directory, used for og image previews to conform to image size limits.
+- **heroImageAlt**: alt text for the hero images.
+- **[post type name]Image (such as recipesImage)**: optional, the name of an image in the [`src/templates/images/`](src/templates/images/) directory, to display as a small icon below the top-level page heading.
+- **[post type name]Description (such as recipesDescription)**: optional, descriptive text to display at the top of the top-level page as well as head markup.
+- **searchPlaceholders**: optional, an array of placeholder texts to use in site search input.
 
 ## Content structure
 
--   The content root is the folder configured by `contentDirectory` in the configuration.
--   Each post type (e.g. `recipes`, `blogs`) should contain a post folder for each post. Each post folder contains a Markdown file (post) and optional assets (images).
--   Footer content lives in the `footers` directory. Each footer is a single Markdown file and is automatically included in the footer on the site.
+- The content root is the folder configured by `contentDirectory` in the configuration.
+- Each post type (e.g. `recipes`, `blogs`) should contain a post folder for each post. Each post folder contains a Markdown file (post) and optional assets (images).
+- Footer content lives in the `footers` directory. Each footer is a single Markdown file and is automatically included in the footer on the site.
 
 Example folder structure:
 
@@ -80,22 +83,22 @@ Front-matter is used to define metadata for site generation and structured data 
 
 Front-matter for posts:
 
--   **title**: the name of the post for display on site cards and og link previews.
--   **description**: the description of the post for display on site cards and og link previews.
--   **keywords**: comma separated keywords related to the post.
--   **date**: the date in ISO format for recent post sorting.
--   **image**: the image of the post for display on site cards and og link previews.
-    -   Ensure the image is <300KB to conform to image size limits for link previews.
+- **title**: the name of the post for display on site cards and og link previews.
+- **description**: the description of the post for display on site cards and og link previews.
+- **keywords**: comma separated keywords related to the post.
+- **date**: the date in ISO format for recent post sorting.
+- **image**: the image of the post for display on site cards and og link previews.
+    - Ensure the image is <300KB to conform to image size limits for link previews.
 
 Front-matter for footers:
 
--   **displayName**: the name in the site footer.
--   **order**: the order it appears in the site footer.
+- **displayName**: the name in the site footer.
+- **order**: the order it appears in the site footer.
 
 ## Templates & Assets
 
--   Templates live in `src/templates/`.
--   Static assets (CSS/JS) are copied to the public output by the assets handler.
+- Templates live in `src/templates/`.
+- Static assets (CSS/JS) are copied to the public output by the assets handler.
 
 ## Posts
 
@@ -103,26 +106,26 @@ This project supports a few post-specific conveniences for writing recipes and f
 
 ### Relative images
 
--   Use relative image paths in your Markdown (example: `![alt](./image.jpg 'Title')`).
--   This supports local previewing while writing content.
--   On build the generator copies those images into the output directory and rewrites the image references in the generated HTML, so they point to the copied asset in the public site.
+- Use relative image paths in your Markdown (example: `![alt](./image.jpg 'Title')`).
+- This supports local previewing while writing content.
+- On build the generator copies those images into the output directory and rewrites the image references in the generated HTML, so they point to the copied asset in the public site.
 
 ### Recipe and box layout blocks
 
--   Wrap recipe-specific content in the recipe box layout block to produce a styled recipe block:
-    -   Start marker: `{recipeboxstart}`
-    -   End marker: `{recipeboxend}`
--   Anything between these markers is rendered as a single recipe block.
-    Example:
+- Wrap recipe-specific content in the recipe box layout block to produce a styled recipe block:
+    - Start marker: `{recipeboxstart}`
+    - End marker: `{recipeboxend}`
+- Anything between these markers is rendered as a single recipe block.
+  Example:
 
 ```markdown
 {recipeboxstart}
 
 ## Ingredients
 
--   500 g flour
--   350 g water
--   ...
+- 500 g flour
+- 350 g water
+- ...
 
 ### Method
 
@@ -136,7 +139,7 @@ Use `{lightstyleboxstart} {lightstyleboxend}` and `{darkstyleboxstart} {darkstyl
 
 ### Tables
 
--   Markdown tables are styled for improved readability. Write standard Markdown tables and the style will be applied automatically.
+- Markdown tables are styled for improved readability. Write standard Markdown tables and the style will be applied automatically.
 
 Example:
 
@@ -149,18 +152,27 @@ Example:
 
 ### Additional Features
 
--   **Jump to recipe**: Add a jump to recipe button by adding the `{jumptorecipebox}` marker anywhere in the content. This will generate a button that, when clicked, scrolls the page to the start of the first recipe box.
--   **Ingredient checkboxes**: Add checkboxes for ingredients using markdown task list syntax `- [ ]`. These will be styled and will cross out the text when checked.
+- **Jump to recipe**: Add a jump to recipe button by adding the `{jumptorecipebox}` marker anywhere in the content. This will generate a button that, when clicked, scrolls the page to the start of the first recipe box.
+- **Ingredient checkboxes**: Add checkboxes for ingredients using markdown task list syntax `- [ ]`. These will be styled and will cross out the text when checked.
+
+## Search
+
+This generator includes a high-performance client-side search powered by Lunr.js.
+
+- Search index is created during build with filename content hashing, and only fetched upon user interaction.
+- Can be toggled on/off via site configuration.
+- Features debounced search execution and automatic highlighting for better readability.
+- Search hits and top search term tracking via visit counter.
 
 ## Visit Counter
 
 This generator includes an optional visit counter to track site visits.
 
--   Visit counting is enabled by default but can be customised via the `enableVisitCounter` property in the configuration. Simple numeric data is stored, persisted in `data/visitCounts.json`.
--   totalPostHits are incremented indefinitely, and visit stats are captured daily. Daily visit stats are rotated so only the last 30 days of visits are kept.
--   To prevent internal testing inflating visit counting, counting is bypassed if the url search string contains the parameter `test=true`.
--   For counting totalPostHits, homepageHits and postHits a simple client-side JavaScript tracking is used. For counting unique visitors, hashed ip address and user agent are stored and reset each day. If you require stricter privacy, disable this feature.
--   Example:
+- Visit counting is enabled by default but can be customised via the `enableVisitCounter` property in the configuration. Simple numeric data is stored, persisted in `data/visitCounts.json`.
+- totalPostHits are incremented indefinitely, and visit stats are captured daily. Daily visit stats are rotated so only the last 30 days of visits are kept.
+- To prevent internal testing inflating visit counting, counting is bypassed if the url search string contains the parameter `test=true`.
+- For counting totalPostHits, homepageHits and postHits a simple client-side JavaScript tracking is used. For counting unique visitors, hashed ip address and user agent are stored and reset each day. If you require stricter privacy, disable this feature.
+- Example:
 
 ```json
 {

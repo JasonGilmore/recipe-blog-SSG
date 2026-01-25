@@ -13,5 +13,6 @@
             "structuredDataContentType": "BlogPosting"
         }
     },
-    "enableVisitCounter": true
+    "enableVisitCounter": true,
+    "enableSearch": true
 }

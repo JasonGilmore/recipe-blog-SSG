@@ -9,8 +9,9 @@ function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativ
     const ogImageHashPath = utils.getHashPath(`${relativeImage ? utils.siteContent.siteUrl + utils.getHashPath(relativeImage) : heroImageOgHashUrl}`);
     const faviconHashPath = utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/favicon.ico`);
     const mainCssHashPath = utils.getHashPath('/css/main.css');
-    const navbarJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/navbar.js`);
+    const headerJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/header.js`);
     const postCssHashPath = utils.getHashPath('/css/post.css');
+    const searchJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/${utils.SEARCH_JS_FILENAME}`);
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -30,8 +31,9 @@ function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativ
 
         <link rel="icon" type="image/x-icon" href="${faviconHashPath}" />
         <link rel="stylesheet" href="${mainCssHashPath}" />
-        <script src="${navbarJsHashPath}"></script>
+        <script src="${headerJsHashPath}"></script>
         ${pageType === utils.PAGE_TYPES.POST ? `<link rel="stylesheet" href="${postCssHashPath}" />` : ''}
+        ${utils.isFeatureEnabled('enableSearch') ? `<script src="${searchJsHashPath}"></script>` : ''}
 
         ${structuredData ? structuredData : ''}
     </head>

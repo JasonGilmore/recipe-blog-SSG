@@ -17,45 +17,107 @@ console.time(timerLabel);
 utils.validateConfigurations();
 utils.prepareDirectory(utils.PUBLIC_OUTPUT_DIRECTORY);
 
+// Preparation tasks for buliding site
+// Each post meta contains front-matter attributes plus additional properties link, imageHashPath, postType and mdFilename
+const allPostMeta = prepareSiteGeneration();
+
+if (utils.isFeatureEnabled('enableSearch')) {
+    templateHelper.generateSearchData(allPostMeta);
+}
+
 // Generate assets upfront to use filename content hash for cache busting
 generateAssets();
 
 // Generate footers upfront so they can be added to all site pages
 footerHandler.generateFooters();
 
-// Generate posts and get a list of all post metadata, grouped by post type
-// Each post has front-matter attributes plus additional properties "filename", "postTypeToDisplay" and "postTypeDirectoryName" so the templates can link and display these items
-const postMetaGroupedByType = generateContent();
-const recentPosts = getRecentPosts(postMetaGroupedByType, 5);
+// Generate post pages
+generateContent();
 
 // Generate the rest of the site
+const recentPosts = getRecentPosts(allPostMeta, 5);
 generateHomepage(recentPosts);
-generateTopLevelPages(postMetaGroupedByType);
+generateTopLevelPages(allPostMeta);
 
 console.timeEnd(timerLabel);
 
+// Iterate through each post type directory, generate post meta and image hash filenames
+function prepareSiteGeneration() {
+    let allPostMeta = [];
+
+    // Get contents of post type directory
+    for (const postType of Object.keys(utils.siteConfig.postTypes)) {
+        const postTypeConfig = utils.getPostTypeConfig(postType);
+        const postTypePath = path.join(utils.CONTENT_DIRECTORY, postTypeConfig.postTypeDirectory);
+        const postDirNames = fs.readdirSync(postTypePath, 'utf8');
+
+        // Get individiual post directories
+        postDirNames.forEach((postDirName) => {
+            const postDirPath = path.join(postTypePath, postDirName);
+            const allPostFiles = fs.readdirSync(postDirPath, 'utf8');
+            const postDirOutputPath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, postTypeConfig.postTypeDirectory, postDirName);
+            setImageHashPath(postDirPath, postDirOutputPath, allPostFiles);
+            allPostMeta.push(getPostMeta(postDirPath, postType, postDirName, allPostFiles));
+        });
+    }
+    return allPostMeta;
+}
+
+// Set image filename hash for one post directory
+function setImageHashPath(postDirPath, postDirOutputPath, postFiles) {
+    const postImages = getPostImages(postFiles);
+
+    postImages.forEach((image) => {
+        const hashFilename = computeImageHash(postDirPath, image);
+        const logicalImageOutputPath = path.join(postDirOutputPath, image);
+        const imageOutputPath = path.join(postDirOutputPath, hashFilename);
+        utils.setHashPath(logicalImageOutputPath, imageOutputPath);
+    });
+}
+
+// Compute the image hash and return the hash filename
+function computeImageHash(postDirPath, image) {
+    const imagePath = path.join(postDirPath, image);
+    const ext = path.extname(image);
+    const base = path.basename(image, ext);
+
+    return utils.getHashFilename(base, utils.getFileHash(imagePath), ext);
+}
+
+// Generate post meta for one post directory
+// Call after generateImageHashes so meta contains the hash filename
+function getPostMeta(postDirPath, postType, postDirName, allPostFiles) {
+    const postTypeConfig = utils.getPostTypeConfig(postType);
+    const mdFilename = getMdFile(allPostFiles);
+    if (!mdFilename) return;
+
+    // Extract front-matter content
+    const fileContent = fs.readFileSync(path.join(postDirPath, mdFilename), 'utf8');
+    const { image, ...restAttributes } = fm(fileContent).attributes;
+    const imageOutputPath = `/${postTypeConfig.postTypeDirectory}/${postDirName}/${image}`;
+    const link = `/${postTypeConfig.postTypeDirectory}/${postDirName}`;
+    const imageHashPath = utils.getHashPath(imageOutputPath);
+    return { ...restAttributes, link, imageHashPath, postType, mdFilename };
+}
+
+function getPostImages(postFiles) {
+    return postFiles.filter((filename) => utils.allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
+}
+
+function getMdFile(postFiles) {
+    return postFiles.find((file) => path.extname(file).toLowerCase() === '.md');
+}
+
 // For each post type, create the output directory and generate the files
-// Returns all post metadata grouped by post type
 function generateContent() {
-    let postMetaGroupedByType = {};
     const allPostTypeConfigs = utils.siteConfig.postTypes;
 
     for (let postType in allPostTypeConfigs) {
-        const postTypeConfig = allPostTypeConfigs[postType];
-        let generatedPostMeta = generatePosts(postType);
-        // Add additional properties to post metadata
-        postMetaGroupedByType[postType] = generatedPostMeta.map((post) => ({
-            ...post,
-            postTypeToDisplay: postTypeConfig.postTypeDisplayName,
-            postTypeDirectoryName: postTypeConfig.postTypeDirectory,
-        }));
+        generatePosts(postType);
     }
-
-    return postMetaGroupedByType;
 }
 
 // Generates the posts for a single post type, converting .md files to .html and saving in the post type output directory
-// Returns an array of objects, where each object is the post metadata
 function generatePosts(postType) {
     // Prepare directories
     const postTypeConfig = utils.getPostTypeConfig(postType);
@@ -65,9 +127,6 @@ function generatePosts(postType) {
 
     // Read all inner directory names (the posts) for the post type
     const postDirectoryNames = fs.readdirSync(postTypePath, 'utf8');
-
-    // Collect all post metadata for use in generating site
-    let postMeta = [];
 
     // Generate posts
     // Content structure is content directory > post type directory > post directory > post.md + images
@@ -80,7 +139,7 @@ function generatePosts(postType) {
 
         // Process post images first so content hash filenames can be used in the post page
         const postContext = {
-            postTypeConfig,
+            postType,
             allPostFiles,
             postTypePath,
             postTypeOutputPath,
@@ -88,27 +147,25 @@ function generatePosts(postType) {
             postDirectoryPath,
         };
         processPostImages(postContext);
-        const generatedMeta = processMarkdownFile(postContext);
-        postMeta.push(generatedMeta);
+        generatePostPage(postContext);
     });
-
-    return postMeta;
 }
 
 // Copy any images from their post directory to the output directory, including with Exif removal and content hash filenames
-function processPostImages({ allPostFiles, postTypeOutputPath, postDirectoryName, postDirectoryPath }) {
+// Image may already have their hash filename computed
+function processPostImages({ postType, allPostFiles, postTypeOutputPath, postDirectoryName, postDirectoryPath }) {
+    const postTypeConfig = utils.getPostTypeConfig(postType);
     const postImages = allPostFiles.filter((filename) => utils.allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
 
     postImages.forEach((image) => {
         const imagePath = path.join(postDirectoryPath, image);
-        const ext = path.extname(image);
-        const base = path.basename(image, ext);
+        const logicalOutputPath = `/${postTypeConfig.postTypeDirectory}/${postDirectoryName}/${image}`;
 
-        // Compute content hash details
-        const hash = utils.getFileHash(imagePath);
-        const hashFilename = utils.getHashFilename(base, hash, ext);
-        const logicalImageOutputPath = path.join(postTypeOutputPath, postDirectoryName, image);
-        const imageOutputPath = path.join(postTypeOutputPath, postDirectoryName, hashFilename);
+        // If image hash already computed use the path, otherwise generate
+        if (!utils.getHashPaths()[logicalOutputPath]) {
+            utils.setHashPath(logicalOutputPath, path.join(postTypeOutputPath, postDirectoryName, computeImageHash(postDirectoryPath, image)));
+        }
+        const hashOutputPathFull = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, utils.getHashPath(logicalOutputPath));
 
         // If contain exif data, remove and write the new image, otherwise copy the image
         const fileType = path.extname(imagePath).toLowerCase();
@@ -124,21 +181,20 @@ function processPostImages({ allPostFiles, postTypeOutputPath, postDirectoryName
             if (hasExif) {
                 const cleanedImage = piexif.remove(imageAsBinaryString);
                 const cleanedImageBuffer = Buffer.from(cleanedImage, 'binary');
-                fs.writeFileSync(imageOutputPath, cleanedImageBuffer);
+                fs.writeFileSync(hashOutputPathFull, cleanedImageBuffer);
                 wasProcessed = true;
             }
         }
 
         if (!wasProcessed) {
-            fs.copyFileSync(imagePath, imageOutputPath);
+            fs.copyFileSync(imagePath, hashOutputPathFull);
         }
-        utils.setHashPath(logicalImageOutputPath, imageOutputPath);
     });
 }
 
 // Generate the html page from the md file
-// Return metadata about the post (post .md filename and front-matter attributes)
-function processMarkdownFile({ postTypeConfig, allPostFiles, postDirectoryPath, postDirectoryName, postTypeOutputPath }) {
+function generatePostPage({ postType, allPostFiles, postDirectoryPath, postDirectoryName, postTypeOutputPath }) {
+    const postTypeConfig = utils.getPostTypeConfig(postType);
     const postTypeDirectoryName = postTypeConfig.postTypeDirectory;
 
     // Retrieve and format post html and front-matter attributes
@@ -148,60 +204,20 @@ function processMarkdownFile({ postTypeConfig, allPostFiles, postDirectoryPath, 
         const fileContent = fs.readFileSync(path.join(postDirectoryPath, markdownFilename), 'utf8');
         const content = fm(fileContent);
         let rawPostHtml = marked.parse(content.body);
-        htmlContent = formatPostHtml(rawPostHtml, postTypeDirectoryName, postDirectoryName);
+        htmlContent = templateHelper.formatPostHtml(rawPostHtml, postTypeDirectoryName, postDirectoryName);
 
         // Generate the post site page
         const postPage = generatePost(postTypeConfig, htmlContent, content.attributes, postTypeDirectoryName, filename);
         const postFilePath = path.join(postTypeOutputPath, postDirectoryName, filename + '.html');
         fs.writeFileSync(postFilePath, postPage, 'utf8');
-        return { ...content.attributes, filename: filename };
     } else {
         throw new Error(`Missing markdown file for ${filename}`);
     }
 }
 
-// Replace the relative image urls, add css and other formatting features
-function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
-    const folderPath = `/${postTypeDirectoryName}/${postDirectoryName}/`;
-
-    htmlContent = htmlContent
-        .replaceAll('src="./', `src="${folderPath}`)
-        .replaceAll('<table>', '<div class="table-wrapper"><table>')
-        .replaceAll('</table>', '</table></div>')
-        .replaceAll('<p>{recipeboxstart}</p>', '<div id="recipe" class="recipe-box">')
-        .replaceAll('<p>{recipeboxend}</p>', '</div>')
-        .replaceAll('{jumptorecipebox}', `<button class="jump-to-recipe flex-centre" type="button">${templateHelper.getDownArrow()} Jump to recipe</button>`)
-        .replaceAll('<p>{lightstyleboxstart}</p>', '<div class="light-style-box">')
-        .replaceAll('<p>{lightstyleboxend}</p>', '</div>')
-        .replaceAll('<p>{darkstyleboxstart}</p>', '<div class="dark-style-box">')
-        .replaceAll('<p>{darkstyleboxend}</p>', '</div>');
-
-    // Update image references to use the content hash filename
-    Object.entries(utils.getHashPaths()).forEach(([logical, hash]) => {
-        htmlContent = htmlContent.replaceAll(`src="${logical}`, `src="${hash}`);
-    });
-
-    // The first image should be a priority to optimise LCP and avoid layout shifts
-    htmlContent = htmlContent.replace('<img', '<img fetchpriority="high" class="content-image"');
-    htmlContent = htmlContent.replaceAll('<img src=', '<img loading="lazy" class="content-image" src=');
-
-    // Update checkboxes so they are active and text is crossed out on check
-    let checkboxIdCounter = 1;
-    htmlContent = htmlContent.replaceAll(/<li><input disabled="" type="checkbox">(.*?)(?=<\/li>|<ul>)/g, (match, text) => {
-        const id = `checkbox-${checkboxIdCounter}`;
-        checkboxIdCounter++;
-        return `<li class="ingredient-item-checkbox"><input type="checkbox" class="test" id="${id}"> <label for="${id}">${text}</label>`;
-    });
-    return htmlContent;
-}
-
 // Get an array of the most recent posts across all post types
-function getRecentPosts(postMetaGroupedByType, numberOfPosts) {
-    let allPosts = [];
-    for (let postType of Object.keys(postMetaGroupedByType)) {
-        allPosts.push(...postMetaGroupedByType[postType]);
-    }
+function getRecentPosts(allPostMeta, numberOfPosts) {
     // Sort posts by created date descending
-    allPosts.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
-    return allPosts.length < numberOfPosts ? allPosts : allPosts.slice(0, numberOfPosts);
+    allPostMeta.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+    return allPostMeta.length < numberOfPosts ? allPostMeta : allPostMeta.slice(0, numberOfPosts);
 }

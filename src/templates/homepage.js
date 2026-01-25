@@ -41,7 +41,7 @@ function createHomepage(recentPosts) {
             ${createPostCards(recentPosts, true, 'h3')}
         </main>
         ${footerHandler.createFooter()}
-        ${utils.siteConfig.enableVisitCounter ? `<script src="${pageTrackHashPath}"></script>` : ''}
+        ${utils.isFeatureEnabled('enableVisitCounter') ? `<script src="${pageTrackHashPath}"></script>` : ''}
     </body>
 </html>`;
 }

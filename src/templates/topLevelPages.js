@@ -7,17 +7,18 @@ const createHeader = require('./header.js');
 const createPostCards = require('./postCards.js');
 const footerHandler = require('./footer.js');
 
-function generateTopLevelPages(postMetaGroupedByType) {
-    for (let postType of Object.keys(postMetaGroupedByType)) {
+function generateTopLevelPages(allPostMeta) {
+    for (const postType of Object.keys(utils.siteConfig.postTypes)) {
         const postTypeConfig = utils.getPostTypeConfig(postType);
         const topLevelPagePath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, postTypeConfig.postTypeDirectory + '/' + 'index.html');
-        fs.writeFileSync(topLevelPagePath, createTopLevelPage(postType, postTypeConfig, postMetaGroupedByType[postType]), 'utf8');
+        fs.writeFileSync(topLevelPagePath, createTopLevelPage(postType, postTypeConfig, allPostMeta), 'utf8');
     }
 }
 
 // Create a site page for the post type
-function createTopLevelPage(postType, postTypeConfig, postMetaList) {
-    // Sort posts by created date descending
+function createTopLevelPage(postType, postTypeConfig, allPostMeta) {
+    // Sort posts by created date descending for this post type
+    let postMetaList = allPostMeta.filter((post) => postType === post.postType);
     postMetaList.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
 
     // Get the top-level items if present

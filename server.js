@@ -12,12 +12,12 @@ app.set('trust proxy', true);
 app.use(
     helmet({
         strictTransportSecurity: false, // handled by reverse proxy
-    })
+    }),
 );
 
-if (srcUtils.siteConfig.enableVisitCounter) {
+if (srcUtils.isFeatureEnabled('enableVisitCounter')) {
     const visitCounter = require('./lib/visitCounter.js');
-    app.use(express.json());
+    app.use(express.json({ limit: '1kb' }));
     app.use(visitCounter.middleware);
     visitCounter.startAutoSave();
 }
@@ -43,7 +43,7 @@ app.use((req, res, next) => {
     const isImage = srcUtils.allowedImageExtensions.some((ext) => path.endsWith(ext));
     if (isImage || path.endsWith('.ico')) {
         res.setHeader('Cache-Control', 'public, max-age=432000, must-revalidate');
-    } else if (path.endsWith('.js') || path.endsWith('.css')) {
+    } else if (path.endsWith('.js') || path.endsWith('.css') || path.endsWith('.json')) {
         // Cache static assets for 5 days
         res.setHeader('Cache-Control', 'public, max-age=432000, must-revalidate');
     } else {
