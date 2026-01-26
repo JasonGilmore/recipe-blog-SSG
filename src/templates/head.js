@@ -10,8 +10,12 @@ function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativ
     const faviconHashPath = utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/favicon.ico`);
     const mainCssHashPath = utils.getHashPath('/css/main.css');
     const headerJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/header.js`);
+
+    // Conditional hash asset paths
     const postCssHashPath = utils.getHashPath('/css/post.css');
     const searchJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/${utils.SEARCH_JS_FILENAME}`);
+    const pageTrackJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/pageTrack.js`);
+    const shouldPageTrack = utils.isFeatureEnabled('enableVisitCounter') && (pageType === utils.PAGE_TYPES.HOMEPAGE || pageType === utils.PAGE_TYPES.POST);
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -27,13 +31,16 @@ function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativ
         <meta property="og:image" content="${ogImageHashPath}" />
         <meta property="og:url" content="${pageUrl}" />
         ${pageDescription ? `<meta property="og:description" content="${pageDescription}" />` : ''}
+        
         <link rel="canonical" href="${pageUrl}" />
-
         <link rel="icon" type="image/x-icon" href="${faviconHashPath}" />
+
         <link rel="stylesheet" href="${mainCssHashPath}" />
-        <script src="${headerJsHashPath}"></script>
         ${pageType === utils.PAGE_TYPES.POST ? `<link rel="stylesheet" href="${postCssHashPath}" />` : ''}
-        ${utils.isFeatureEnabled('enableSearch') ? `<script src="${searchJsHashPath}"></script>` : ''}
+
+        <script src="${headerJsHashPath}" defer></script>
+        ${utils.isFeatureEnabled('enableSearch') ? `<script src="${searchJsHashPath}" defer></script>` : ''}
+        ${shouldPageTrack ? `<script src="${pageTrackJsHashPath}" defer></script>` : ''}
 
         ${structuredData ? structuredData : ''}
     </head>

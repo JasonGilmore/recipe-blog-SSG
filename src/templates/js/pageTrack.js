@@ -1,4 +1,6 @@
-window.addEventListener('load', () => {
+// Script is deferred
+if (!window.hasTrackedPage) {
+    window.hasTrackedPage = true;
     fetch('/track-event', {
         method: 'POST',
         headers: {
@@ -9,4 +11,4 @@ window.addEventListener('load', () => {
             pathname: window.location.pathname + window.location.search,
         }),
     });
-});
+}

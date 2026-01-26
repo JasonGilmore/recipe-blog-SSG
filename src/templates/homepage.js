@@ -22,7 +22,6 @@ function createHomepage(recentPosts) {
         structuredData,
     });
 
-    const pageTrackHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/pageTrack.js`);
     const heroImageHashPath = utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/${utils.siteContent.heroImage}`);
 
     return `${head}
@@ -41,7 +40,6 @@ function createHomepage(recentPosts) {
             ${createPostCards(recentPosts, true, 'h3')}
         </main>
         ${footerHandler.createFooter()}
-        ${utils.isFeatureEnabled('enableVisitCounter') ? `<script src="${pageTrackHashPath}"></script>` : ''}
     </body>
 </html>`;
 }

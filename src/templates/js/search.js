@@ -1,3 +1,4 @@
+// Script is deferred
 let searchDialog = null;
 let searchResultsContainer = null;
 let searchInput = null;
@@ -12,60 +13,58 @@ let searchFailures = 0;
 const searchTrack = '#SEARCH_TRACK_PLACEHOLDER';
 let searchTrackTimeout = null;
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Handle open dialog
-    document.addEventListener('click', (e) => {
-        if (e.target.closest('.search-button')) {
-            showSearch();
-            closeBurger();
+// Handle open dialog
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.search-button')) {
+        showSearch();
+        closeBurger();
+    }
+});
+
+// Handle close dialog
+searchDialog = document.querySelector('.search-dialog');
+searchResultsContainer = document.querySelector('.search-results');
+
+const closeDialog = () => searchDialog.close();
+const closeSearchBtn = document.querySelector('.close-search');
+closeSearchBtn.addEventListener('click', closeDialog);
+closeSearchBtn.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        closeDialog();
+    }
+});
+
+// Debounce search
+searchInput = document.querySelector('.search-input');
+searchInput.addEventListener('input', (event) => {
+    clearTimeout(searchTimeout);
+
+    if (event.target.value.trim() === '') {
+        searchResultsContainer.innerHTML = '';
+        return;
+    }
+
+    searchTimeout = setTimeout(() => {
+        performSearch(event.target.value);
+    }, 400);
+
+    if (searchTrack) {
+        clearTimeout(searchTrackTimeout);
+        searchTrackTimeout = setTimeout(() => {
+            trackSearch(event.target.value);
+        }, 2000);
+    }
+});
+
+// If touch device using virtual keyboard, hide the keyboard on enter since search results already shown
+searchInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        if (navigator.maxTouchPoints > 0 && window.visualViewport.height < window.innerHeight) {
+            searchInput.blur();
         }
-    });
-
-    // Handle close dialog
-    searchDialog = document.querySelector('.search-dialog');
-    searchResultsContainer = document.querySelector('.search-results');
-
-    const closeDialog = () => searchDialog.close();
-    const closeSearchBtn = document.querySelector('.close-search');
-    closeSearchBtn.addEventListener('click', closeDialog);
-    closeSearchBtn.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            closeDialog();
-        }
-    });
-
-    // Debounce search
-    searchInput = document.querySelector('.search-input');
-    searchInput.addEventListener('input', (event) => {
-        clearTimeout(searchTimeout);
-
-        if (event.target.value.trim() === '') {
-            searchResultsContainer.innerHTML = '';
-            return;
-        }
-
-        searchTimeout = setTimeout(() => {
-            performSearch(event.target.value);
-        }, 400);
-
-        if (searchTrack) {
-            clearTimeout(searchTrackTimeout);
-            searchTrackTimeout = setTimeout(() => {
-                trackSearch(event.target.value);
-            }, 2000);
-        }
-    });
-
-    // If touch device using virtual keyboard, hide the keyboard on enter since search results already shown
-    searchInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            if (navigator.maxTouchPoints > 0 && window.visualViewport.height < window.innerHeight) {
-                searchInput.blur();
-            }
-        }
-    });
+    }
 });
 
 function showSearch() {

@@ -18,7 +18,6 @@ function createPost(postTypeConfig, postHtml, postAttributes, postTypeDirectoryN
     });
 
     const postsJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/posts.js`);
-    const pageTrackJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/pageTrack.js`);
 
     return `
         ${head}
@@ -36,7 +35,6 @@ function createPost(postTypeConfig, postHtml, postAttributes, postTypeDirectoryN
             </main>
             ${footerHandler.createFooter()}
             <script src="${postsJsHashPath}"></script>
-            ${utils.isFeatureEnabled('enableVisitCounter') ? `<script src="${pageTrackJsHashPath}"></script>` : ''}
         </body>
 
     </html>

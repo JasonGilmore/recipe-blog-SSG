@@ -1,12 +1,11 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const burgerMenuButton = document.querySelector('.burger-container');
-    if (burgerMenuButton) {
-        burgerMenuButton.addEventListener('click', toggleBurger);
-        burgerMenuButton.addEventListener('keydown', (event) => {
-            event.key === 'Enter' && toggleBurger();
-        });
-    }
-});
+// Script is deferred
+const burgerMenuButton = document.querySelector('.burger-container');
+if (burgerMenuButton) {
+    burgerMenuButton.addEventListener('click', toggleBurger);
+    burgerMenuButton.addEventListener('keydown', (event) => {
+        event.key === 'Enter' && toggleBurger();
+    });
+}
 
 function toggleBurger() {
     const burgerContainer = document.querySelector('.burger-container');
