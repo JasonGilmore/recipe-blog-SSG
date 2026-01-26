@@ -16,7 +16,6 @@ if (goToTopButton) {
     });
 
     goToTopButton.addEventListener('click', function () {
-        const mainPageContainer = document.querySelector('.content-page-container');
-        mainPageContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     });
 }
