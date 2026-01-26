@@ -82,7 +82,7 @@ function generateSearchData(allPostMeta) {
         this.field('content');
 
         allPostMeta.forEach((postMeta) => {
-            const contentPath = path.join(utils.CONTENT_DIRECTORY, postMeta.link, postMeta.mdFilename);
+            const contentPath = path.join(utils.CONTENT_DIR_PATH, postMeta.link, postMeta.mdFilename);
             const content = cleanMarkdown(fm(fs.readFileSync(contentPath, 'utf8')).body);
             this.add({
                 link: postMeta.link,
@@ -100,7 +100,7 @@ function generateSearchData(allPostMeta) {
         store: store,
     };
 
-    utils.writeHashFile(JSON.stringify(searchDataObj), utils.SEARCH_DATA_FILENAME, utils.PUBLIC_OUTPUT_DIRECTORY);
+    utils.writeHashFile(JSON.stringify(searchDataObj), utils.SEARCH_DATA_FILENAME, utils.getOutputPath());
 }
 
 // Remove accent marks

@@ -19,9 +19,22 @@ const IMAGE_ASSETS_FOLDER = 'images/site-assets';
 const SEARCH_JS_FILENAME = 'search.js';
 const SEARCH_DATA_FILENAME = 'search-data.json';
 
-const PUBLIC_OUTPUT_DIRECTORY = path.join(__dirname, '../', siteConfig.outputDirectory);
-const CONTENT_DIRECTORY = path.join(__dirname, '../', siteConfig.contentDirectory);
-const FOOTER_DIRECTORY = path.join(CONTENT_DIRECTORY, 'footers');
+const OUTPUT_DIR_PATH = path.join(__dirname, '../', siteConfig.outputDirectory);
+const CONTENT_DIR_PATH = path.join(__dirname, '../', siteConfig.contentDirectory);
+const FOOTER_DIR_PATH = path.join(CONTENT_DIR_PATH, 'footers');
+let tempOutputDirName = siteConfig.outputDirectory;
+let tempOutputPath = OUTPUT_DIR_PATH;
+
+// Set the temp output dir for atomic write
+function setTempOutput(dirPath) {
+    tempOutputPath = dirPath;
+    tempOutputDirName = path.basename(dirPath);
+}
+
+// Returns the output path in case a temp output has been specified for atomic write
+function getOutputPath() {
+    return tempOutputPath ? tempOutputPath : OUTPUT_DIR_PATH;
+}
 
 function validateConfigurations() {
     if (!siteConfig.postTypes) {
@@ -45,7 +58,7 @@ const PAGE_TYPES = {
 // Creates the directory if not present, and clears all contents
 function prepareDirectory(directory) {
     // Directory must be a valid output directory
-    if (!directory.startsWith(PUBLIC_OUTPUT_DIRECTORY)) {
+    if (!directory.startsWith(OUTPUT_DIR_PATH)) {
         throw new Error(`Invalid path ${directory}. Must be a valid output directory.`);
     }
 
@@ -108,11 +121,12 @@ function getHashPaths() {
     return { ...pathNameMap };
 }
 
-// Normalise the path to the relative path from the public folder
+// Normalise the path to the relative path from the output folder
 function normalisePath(filePath) {
     let normalisedPath = filePath.split(path.sep).join('/');
-    if (normalisedPath.includes('/public/')) {
-        normalisedPath = normalisedPath.split('/public/')[1];
+    const outputDirStart = `/${tempOutputDirName}/`;
+    if (normalisedPath.includes(outputDirStart)) {
+        normalisedPath = normalisedPath.split(outputDirStart)[1];
     }
     return normalisedPath.startsWith('/') ? normalisedPath : '/' + normalisedPath;
 }
@@ -126,7 +140,7 @@ function writeHashFile(stringContent, filename, outputDir) {
 
     const logicalPath = path.join(outputDir, filename);
     const hashPath = path.join(outputDir, hashFilename);
-    setHashPath(logicalPath, hashPath);
+    setHashPath(logicalPath, hashPath, outputDir);
     fs.writeFileSync(hashPath, stringContent, 'utf8');
 }
 
@@ -150,9 +164,11 @@ function removeLast(word, text) {
 
 module.exports = {
     siteContent,
-    PUBLIC_OUTPUT_DIRECTORY,
-    CONTENT_DIRECTORY,
-    FOOTER_DIRECTORY,
+    OUTPUT_DIR_PATH,
+    CONTENT_DIR_PATH,
+    FOOTER_DIR_PATH,
+    setTempOutput,
+    getOutputPath,
     PAGE_TYPES,
     IMAGE_ASSETS_FOLDER,
     SEARCH_JS_FILENAME,

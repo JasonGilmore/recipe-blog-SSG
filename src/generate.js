@@ -13,9 +13,12 @@ const templateHelper = require('./templates/templateHelper.js');
 
 const timerLabel = 'Generate site';
 console.time(timerLabel);
-
 utils.validateConfigurations();
-utils.prepareDirectory(utils.PUBLIC_OUTPUT_DIRECTORY);
+
+// Prepare atomic write. Build into a temporary folder, then swap on success
+const tempOutputPath = path.join(__dirname, '../', utils.siteConfig.outputDirectory + '.tmp');
+utils.setTempOutput(tempOutputPath);
+utils.prepareDirectory(tempOutputPath);
 
 // Preparation tasks for buliding site
 // Each post meta contains front-matter attributes plus additional properties link, imageHashPath, postType and mdFilename
@@ -39,6 +42,32 @@ const recentPosts = getRecentPosts(allPostMeta, 5);
 generateHomepage(recentPosts);
 generateTopLevelPages(allPostMeta);
 
+// Generation success, complete atomic swap
+const backupPath = utils.OUTPUT_DIR_PATH + '.old';
+try {
+    if (fs.existsSync(backupPath)) {
+        fs.rmSync(backupPath, { recursive: true, force: true });
+    }
+
+    if (fs.existsSync(utils.OUTPUT_DIR_PATH)) {
+        fs.renameSync(utils.OUTPUT_DIR_PATH, backupPath);
+    }
+
+    fs.renameSync(tempOutputPath, utils.OUTPUT_DIR_PATH);
+
+    if (fs.existsSync(backupPath)) {
+        fs.rmSync(backupPath, { recursive: true, force: true });
+    }
+} catch (err) {
+    let restored = false;
+    if (fs.existsSync(backupPath) && !fs.existsSync(utils.OUTPUT_DIR_PATH)) {
+        fs.renameSync(backupPath, utils.OUTPUT_DIR_PATH);
+        restored = true;
+    }
+    const message = 'Atomic swap failed.' + (restored ? ' Restored old public folder.' : '') + ' ' + err;
+    throw new Error(message);
+}
+
 console.timeEnd(timerLabel);
 
 // Iterate through each post type directory, generate post meta and image hash filenames
@@ -48,14 +77,14 @@ function prepareSiteGeneration() {
     // Get contents of post type directory
     for (const postType of Object.keys(utils.siteConfig.postTypes)) {
         const postTypeConfig = utils.getPostTypeConfig(postType);
-        const postTypePath = path.join(utils.CONTENT_DIRECTORY, postTypeConfig.postTypeDirectory);
+        const postTypePath = path.join(utils.CONTENT_DIR_PATH, postTypeConfig.postTypeDirectory);
         const postDirNames = fs.readdirSync(postTypePath, 'utf8');
 
         // Get individiual post directories
         postDirNames.forEach((postDirName) => {
             const postDirPath = path.join(postTypePath, postDirName);
             const allPostFiles = fs.readdirSync(postDirPath, 'utf8');
-            const postDirOutputPath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, postTypeConfig.postTypeDirectory, postDirName);
+            const postDirOutputPath = path.join(utils.getOutputPath(), postTypeConfig.postTypeDirectory, postDirName);
             setImageHashPaths(postDirPath, postDirOutputPath, allPostFiles);
             allPostMeta.push(getPostMeta(postDirPath, postType, postDirName, allPostFiles));
         });
@@ -121,8 +150,8 @@ function generateContent() {
 function generatePosts(postType) {
     // Prepare directories
     const postTypeConfig = utils.getPostTypeConfig(postType);
-    const postTypePath = path.join(utils.CONTENT_DIRECTORY, postTypeConfig.postTypeDirectory);
-    const postTypeOutputPath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, postTypeConfig.postTypeDirectory);
+    const postTypePath = path.join(utils.CONTENT_DIR_PATH, postTypeConfig.postTypeDirectory);
+    const postTypeOutputPath = path.join(utils.getOutputPath(), postTypeConfig.postTypeDirectory);
     utils.prepareDirectory(postTypeOutputPath);
 
     // Read all inner directory names (the posts) for the post type
@@ -165,7 +194,7 @@ function processPostImages({ postType, allPostFiles, postTypeOutputPath, postDir
         if (!utils.getHashPaths()[logicalOutputPath]) {
             utils.setHashPath(logicalOutputPath, path.join(postTypeOutputPath, postDirectoryName, getFileHashName(postDirectoryPath, image)));
         }
-        const hashOutputPathFull = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, utils.getHashPath(logicalOutputPath));
+        const hashOutputPathFull = path.join(utils.getOutputPath(), utils.getHashPath(logicalOutputPath));
 
         // If contain exif data, remove and write the new image, otherwise copy the image
         const fileType = path.extname(imagePath).toLowerCase();

@@ -4,11 +4,11 @@ const utils = require('../utils.js');
 
 function generateAssets() {
     // Images
-    processAssets(path.join(__dirname, 'images'), path.join(utils.PUBLIC_OUTPUT_DIRECTORY, utils.IMAGE_ASSETS_FOLDER));
+    processAssets(path.join(__dirname, 'images'), path.join(utils.getOutputPath(), utils.IMAGE_ASSETS_FOLDER));
 
     // CSS
     // Apply theme if present
-    processAssets(path.join(__dirname, 'css'), path.join(utils.PUBLIC_OUTPUT_DIRECTORY, utils.CSS_FOLDER), (item, srcPath) => {
+    processAssets(path.join(__dirname, 'css'), path.join(utils.getOutputPath(), utils.CSS_FOLDER), (item, srcPath) => {
         if (item !== 'main.css' || !utils.siteContent.theme) {
             return true;
         }
@@ -22,7 +22,7 @@ function generateAssets() {
 
     // JS
     // Only copy feature scripts if enabled
-    processAssets(path.join(__dirname, 'js'), path.join(utils.PUBLIC_OUTPUT_DIRECTORY, utils.JS_FOLDER), (item) => {
+    processAssets(path.join(__dirname, 'js'), path.join(utils.getOutputPath(), utils.JS_FOLDER), (item) => {
         if (item === utils.SEARCH_JS_FILENAME) {
             return generateSearchBundle();
         }

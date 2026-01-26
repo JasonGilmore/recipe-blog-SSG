@@ -8,7 +8,7 @@ const createPostCards = require('./postCards.js');
 const footerHandler = require('./footer.js');
 
 function generateHomepage(recentPosts) {
-    fs.writeFileSync(path.join(utils.PUBLIC_OUTPUT_DIRECTORY, '/index.html'), createHomepage(recentPosts), 'utf8');
+    fs.writeFileSync(path.join(utils.getOutputPath(), '/index.html'), createHomepage(recentPosts), 'utf8');
 }
 
 function createHomepage(recentPosts) {

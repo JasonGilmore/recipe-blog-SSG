@@ -10,7 +10,7 @@ const footerHandler = require('./footer.js');
 function generateTopLevelPages(allPostMeta) {
     for (const postType of Object.keys(utils.siteConfig.postTypes)) {
         const postTypeConfig = utils.getPostTypeConfig(postType);
-        const topLevelPagePath = path.join(utils.PUBLIC_OUTPUT_DIRECTORY, postTypeConfig.postTypeDirectory + '/' + 'index.html');
+        const topLevelPagePath = path.join(utils.getOutputPath(), postTypeConfig.postTypeDirectory + '/' + 'index.html');
         fs.writeFileSync(topLevelPagePath, createTopLevelPage(postType, postTypeConfig, allPostMeta), 'utf8');
     }
 }
