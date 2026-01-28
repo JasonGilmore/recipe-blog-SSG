@@ -192,18 +192,21 @@ function createResultItem(result, index, query) {
     return resultContainer;
 }
 
-// Escapes dangerous characters and returns text with highlights on any query matches
+// Escapes dangerous characters and returns text with highlights on any query word matches
 function toSafeHighlightedText(text, query) {
     const helperDiv = document.createElement('div');
     helperDiv.textContent = text;
     const safeText = helperDiv.innerHTML;
+    const minHighlightChars = 3;
 
-    if (!query || query.length < 3 || !text) return safeText;
+    if (!query || query.length < minHighlightChars || !text) return safeText;
 
     helperDiv.textContent = query;
-    const safeQuery = RegExp.escape(helperDiv.innerHTML);
+    const words = helperDiv.innerHTML.split(/\s+/).filter((word) => word.length >= minHighlightChars);
+    if (words.length === 0) return safeText;
 
-    const regex = new RegExp(`(${safeQuery})`, 'gi');
+    const pattern = words.map((word) => RegExp.escape(word)).join('|');
+    const regex = new RegExp(`(${pattern})`, 'gi');
     return safeText.replaceAll(regex, '<mark>$1</mark>');
 }
 
