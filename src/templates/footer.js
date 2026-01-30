@@ -1,4 +1,4 @@
-const fs = require('node:fs');
+const fs = require('node:fs/promises');
 const path = require('node:path');
 const fm = require('front-matter');
 const marked = require('marked');
@@ -9,19 +9,19 @@ const createHeader = require('./header.js');
 
 let footerItems = [];
 
-function generateFooters() {
+async function generateFooters() {
     // Footers are optional, if no footer directory skip generation
-    if (!fs.existsSync(utils.FOOTER_DIR_PATH)) {
+    if (!(await utils.dirExistsAsync(utils.FOOTER_DIR_PATH))) {
         console.log(`Footers not found and footer will not be generated on the site. Ignore if not required.`);
         return;
     }
 
-    const footerFiles = fs.readdirSync(utils.FOOTER_DIR_PATH, 'utf8').filter((file) => path.extname(file).toLowerCase() === '.md');
+    const footerFiles = (await fs.readdir(utils.FOOTER_DIR_PATH, 'utf8')).filter((file) => path.extname(file).toLowerCase() === '.md');
     let footersToGenerate = [];
 
-    for (footerFile of footerFiles) {
+    for (const footerFile of footerFiles) {
         const filename = footerFile.slice(0, -3);
-        const footerContent = fs.readFileSync(path.join(utils.FOOTER_DIR_PATH, footerFile), 'utf8');
+        const footerContent = await fs.readFile(path.join(utils.FOOTER_DIR_PATH, footerFile), 'utf8');
         const content = fm(footerContent);
         const htmlContent = marked.parse(content.body);
         const footerOutputPath = path.join(utils.getOutputPath(), filename + '.html');
@@ -32,8 +32,8 @@ function generateFooters() {
         footerItems.push({ location: '/' + filename, displayName, order: content.attributes.order });
     }
 
-    for (footer of footersToGenerate) {
-        fs.writeFileSync(footer.footerOutputPath, createFooterPage(footer.content, footer.displayName, footer.filename), 'utf8');
+    for (const footer of footersToGenerate) {
+        await fs.writeFile(footer.footerOutputPath, createFooterPage(footer.content, footer.displayName, footer.filename), 'utf8');
     }
 }
 

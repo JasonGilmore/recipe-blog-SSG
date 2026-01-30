@@ -1,5 +1,6 @@
 const path = require('node:path');
 const fs = require('node:fs');
+const fsProm = require('node:fs/promises');
 const crypto = require('node:crypto');
 const siteContent = require('./templates/siteContent.json');
 
@@ -56,37 +57,20 @@ const PAGE_TYPES = {
 };
 
 // Creates the directory if not present, and clears all contents
-function prepareDirectory(directory) {
+async function prepareDirectory(directory) {
     // Directory must be a valid output directory
     if (!directory.startsWith(OUTPUT_DIR_PATH)) {
         throw new Error(`Invalid path ${directory}. Must be a valid output directory.`);
     }
 
-    if (!fs.existsSync(directory)) {
-        fs.mkdirSync(directory);
-    } else {
-        clearDirectoryExceptSome(directory);
+    if (await dirExistsAsync(directory)) {
+        await fsProm.rm(directory, { recursive: true, force: true });
     }
+    await fsProm.mkdir(directory);
 }
 
-function clearDirectoryExceptSome(directory) {
-    const doNotClear = ['robots.txt'];
-    const directoryItems = fs.readdirSync(directory, { withFileTypes: true });
-    for (const item of directoryItems) {
-        if (doNotClear.includes(item.name)) {
-            continue;
-        }
-        const fullPath = path.join(directory, item.name);
-        if (item.isDirectory()) {
-            fs.rmSync(fullPath, { recursive: true, force: true });
-        } else {
-            fs.unlinkSync(fullPath);
-        }
-    }
-}
-
-function getFileHash(filePath) {
-    const fileBuffer = fs.readFileSync(filePath);
+async function getFileHash(filePath) {
+    const fileBuffer = await fsProm.readFile(filePath);
     return getBufferHash(fileBuffer);
 }
 
@@ -131,19 +115,6 @@ function normalisePath(filePath) {
     return normalisedPath.startsWith('/') ? normalisedPath : '/' + normalisedPath;
 }
 
-// Store hash and write file from string
-function writeHashFile(stringContent, filename, outputDir) {
-    const hash = getStringHash(stringContent);
-    const [base, ext] = filename.split('.');
-    const hashFilename = getHashFilename(base, hash, `.${ext}`);
-    fs.mkdirSync(outputDir, { recursive: true });
-
-    const logicalPath = path.join(outputDir, filename);
-    const hashPath = path.join(outputDir, hashFilename);
-    setHashPath(logicalPath, hashPath, outputDir);
-    fs.writeFileSync(hashPath, stringContent, 'utf8');
-}
-
 const allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
 
 function getPostTypeConfig(postType) {
@@ -160,6 +131,15 @@ function removeLastS(word) {
 
 function removeLast(word, text) {
     return word.lastIndexOf(text) === word.length - 1 ? word.slice(0, word.length - 1) : word;
+}
+
+async function dirExistsAsync(path) {
+    try {
+        const s = await fsProm.stat(path);
+        return s.isDirectory();
+    } catch {
+        return false;
+    }
 }
 
 module.exports = {
@@ -184,9 +164,9 @@ module.exports = {
     getHashPath,
     setHashPath,
     getHashPaths,
-    writeHashFile,
     allowedImageExtensions,
     getPostTypeConfig,
     isFeatureEnabled,
     removeLastS,
+    dirExistsAsync,
 };

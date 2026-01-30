@@ -1,5 +1,5 @@
 const path = require('node:path');
-const fs = require('node:fs');
+const fs = require('node:fs/promises');
 const fm = require('front-matter');
 const marked = require('marked');
 const piexif = require('piexifjs');
@@ -11,117 +11,124 @@ const generateAssets = require('./templates/assetsHandler.js');
 const generatePost = require('./templates/posts.js');
 const templateHelper = require('./templates/templateHelper.js');
 
-const timerLabel = 'Generate site';
-console.time(timerLabel);
-utils.validateConfigurations();
+const timerLabel = 'Generate site async';
+generateSite();
 
-// Prepare atomic write. Build into a temporary folder, then swap on success
-const tempOutputPath = path.join(__dirname, '../', utils.siteConfig.outputDirectory + '.tmp');
-utils.setTempOutput(tempOutputPath);
-utils.prepareDirectory(tempOutputPath);
+// Use sequential awaits to ensure predictable execution order and readable logs
+async function generateSite() {
+    console.time(timerLabel);
+    utils.validateConfigurations();
 
-// Preparation tasks for buliding site
-// Each post meta contains front-matter attributes plus additional properties link, imageHashPath, postType and mdFilename
-const allPostMeta = prepareSiteGeneration();
+    // Prepare atomic write. Build into a temporary folder, then swap on success
+    const tempOutputPath = path.join(__dirname, '../', utils.siteConfig.outputDirectory + '.tmp');
+    utils.setTempOutput(tempOutputPath);
+    utils.prepareDirectory(tempOutputPath);
 
-if (utils.isFeatureEnabled('enableSearch')) {
-    templateHelper.generateSearchData(allPostMeta);
+    // Preparation tasks for buliding site
+    // Each post meta contains front-matter attributes plus additional properties link, imageHashPath, postType and mdFilename
+    const allPostMeta = await prepareSiteGeneration();
+
+    if (utils.isFeatureEnabled('enableSearch')) {
+        await templateHelper.generateSearchData(allPostMeta);
+    }
+
+    // Generate assets upfront to use filename content hash for cache busting
+    await generateAssets();
+
+    // Generate footers upfront so they can be added to all site pages
+    await footerHandler.generateFooters();
+
+    // Generate post pages
+    await generateContent();
+
+    // Generate the rest of the site
+    const recentPosts = getRecentPosts(allPostMeta, 5);
+    await generateHomepage(recentPosts);
+    await generateTopLevelPages(allPostMeta);
+
+    // Generation success, complete atomic swap
+    const backupPath = utils.OUTPUT_DIR_PATH + '.old';
+
+    try {
+        // Remove old backup output folder if exists
+        await fs.rm(backupPath, { recursive: true, force: true });
+
+        // Rename existing output folder to backup if exists
+        if (await utils.dirExistsAsync(utils.OUTPUT_DIR_PATH)) {
+            await fs.rename(utils.OUTPUT_DIR_PATH, backupPath);
+        }
+
+        // Rename the temp output folder to the output folder
+        await fs.rename(tempOutputPath, utils.OUTPUT_DIR_PATH);
+
+        // Remove backup folder
+        await fs.rm(backupPath, { recursive: true, force: true });
+    } catch (err) {
+        let restored = false;
+        const hasBackup = await utils.dirExistsAsync(backupPath);
+        const hasOutput = await utils.dirExistsAsync(utils.OUTPUT_DIR_PATH);
+        if (hasBackup && !hasOutput) {
+            await fs.rename(backupPath, utils.OUTPUT_DIR_PATH);
+            restored = true;
+        }
+        const message = 'Atomic swap failed.' + (restored ? ' Restored old public folder.' : ' Did not restore old public folder.') + ' ' + err.stack;
+        throw new Error(message);
+    }
+    console.timeEnd(timerLabel);
 }
-
-// Generate assets upfront to use filename content hash for cache busting
-generateAssets();
-
-// Generate footers upfront so they can be added to all site pages
-footerHandler.generateFooters();
-
-// Generate post pages
-generateContent();
-
-// Generate the rest of the site
-const recentPosts = getRecentPosts(allPostMeta, 5);
-generateHomepage(recentPosts);
-generateTopLevelPages(allPostMeta);
-
-// Generation success, complete atomic swap
-const backupPath = utils.OUTPUT_DIR_PATH + '.old';
-try {
-    if (fs.existsSync(backupPath)) {
-        fs.rmSync(backupPath, { recursive: true, force: true });
-    }
-
-    if (fs.existsSync(utils.OUTPUT_DIR_PATH)) {
-        fs.renameSync(utils.OUTPUT_DIR_PATH, backupPath);
-    }
-
-    fs.renameSync(tempOutputPath, utils.OUTPUT_DIR_PATH);
-
-    if (fs.existsSync(backupPath)) {
-        fs.rmSync(backupPath, { recursive: true, force: true });
-    }
-} catch (err) {
-    let restored = false;
-    if (fs.existsSync(backupPath) && !fs.existsSync(utils.OUTPUT_DIR_PATH)) {
-        fs.renameSync(backupPath, utils.OUTPUT_DIR_PATH);
-        restored = true;
-    }
-    const message = 'Atomic swap failed.' + (restored ? ' Restored old public folder.' : '') + ' ' + err;
-    throw new Error(message);
-}
-
-console.timeEnd(timerLabel);
 
 // Iterate through each post type directory, generate post meta and image hash filenames
-function prepareSiteGeneration() {
+async function prepareSiteGeneration() {
     let allPostMeta = [];
 
     // Get contents of post type directory
     for (const postType of Object.keys(utils.siteConfig.postTypes)) {
         const postTypeConfig = utils.getPostTypeConfig(postType);
         const postTypePath = path.join(utils.CONTENT_DIR_PATH, postTypeConfig.postTypeDirectory);
-        const postDirNames = fs.readdirSync(postTypePath, 'utf8');
+        const postDirNames = await fs.readdir(postTypePath);
 
         // Get individiual post directories
-        postDirNames.forEach((postDirName) => {
+        for (const postDirName of postDirNames) {
             const postDirPath = path.join(postTypePath, postDirName);
-            const allPostFiles = fs.readdirSync(postDirPath, 'utf8');
+            const allPostFiles = await fs.readdir(postDirPath);
             const postDirOutputPath = path.join(utils.getOutputPath(), postTypeConfig.postTypeDirectory, postDirName);
-            setImageHashPaths(postDirPath, postDirOutputPath, allPostFiles);
-            allPostMeta.push(getPostMeta(postDirPath, postType, postDirName, allPostFiles));
-        });
+            await setImageHashPaths(postDirPath, postDirOutputPath, allPostFiles);
+            allPostMeta.push(await getPostMeta(postDirPath, postType, postDirName, allPostFiles));
+        }
     }
     return allPostMeta;
 }
 
 // Set image filename hashes for images in one post directory
-function setImageHashPaths(postDirPath, postDirOutputPath, postFiles) {
+async function setImageHashPaths(postDirPath, postDirOutputPath, postFiles) {
     const postImages = getPostImages(postFiles);
 
-    postImages.forEach((image) => {
-        const hashFilename = getFileHashName(postDirPath, image);
+    for (const image of postImages) {
+        const hashFilename = await getFileHashName(postDirPath, image);
         const logicalImageOutputPath = path.join(postDirOutputPath, image);
         const imageOutputPath = path.join(postDirOutputPath, hashFilename);
         utils.setHashPath(logicalImageOutputPath, imageOutputPath);
-    });
+    }
 }
 
 // Compute the hash and return the hash filename
-function getFileHashName(postDirPath, filename) {
+async function getFileHashName(postDirPath, filename) {
     const imagePath = path.join(postDirPath, filename);
     const ext = path.extname(filename);
     const base = path.basename(filename, ext);
 
-    return utils.getHashFilename(base, utils.getFileHash(imagePath), ext);
+    return utils.getHashFilename(base, await utils.getFileHash(imagePath), ext);
 }
 
 // Generate post meta for one post directory
 // Call after generateImageHashes so meta contains the hash filename
-function getPostMeta(postDirPath, postType, postDirName, allPostFiles) {
+async function getPostMeta(postDirPath, postType, postDirName, allPostFiles) {
     const postTypeConfig = utils.getPostTypeConfig(postType);
     const mdFilename = getMdFile(allPostFiles);
     if (!mdFilename) return;
 
     // Extract front-matter content
-    const fileContent = fs.readFileSync(path.join(postDirPath, mdFilename), 'utf8');
+    const fileContent = await fs.readFile(path.join(postDirPath, mdFilename), 'utf8');
     const { image, ...restAttributes } = fm(fileContent).attributes;
     const imageOutputPath = `/${postTypeConfig.postTypeDirectory}/${postDirName}/${image}`;
     const link = `/${postTypeConfig.postTypeDirectory}/${postDirName}`;
@@ -138,16 +145,14 @@ function getMdFile(postFiles) {
 }
 
 // For each post type, create the output directory and generate the files
-function generateContent() {
-    const allPostTypeConfigs = utils.siteConfig.postTypes;
-
-    for (let postType in allPostTypeConfigs) {
-        generatePosts(postType);
+async function generateContent() {
+    for (const postType of Object.keys(utils.siteConfig.postTypes)) {
+        await generatePosts(postType);
     }
 }
 
 // Generates the posts for a single post type, converting .md files to .html and saving in the post type output directory
-function generatePosts(postType) {
+async function generatePosts(postType) {
     // Prepare directories
     const postTypeConfig = utils.getPostTypeConfig(postType);
     const postTypePath = path.join(utils.CONTENT_DIR_PATH, postTypeConfig.postTypeDirectory);
@@ -155,16 +160,16 @@ function generatePosts(postType) {
     utils.prepareDirectory(postTypeOutputPath);
 
     // Read all inner directory names (the posts) for the post type
-    const postDirectoryNames = fs.readdirSync(postTypePath, 'utf8');
+    const postDirectoryNames = await fs.readdir(postTypePath);
 
     // Generate posts
     // Content structure is content directory > post type directory > post directory > post.md + images
-    postDirectoryNames.forEach((postDirectoryName) => {
+    for (const postDirectoryName of postDirectoryNames) {
         const postDirectoryPath = path.join(postTypePath, postDirectoryName);
         const postOutputDirectoryPath = path.join(postTypeOutputPath, postDirectoryName);
-        const allPostFiles = fs.readdirSync(postDirectoryPath, 'utf8');
+        const allPostFiles = await fs.readdir(postDirectoryPath);
         // Create an output folder for the post, within the post type folder
-        fs.mkdirSync(postOutputDirectoryPath);
+        await fs.mkdir(postOutputDirectoryPath);
 
         // Process post images first so content hash filenames can be used in the post page
         const postContext = {
@@ -175,24 +180,24 @@ function generatePosts(postType) {
             postDirectoryName,
             postDirectoryPath,
         };
-        processPostImages(postContext);
-        generatePostPage(postContext);
-    });
+        await processPostImages(postContext);
+        await generatePostPage(postContext);
+    }
 }
 
 // Copy any images from their post directory to the output directory, including with Exif removal and content hash filenames
 // Image may already have their hash filename computed
-function processPostImages({ postType, allPostFiles, postTypeOutputPath, postDirectoryName, postDirectoryPath }) {
+async function processPostImages({ postType, allPostFiles, postTypeOutputPath, postDirectoryName, postDirectoryPath }) {
     const postTypeConfig = utils.getPostTypeConfig(postType);
     const postImages = allPostFiles.filter((filename) => utils.allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
 
-    postImages.forEach((image) => {
+    for (const image of postImages) {
         const imagePath = path.join(postDirectoryPath, image);
         const logicalOutputPath = `/${postTypeConfig.postTypeDirectory}/${postDirectoryName}/${image}`;
 
         // If image hash already computed use the path, otherwise generate
         if (!utils.getHashPaths()[logicalOutputPath]) {
-            utils.setHashPath(logicalOutputPath, path.join(postTypeOutputPath, postDirectoryName, getFileHashName(postDirectoryPath, image)));
+            utils.setHashPath(logicalOutputPath, path.join(postTypeOutputPath, postDirectoryName, await getFileHashName(postDirectoryPath, image)));
         }
         const hashOutputPathFull = path.join(utils.getOutputPath(), utils.getHashPath(logicalOutputPath));
 
@@ -202,7 +207,7 @@ function processPostImages({ postType, allPostFiles, postTypeOutputPath, postDir
         let wasProcessed = false;
 
         if (exifFileTypes.includes(fileType)) {
-            const imageAsBinaryString = fs.readFileSync(imagePath, 'binary');
+            const imageAsBinaryString = await fs.readFile(imagePath, 'binary');
             const exifData = piexif.load(imageAsBinaryString);
             const exifSections = ['0th', 'Exif', 'GPS', 'Interop', '1st', 'thumbnail'];
             const hasExif = exifSections.some((tag) => Object.keys(exifData?.[tag] || {}).length > 0);
@@ -210,38 +215,38 @@ function processPostImages({ postType, allPostFiles, postTypeOutputPath, postDir
             if (hasExif) {
                 const cleanedImage = piexif.remove(imageAsBinaryString);
                 const cleanedImageBuffer = Buffer.from(cleanedImage, 'binary');
-                fs.writeFileSync(hashOutputPathFull, cleanedImageBuffer);
+                await fs.writeFile(hashOutputPathFull, cleanedImageBuffer);
                 wasProcessed = true;
             }
         }
 
         if (!wasProcessed) {
-            fs.copyFileSync(imagePath, hashOutputPathFull);
+            await fs.copyFile(imagePath, hashOutputPathFull);
         }
-    });
+    }
 }
 
 // Generate the html page from the md file
-function generatePostPage({ postType, allPostFiles, postDirectoryPath, postDirectoryName, postTypeOutputPath }) {
+async function generatePostPage({ postType, allPostFiles, postDirectoryPath, postDirectoryName, postTypeOutputPath }) {
     const postTypeConfig = utils.getPostTypeConfig(postType);
     const postTypeDirectoryName = postTypeConfig.postTypeDirectory;
 
     // Retrieve and format post html and front-matter attributes
     const markdownFilename = allPostFiles.find((file) => path.extname(file).toLowerCase() === '.md');
-    if (markdownFilename) {
-        const filename = markdownFilename.slice(0, -3);
-        const fileContent = fs.readFileSync(path.join(postDirectoryPath, markdownFilename), 'utf8');
-        const content = fm(fileContent);
-        let rawPostHtml = marked.parse(content.body);
-        htmlContent = templateHelper.formatPostHtml(rawPostHtml, postTypeDirectoryName, postDirectoryName);
-
-        // Generate the post site page
-        const postPage = generatePost(postTypeConfig, htmlContent, content.attributes, postTypeDirectoryName, filename);
-        const postFilePath = path.join(postTypeOutputPath, postDirectoryName, filename + '.html');
-        fs.writeFileSync(postFilePath, postPage, 'utf8');
-    } else {
+    if (!markdownFilename) {
         throw new Error(`Missing markdown file for ${filename}`);
     }
+
+    const filename = markdownFilename.slice(0, -3);
+    const fileContent = await fs.readFile(path.join(postDirectoryPath, markdownFilename), 'utf8');
+    const content = fm(fileContent);
+    let rawPostHtml = marked.parse(content.body);
+    htmlContent = templateHelper.formatPostHtml(rawPostHtml, postTypeDirectoryName, postDirectoryName);
+
+    // Generate the post site page
+    const postPage = generatePost(postTypeConfig, htmlContent, content.attributes, postTypeDirectoryName, filename);
+    const postFilePath = path.join(postTypeOutputPath, postDirectoryName, filename + '.html');
+    await fs.writeFile(postFilePath, postPage, 'utf8');
 }
 
 // Get an array of the most recent posts across all post types

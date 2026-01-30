@@ -1,5 +1,5 @@
 const path = require('node:path');
-const fs = require('node:fs');
+const fs = require('node:fs/promises');
 const lunr = require('lunr');
 const fm = require('front-matter');
 const utils = require('../utils.js');
@@ -62,8 +62,51 @@ function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
 
 // Create the index and a data store for result metadata
 // Compression is omitted here, ideally handled by a reverse proxy
-function generateSearchData(allPostMeta) {
-    const store = allPostMeta.reduce((acc, postMeta) => {
+async function generateSearchData(allPostMeta) {
+    const searchDataString = JSON.stringify({
+        index: await createSearchIndex(allPostMeta),
+        store: createStore(allPostMeta),
+    });
+
+    // Store hash and write file from string
+    const hash = utils.getStringHash(searchDataString);
+    const [base, ext] = utils.SEARCH_DATA_FILENAME.split('.');
+    const hashFilename = utils.getHashFilename(base, hash, `.${ext}`);
+    await fs.mkdir(utils.getOutputPath(), { recursive: true });
+
+    const logicalPath = path.join(utils.getOutputPath(), utils.SEARCH_DATA_FILENAME);
+    const hashPath = path.join(utils.getOutputPath(), hashFilename);
+    utils.setHashPath(logicalPath, hashPath);
+    await fs.writeFile(hashPath, searchDataString, 'utf8');
+}
+
+async function createSearchIndex(allPostMeta) {
+    const builder = new lunr.Builder();
+    builder.ref('link');
+    builder.field('title', { boost: 10 });
+    builder.field('keywords');
+    builder.field('description');
+    builder.field('category');
+    builder.field('content');
+
+    for (const postMeta of allPostMeta) {
+        const contentPath = path.join(utils.CONTENT_DIR_PATH, postMeta.link, postMeta.mdFilename);
+        const content = cleanMarkdown(fm(await fs.readFile(contentPath, 'utf8')).body);
+        builder.add({
+            link: postMeta.link,
+            title: normalise(postMeta.title),
+            description: normalise(postMeta.description),
+            keywords: normalise(postMeta.keywords),
+            category: normalise(postMeta.category),
+            content: normalise(content),
+        });
+    }
+
+    return builder.build();
+}
+
+function createStore(allPostMeta) {
+    return allPostMeta.reduce((acc, postMeta) => {
         acc[postMeta.link] = {
             link: postMeta.link,
             title: postMeta.title,
@@ -72,35 +115,6 @@ function generateSearchData(allPostMeta) {
         };
         return acc;
     }, {});
-
-    var idx = lunr(function () {
-        this.ref('link');
-        this.field('title', { boost: 10 });
-        this.field('keywords');
-        this.field('description');
-        this.field('category');
-        this.field('content');
-
-        allPostMeta.forEach((postMeta) => {
-            const contentPath = path.join(utils.CONTENT_DIR_PATH, postMeta.link, postMeta.mdFilename);
-            const content = cleanMarkdown(fm(fs.readFileSync(contentPath, 'utf8')).body);
-            this.add({
-                link: postMeta.link,
-                title: normalise(postMeta.title),
-                description: normalise(postMeta.description),
-                keywords: normalise(postMeta.keywords),
-                category: normalise(postMeta.category),
-                content: normalise(content),
-            });
-        });
-    });
-
-    const searchDataObj = {
-        index: idx,
-        store: store,
-    };
-
-    utils.writeHashFile(JSON.stringify(searchDataObj), utils.SEARCH_DATA_FILENAME, utils.getOutputPath());
 }
 
 // Remove accent marks

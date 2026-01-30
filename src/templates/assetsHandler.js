@@ -1,19 +1,19 @@
-const fs = require('node:fs');
+const fs = require('node:fs/promises');
 const path = require('node:path');
 const utils = require('../utils.js');
 
-function generateAssets() {
+async function generateAssets() {
     // Images
-    processAssets(path.join(__dirname, 'images'), path.join(utils.getOutputPath(), utils.IMAGE_ASSETS_FOLDER));
+    await processAssets(path.join(__dirname, 'images'), path.join(utils.getOutputPath(), utils.IMAGE_ASSETS_FOLDER));
 
     // CSS
     // Apply theme if present
-    processAssets(path.join(__dirname, 'css'), path.join(utils.getOutputPath(), utils.CSS_FOLDER), (item, srcPath) => {
+    await processAssets(path.join(__dirname, 'css'), path.join(utils.getOutputPath(), utils.CSS_FOLDER), async (item, srcPath) => {
         if (item !== 'main.css' || !utils.siteContent.theme) {
             return true;
         }
 
-        let cssContent = fs.readFileSync(srcPath, 'utf8');
+        let cssContent = await fs.readFile(srcPath, 'utf8');
         Object.entries(utils.siteContent.theme).forEach(([key, value]) => {
             cssContent = cssContent.replace(`--${key}: #theme`, `--${key}: ${value}`);
         });
@@ -22,9 +22,9 @@ function generateAssets() {
 
     // JS
     // Only copy feature scripts if enabled
-    processAssets(path.join(__dirname, 'js'), path.join(utils.getOutputPath(), utils.JS_FOLDER), (item) => {
+    await processAssets(path.join(__dirname, 'js'), path.join(utils.getOutputPath(), utils.JS_FOLDER), async (item) => {
         if (item === utils.SEARCH_JS_FILENAME) {
-            return generateSearchBundle();
+            return await generateSearchBundle();
         }
         if (item === 'pageTrack.js') {
             return utils.isFeatureEnabled('enableVisitCounter');
@@ -35,43 +35,44 @@ function generateAssets() {
 
 // Process an asset directory and generate content hash filenames
 // processFn is optional and can return: String (to write content), Boolean (true to copy, false to skip)
-function processAssets(srcDir, destDir, processFn) {
-    if (!fs.existsSync(srcDir)) return;
+async function processAssets(srcDir, destDir, processFn) {
+    if (!(await utils.dirExistsAsync(srcDir))) return;
 
-    fs.mkdirSync(destDir, { recursive: true });
-    fs.readdirSync(srcDir).forEach((item) => {
+    await fs.mkdir(destDir, { recursive: true });
+    const items = await fs.readdir(srcDir);
+    for (item of items) {
         const srcPath = path.join(srcDir, item);
         const ext = path.extname(item);
         const base = path.basename(item, ext);
 
-        const processResult = processFn ? processFn(item, srcPath) : true;
+        const processResult = processFn ? await processFn(item, srcPath) : true;
         const isString = typeof processResult === 'string';
         const isTrue = processResult === true;
 
         if (isString || isTrue) {
-            const hash = isString ? utils.getStringHash(processResult) : utils.getFileHash(srcPath);
+            const hash = isString ? utils.getStringHash(processResult) : await utils.getFileHash(srcPath);
             const hashFilename = utils.getHashFilename(base, hash, ext);
             const hashDestPath = path.join(destDir, hashFilename);
 
             if (isString) {
-                fs.writeFileSync(hashDestPath, processResult, 'utf8');
+                await fs.writeFile(hashDestPath, processResult, 'utf8');
             } else {
-                fs.cpSync(srcPath, hashDestPath);
+                await fs.cp(srcPath, hashDestPath);
             }
             utils.setHashPath(path.join(destDir, item), hashDestPath);
         }
-    });
+    }
 }
 
 // Inject search index location and search input placeholders
 // Inject the search library - for version consistency and CDN dependency removal
 // Search index already generated from generate.js
-function generateSearchBundle() {
+async function generateSearchBundle() {
     if (!utils.isFeatureEnabled('enableSearch')) return false;
 
     const searchIndexHashPath = utils.getHashPath(`/${utils.SEARCH_DATA_FILENAME}`);
     const searchJsPath = path.join(utils.JS_FOLDER, utils.SEARCH_JS_FILENAME);
-    let searchJs = fs.readFileSync(path.join(__dirname, searchJsPath), 'utf8');
+    let searchJs = await fs.readFile(path.join(__dirname, searchJsPath), 'utf8');
 
     // Update placeholders
     searchJs = searchJs.replace('#SEARCH_INDEX_PLACEHOLDER', searchIndexHashPath);
@@ -81,11 +82,13 @@ function generateSearchBundle() {
     searchJs = searchJs.replace("'#SEARCH_TRACK_PLACEHOLDER'", utils.isFeatureEnabled('enableVisitCounter'));
 
     // Inject search library
-    const libraryPath = path.join(__dirname, '..', '..', 'node_modules', 'lunr', 'lunr.min.js');
-    if (!fs.existsSync(libraryPath)) {
-        throw new Error('Could not locate search library for search generation.');
+    let library;
+    try {
+        const libraryPath = path.join(__dirname, '..', '..', 'node_modules', 'lunr', 'lunr.min.js');
+        library = await fs.readFile(libraryPath, 'utf8');
+    } catch (err) {
+        throw new Error('Error reading search library for search generation. ' + err.stack);
     }
-    const library = fs.readFileSync(libraryPath, 'utf8');
 
     const bundle = searchJs + '\n\n' + library;
     return bundle;

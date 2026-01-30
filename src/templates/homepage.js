@@ -1,4 +1,4 @@
-const fs = require('node:fs');
+const fs = require('node:fs/promises');
 const path = require('node:path');
 const utils = require('../utils.js');
 const structuredDataMarkup = require('./structuredDataMarkup.js');
@@ -7,8 +7,8 @@ const createHeader = require('./header.js');
 const createPostCards = require('./postCards.js');
 const footerHandler = require('./footer.js');
 
-function generateHomepage(recentPosts) {
-    fs.writeFileSync(path.join(utils.getOutputPath(), '/index.html'), createHomepage(recentPosts), 'utf8');
+async function generateHomepage(recentPosts) {
+    await fs.writeFile(path.join(utils.getOutputPath(), '/index.html'), createHomepage(recentPosts), 'utf8');
 }
 
 function createHomepage(recentPosts) {
