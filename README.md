@@ -51,6 +51,8 @@ Create a siteContent.json file within the [`src/templates/`](src/templates/) dir
 - **[post type name]Description (such as recipesDescription)**: optional, descriptive text to display at the top of the top-level page as well as head markup.
 - **searchPlaceholders**: optional, an array of placeholder texts to use in site search input.
 
+Optionally add a robots.txt in the [`src/templates/static`](src/templates/static) directory.
+
 ## Content structure
 
 - The content root is the folder configured by `contentDirectory` in the configuration.

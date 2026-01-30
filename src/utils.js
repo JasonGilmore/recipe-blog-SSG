@@ -17,8 +17,10 @@ if (fs.existsSync(configPath)) {
 const CSS_FOLDER = 'css';
 const JS_FOLDER = 'js';
 const IMAGE_ASSETS_FOLDER = 'images/site-assets';
+const STATIC_FOLDER = 'static';
 const SEARCH_JS_FILENAME = 'search.js';
 const SEARCH_DATA_FILENAME = 'search-data.json';
+const ROBOTS_TXT_FILENAME = 'robots.txt';
 
 const OUTPUT_DIR_PATH = path.join(__dirname, '../', siteConfig.outputDirectory);
 const CONTENT_DIR_PATH = path.join(__dirname, '../', siteConfig.contentDirectory);
@@ -134,11 +136,20 @@ function removeLast(word, text) {
 }
 
 async function dirExistsAsync(path) {
+    const stats = await getStatSafe(path);
+    return stats ? stats.isDirectory() : false;
+}
+
+async function fileExistsAsync(path) {
+    const stats = await getStatSafe(path);
+    return stats ? stats.isFile() : false;
+}
+
+async function getStatSafe(path) {
     try {
-        const s = await fsProm.stat(path);
-        return s.isDirectory();
+        return await fs.promises.stat(path);
     } catch {
-        return false;
+        return null;
     }
 }
 
@@ -151,8 +162,10 @@ module.exports = {
     getOutputPath,
     PAGE_TYPES,
     IMAGE_ASSETS_FOLDER,
+    STATIC_FOLDER,
     SEARCH_JS_FILENAME,
     SEARCH_DATA_FILENAME,
+    ROBOTS_TXT_FILENAME,
     CSS_FOLDER,
     JS_FOLDER,
     siteConfig,
@@ -169,4 +182,5 @@ module.exports = {
     isFeatureEnabled,
     removeLastS,
     dirExistsAsync,
+    fileExistsAsync,
 };

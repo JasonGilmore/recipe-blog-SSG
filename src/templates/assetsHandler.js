@@ -31,6 +31,12 @@ async function generateAssets() {
         }
         return true;
     });
+
+    // Robots.txt
+    const robotsPath = path.join(__dirname, utils.STATIC_FOLDER, utils.ROBOTS_TXT_FILENAME);
+    if (await utils.fileExistsAsync(robotsPath)) {
+        await fs.copyFile(robotsPath, path.join(utils.getOutputPath(), utils.ROBOTS_TXT_FILENAME));
+    }
 }
 
 // Process an asset directory and generate content hash filenames

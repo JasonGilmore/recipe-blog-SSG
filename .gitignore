@@ -12,6 +12,7 @@ public.tmp
 # Site specific content
 src/templates/siteContent.json
 src/templates/images
+src/templates/static
 
 # Dynamic files
 data/
