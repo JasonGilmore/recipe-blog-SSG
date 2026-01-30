@@ -1,7 +1,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const utils = require('../utils.js');
-const { processCss } = require('./templateHelper.js');
+const templateHelper = require('./templateHelper.js');
 
 async function generateAssets() {
     // Images
@@ -19,19 +19,21 @@ async function generateAssets() {
             });
         }
 
-        return processCss(cssContent);
+        return templateHelper.processCss(cssContent);
     });
 
     // JS
     // Only copy feature scripts if enabled
-    await processAssets(path.join(__dirname, 'js'), path.join(utils.getOutputPath(), utils.JS_FOLDER), async (item) => {
+    await processAssets(path.join(__dirname, 'js'), path.join(utils.getOutputPath(), utils.JS_FOLDER), async (item, srcPath) => {
+        if (item === 'pageTrack.js' && !utils.isFeatureEnabled('enableVisitCounter')) {
+            return false;
+        }
+
         if (item === utils.SEARCH_JS_FILENAME) {
             return await generateSearchBundle();
         }
-        if (item === 'pageTrack.js') {
-            return utils.isFeatureEnabled('enableVisitCounter');
-        }
-        return true;
+
+        return await templateHelper.processJs(await fs.readFile(srcPath, 'utf8'));
     });
 
     // Robots.txt
@@ -88,6 +90,7 @@ async function generateSearchBundle() {
         ? searchJs.replace("'#SEARCH_PLACEHOLDERS'", JSON.stringify(utils.siteContent.searchPlaceholders))
         : searchJs.replace('#SEARCH_PLACEHOLDERS', 'Search site...');
     searchJs = searchJs.replace("'#SEARCH_TRACK_PLACEHOLDER'", utils.isFeatureEnabled('enableVisitCounter'));
+    searchJsMin = await templateHelper.processJs(searchJs);
 
     // Inject search library
     let library;
@@ -98,7 +101,7 @@ async function generateSearchBundle() {
         throw new Error('Error reading search library for search generation. ' + err.stack);
     }
 
-    const bundle = searchJs + '\n\n' + library;
+    const bundle = searchJsMin + '\n\n' + library;
     return bundle;
 }
 

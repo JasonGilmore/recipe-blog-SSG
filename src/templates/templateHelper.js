@@ -4,6 +4,7 @@ const lunr = require('lunr');
 const fm = require('front-matter');
 const { minify: htmlMinify } = require('html-minifier-terser');
 const { minify: cssMinify } = require('csso');
+const { minify: jsMinify } = require('terser');
 const utils = require('../utils.js');
 
 function getUpArrow() {
@@ -176,6 +177,12 @@ function processCss(css) {
     return cssMinify(css).css;
 }
 
+// Minify if required
+async function processJs(js) {
+    if (!utils.isFeatureEnabled('enableMinify')) return js;
+    return (await jsMinify(js)).code;
+}
+
 module.exports = {
     getUpArrow,
     getDownArrow,
@@ -184,4 +191,5 @@ module.exports = {
     generateSearchData,
     processHtml,
     processCss,
+    processJs,
 };
