@@ -1,6 +1,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const utils = require('../utils.js');
+const { processCss } = require('./templateHelper.js');
 
 async function generateAssets() {
     // Images
@@ -9,15 +10,16 @@ async function generateAssets() {
     // CSS
     // Apply theme if present
     await processAssets(path.join(__dirname, 'css'), path.join(utils.getOutputPath(), utils.CSS_FOLDER), async (item, srcPath) => {
-        if (item !== 'main.css' || !utils.siteContent.theme) {
-            return true;
+        let cssContent = await fs.readFile(srcPath, 'utf8');
+
+        // Inject colour theme
+        if (item === 'main.css' && utils.siteContent.theme) {
+            Object.entries(utils.siteContent.theme).forEach(([key, value]) => {
+                cssContent = cssContent.replace(`--${key}: #theme`, `--${key}: ${value}`);
+            });
         }
 
-        let cssContent = await fs.readFile(srcPath, 'utf8');
-        Object.entries(utils.siteContent.theme).forEach(([key, value]) => {
-            cssContent = cssContent.replace(`--${key}: #theme`, `--${key}: ${value}`);
-        });
-        return cssContent;
+        return processCss(cssContent);
     });
 
     // JS

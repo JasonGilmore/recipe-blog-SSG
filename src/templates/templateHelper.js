@@ -2,7 +2,8 @@ const path = require('node:path');
 const fs = require('node:fs/promises');
 const lunr = require('lunr');
 const fm = require('front-matter');
-const { minify } = require('html-minifier-terser');
+const { minify: htmlMinify } = require('html-minifier-terser');
+const { minify: cssMinify } = require('csso');
 const utils = require('../utils.js');
 
 function getUpArrow() {
@@ -166,7 +167,13 @@ async function processHtml(html) {
         minifyJS: true,
         processScripts: ['application/ld+json'],
     };
-    return await minify(html, options);
+    return await htmlMinify(html, options);
+}
+
+// Minify if required
+function processCss(css) {
+    if (!utils.isFeatureEnabled('enableMinify')) return css;
+    return cssMinify(css).css;
 }
 
 module.exports = {
@@ -176,4 +183,5 @@ module.exports = {
     formatPostHtml,
     generateSearchData,
     processHtml,
+    processCss,
 };

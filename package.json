@@ -13,6 +13,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "csso": "~5.0.5",
     "express": "~5.1.0",
     "front-matter": "~4.0.2",
     "helmet": "~8.1.0",
