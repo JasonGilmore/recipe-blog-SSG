@@ -14,5 +14,6 @@
         }
     },
     "enableVisitCounter": true,
-    "enableSearch": true
+    "enableSearch": true,
+    "enableMinify": true
 }

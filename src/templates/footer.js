@@ -3,6 +3,7 @@ const path = require('node:path');
 const fm = require('front-matter');
 const marked = require('marked');
 const utils = require('../utils.js');
+const { processHtml } = require('./templateHelper.js');
 const structuredDataMarkup = require('./structuredDataMarkup.js');
 const createHead = require('./head.js');
 const createHeader = require('./header.js');
@@ -33,7 +34,8 @@ async function generateFooters() {
     }
 
     for (const footer of footersToGenerate) {
-        await fs.writeFile(footer.footerOutputPath, createFooterPage(footer.content, footer.displayName, footer.filename), 'utf8');
+        const html = await processHtml(createFooterPage(footer.content, footer.displayName, footer.filename));
+        await fs.writeFile(footer.footerOutputPath, html, 'utf8');
     }
 }
 

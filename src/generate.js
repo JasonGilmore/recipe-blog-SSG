@@ -244,9 +244,9 @@ async function generatePostPage({ postType, allPostFiles, postDirectoryPath, pos
     htmlContent = templateHelper.formatPostHtml(rawPostHtml, postTypeDirectoryName, postDirectoryName);
 
     // Generate the post site page
-    const postPage = generatePost(postTypeConfig, htmlContent, content.attributes, postTypeDirectoryName, filename);
+    const html = await templateHelper.processHtml(generatePost(postTypeConfig, htmlContent, content.attributes, postTypeDirectoryName, filename));
     const postFilePath = path.join(postTypeOutputPath, postDirectoryName, filename + '.html');
-    await fs.writeFile(postFilePath, postPage, 'utf8');
+    await fs.writeFile(postFilePath, html, 'utf8');
 }
 
 // Get an array of the most recent posts across all post types
