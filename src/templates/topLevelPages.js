@@ -1,6 +1,7 @@
 const path = require('node:path');
 const fs = require('node:fs/promises');
 const utils = require('../utils.js');
+const { processHtml } = require('./templateHelper.js');
 const structuredDataMarkup = require('./structuredDataMarkup.js');
 const createHead = require('./head.js');
 const createHeader = require('./header.js');
@@ -11,7 +12,8 @@ async function generateTopLevelPages(allPostMeta) {
     for (const postType of Object.keys(utils.siteConfig.postTypes)) {
         const postTypeConfig = utils.getPostTypeConfig(postType);
         const topLevelPagePath = path.join(utils.getOutputPath(), postTypeConfig.postTypeDirectory + '/' + 'index.html');
-        await fs.writeFile(topLevelPagePath, createTopLevelPage(postType, postTypeConfig, allPostMeta), 'utf8');
+        const html = await processHtml(createTopLevelPage(postType, postTypeConfig, allPostMeta));
+        await fs.writeFile(topLevelPagePath, html, 'utf8');
     }
 }
 

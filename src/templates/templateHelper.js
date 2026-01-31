@@ -2,6 +2,9 @@ const path = require('node:path');
 const fs = require('node:fs/promises');
 const lunr = require('lunr');
 const fm = require('front-matter');
+const { minify: htmlMinify } = require('html-minifier-terser');
+const { minify: cssMinify } = require('csso');
+const { minify: jsMinify } = require('terser');
 const utils = require('../utils.js');
 
 function getUpArrow() {
@@ -151,10 +154,42 @@ function cleanMarkdown(markdown) {
     );
 }
 
+// Minify if required
+async function processHtml(html) {
+    if (!utils.isFeatureEnabled('enableMinify')) return html;
+
+    const options = {
+        caseSensitive: true,
+        removeComments: true,
+        collapseBooleanAttributes: true,
+        removeEmptyAttributes: true,
+        collapseWhitespace: true,
+        minifyCSS: true,
+        minifyJS: true,
+        processScripts: ['application/ld+json'],
+    };
+    return await htmlMinify(html, options);
+}
+
+// Minify if required
+function processCss(css) {
+    if (!utils.isFeatureEnabled('enableMinify')) return css;
+    return cssMinify(css).css;
+}
+
+// Minify if required
+async function processJs(js) {
+    if (!utils.isFeatureEnabled('enableMinify')) return js;
+    return (await jsMinify(js)).code;
+}
+
 module.exports = {
     getUpArrow,
     getDownArrow,
     getSearchIcon,
     formatPostHtml,
     generateSearchData,
+    processHtml,
+    processCss,
+    processJs,
 };
