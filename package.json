@@ -14,13 +14,13 @@
   },
   "dependencies": {
     "csso": "~5.0.5",
+    "exif-be-gone": "~1.5.1",
     "express": "~5.1.0",
     "front-matter": "~4.0.2",
     "helmet": "~8.1.0",
     "html-minifier-terser": "~7.2.0",
     "lunr": "~2.3.9",
     "marked": "~16.4.0",
-    "piexifjs": "~1.0.6",
     "pm2": "~6.0.13",
     "terser": "~5.46.0"
   }

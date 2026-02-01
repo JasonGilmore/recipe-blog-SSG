@@ -5,7 +5,12 @@ const templateHelper = require('./templateHelper.js');
 
 async function generateAssets() {
     // Images
-    await processAssets(path.join(__dirname, 'images'), path.join(utils.getOutputPath(), utils.IMAGE_ASSETS_FOLDER));
+    const imagesOutputPath = path.join(utils.getOutputPath(), utils.IMAGE_ASSETS_FOLDER);
+    await processAssets(path.join(__dirname, 'images'), imagesOutputPath, async (item, srcPath) => {
+        // Handle image generation here to apply exif removal
+        await utils.scrubSaveImage(srcPath, imagesOutputPath, item);
+        return false;
+    });
 
     // CSS
     // Apply theme if present

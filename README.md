@@ -7,7 +7,7 @@ A small static site generator for publishing recipe and food blogs. Write conten
 - Convert Markdown posts with front-matter into HTML pages.
 - Configurable site structure and navigation via `src/config.json` (overrides [`src/config.default.json`](src/config.default.json)).
 - Generate homepage, top-level pages and post pages using simple templating (see [`src/templates/`](src/templates)).
-- Copy and sanitize image assets (Exif removal for JPG/JPEG).
+- Copy and sanitise image assets (with Exif removal).
 - Generate content hash filenames for images and site assets, for reliable cache busting.
 - Simple visit counting.
 - Client-side search.
@@ -34,7 +34,7 @@ A small static site generator for publishing recipe and food blogs. Write conten
 
 ## Configuration
 
-The site generator reads default settings from [`src/config.default.json`](src/config.default.json). To customize content and output directories, post types (which controls top-level pages) and feature toggles, create `src/config.json` which will override the defaults.
+The site generator reads default settings from [`src/config.default.json`](src/config.default.json). To customise content and output directories, post types (which controls top-level pages) and feature toggles, create `src/config.json` which will override the defaults.
 
 Create a siteContent.json file within the [`src/templates/`](src/templates/) directory for key site information including a reference to the homepage image. Place the homepage image and a favicon into the [`src/templates/images/`](src/templates/images/) directory. siteContent.json supports the following fields:
 

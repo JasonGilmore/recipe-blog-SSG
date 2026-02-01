@@ -2,6 +2,9 @@ const path = require('node:path');
 const fs = require('node:fs');
 const fsProm = require('node:fs/promises');
 const crypto = require('node:crypto');
+const { Transform } = require('node:stream');
+const { pipeline } = require('node:stream/promises');
+const ExifTransformer = require('exif-be-gone');
 const siteContent = require('./templates/siteContent.json');
 
 // Fallback to default config if config not present
@@ -21,6 +24,9 @@ const STATIC_FOLDER = 'static';
 const SEARCH_JS_FILENAME = 'search.js';
 const SEARCH_DATA_FILENAME = 'search-data.json';
 const ROBOTS_TXT_FILENAME = 'robots.txt';
+
+const HASH_ALGO = 'MD5';
+const HASH_ENCODING = 'hex';
 
 const OUTPUT_DIR_PATH = path.join(__dirname, '../', siteConfig.outputDirectory);
 const CONTENT_DIR_PATH = path.join(__dirname, '../', siteConfig.contentDirectory);
@@ -82,7 +88,7 @@ function getStringHash(stringContent) {
 }
 
 function getBufferHash(buffer) {
-    return crypto.createHash('MD5').update(buffer).digest('hex');
+    return crypto.createHash(HASH_ALGO).update(buffer).digest(HASH_ENCODING);
 }
 
 function getHashFilename(base, hash, ext) {
@@ -117,7 +123,7 @@ function normalisePath(filePath) {
     return normalisedPath.startsWith('/') ? normalisedPath : '/' + normalisedPath;
 }
 
-const allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+const allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
 
 function getPostTypeConfig(postType) {
     return siteConfig.postTypes[postType];
@@ -153,6 +159,38 @@ async function getStatSafe(path) {
     }
 }
 
+// Removes exif (or other private data) from an image and writes the cleaned image including with content hash filename
+async function scrubSaveImage(imagePath, outputDir, imageName) {
+    try {
+        const tempPath = path.join(outputDir, imageName) + '.tmp';
+        const reader = fs.createReadStream(imagePath);
+        const transformer = new ExifTransformer();
+        const writer = fs.createWriteStream(tempPath);
+
+        const contentHashInstance = crypto.createHash(HASH_ALGO);
+        const hashTransformer = new Transform({
+            transform(chunk, encoding, callback) {
+                contentHashInstance.update(chunk);
+                callback(null, chunk);
+            },
+        });
+
+        await pipeline(reader, transformer, hashTransformer, writer);
+
+        const contentHash = contentHashInstance.digest(HASH_ENCODING);
+        const ext = path.extname(imageName);
+        const base = path.basename(imageName, ext);
+        const hashFilename = getHashFilename(base, contentHash, ext);
+        const outputHashPath = path.join(outputDir, hashFilename);
+        setHashPath(path.join(outputDir, imageName), outputHashPath);
+
+        await fsProm.rename(tempPath, outputHashPath);
+        return hashFilename;
+    } catch (err) {
+        throw new Error('Error removing exif. ' + err.stack);
+    }
+}
+
 module.exports = {
     siteContent,
     OUTPUT_DIR_PATH,
@@ -183,4 +221,5 @@ module.exports = {
     removeLastS,
     dirExistsAsync,
     fileExistsAsync,
+    scrubSaveImage,
 };
