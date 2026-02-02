@@ -1,13 +1,22 @@
-const jumpToRecipeButtons = document.querySelectorAll('.jump-to-recipe');
-jumpToRecipeButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-        const recipeBox = document.querySelector('#recipe');
-        recipeBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        if (window.location.hash !== '#recipe') {
-            history.pushState(null, '', '#recipe');
-        }
-    });
-});
+// Script is deferred
+const container = document.querySelector('.content-page-container');
+container.addEventListener('click', jumpToRecipeDelegation);
+
+function jumpToRecipeDelegation(e) {
+    const button = e.target.closest('.jump-to-recipe');
+    if (!button) return;
+
+    const recipeBox = document.querySelector('#recipe');
+    recipeBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (window.location.hash !== '#recipe') {
+        history.pushState(null, '', '#recipe');
+    }
+
+    // Remove persistent hover even on mobile devices
+    const newButton = button.cloneNode(true);
+    button.parentNode.replaceChild(newButton, button);
+    button.blur();
+}
 
 let goToTopButton = document.getElementById('goToTop');
 if (goToTopButton) {

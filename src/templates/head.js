@@ -12,6 +12,7 @@ function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativ
     const headerJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/header.js`);
 
     // Conditional hash asset paths
+    const postsJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/posts.js`);
     const postCssHashPath = utils.getHashPath('/css/post.css');
     const searchJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/${utils.SEARCH_JS_FILENAME}`);
     const pageTrackJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/pageTrack.js`);
@@ -37,6 +38,7 @@ function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativ
 
         <link rel="stylesheet" href="${mainCssHashPath}" />
         ${pageType === utils.PAGE_TYPES.POST ? `<link rel="stylesheet" href="${postCssHashPath}" />` : ''}
+        ${pageType === utils.PAGE_TYPES.POST ? `<script src="${postsJsHashPath}" defer></script>` : ''}
 
         <script src="${headerJsHashPath}" defer></script>
         ${utils.isFeatureEnabled('enableSearch') ? `<script src="${searchJsHashPath}" defer></script>` : ''}

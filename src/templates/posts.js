@@ -17,8 +17,6 @@ function createPost(postTypeConfig, postHtml, postAttributes, postTypeDirectoryN
         structuredData,
     });
 
-    const postsJsHashPath = utils.getHashPath(`/${utils.JS_FOLDER}/posts.js`);
-
     return `
         ${head}
         <body>
@@ -34,7 +32,6 @@ function createPost(postTypeConfig, postHtml, postAttributes, postTypeDirectoryN
                 </div>
             </main>
             ${footerHandler.createFooter()}
-            <script src="${postsJsHashPath}"></script>
         </body>
 
     </html>
