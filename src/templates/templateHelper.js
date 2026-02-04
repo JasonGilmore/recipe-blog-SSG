@@ -36,7 +36,7 @@ function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
         .replaceAll('src="./', `src="${folderPath}`)
         .replaceAll('<table>', '<div class="table-wrapper"><table>')
         .replaceAll('</table>', '</table></div>')
-        .replaceAll('<p>{recipeboxstart}</p>', '<div id="recipe" class="recipe-box">')
+        .replaceAll('<p>{recipeboxstart}</p>', '<div id="recipe" class="recipe-box" role="region" aria-label="Recipe box">')
         .replaceAll('<p>{recipeboxend}</p>', '</div>')
         .replaceAll('{jumptorecipebox}', `<button class="jump-to-recipe flex-centre" type="button">${getDownArrow()} Jump to recipe</button>`)
         .replaceAll('<p>{lightstyleboxstart}</p>', '<div class="light-style-box">')

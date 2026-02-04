@@ -25,7 +25,7 @@ function createPost(postTypeConfig, postHtml, postAttributes, postTypeDirectoryN
                 <div class="content-page-container">
                     ${postHtml}
 
-                    <button id="goToTop" class="flex-centre" aria-label="Go to top" title="Go to top">
+                    <button id="jumpToTop" class="flex-centre" aria-label="Go to top" title="Go to top">
                         ${templateHelper.getUpArrow()}
                     </button>
 

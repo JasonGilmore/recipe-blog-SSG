@@ -1,11 +1,28 @@
 // Script is deferred
+
+// Click, enter and space to use buttons
 const container = document.querySelector('.content-page-container');
-container.addEventListener('click', jumpToRecipeDelegation);
+container.addEventListener('click', handleContainerEvents);
+container.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === ' ') e.preventDefault();
+        handleContainerEvents(e);
+    }
+});
 
-function jumpToRecipeDelegation(e) {
-    const button = e.target.closest('.jump-to-recipe');
-    if (!button) return;
+function handleContainerEvents(e) {
+    const jumpToRecipeBtn = e.target.closest('.jump-to-recipe');
+    const jumpToTopBtn = e.target.closest('#jumpToTop');
 
+    if (jumpToRecipeBtn) {
+        jumpToRecipeHandler(e);
+    } else if (jumpToTopBtn) {
+        jumpToTopHandler(e);
+    }
+}
+
+function jumpToRecipeHandler(e) {
+    const button = e.target;
     const recipeBox = document.querySelector('#recipe');
     recipeBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
     if (window.location.hash !== '#recipe') {
@@ -16,15 +33,30 @@ function jumpToRecipeDelegation(e) {
     const newButton = button.cloneNode(true);
     button.parentNode.replaceChild(newButton, button);
     button.blur();
+
+    // Dynamically add tabIndex so navigation to url with recipe box anchor doesn't show border
+    setFocusable(recipeBox);
+    recipeBox.focus({ preventScroll: true });
 }
 
-let goToTopButton = document.getElementById('goToTop');
-if (goToTopButton) {
-    window.addEventListener('scroll', function () {
-        goToTopButton.style.visibility = document.documentElement.scrollTop > 2000 ? 'visible' : 'hidden';
-    });
+function jumpToTopHandler() {
+    // Make body focusable to shift screen reader to start of page
+    document.body.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setFocusable(document.body);
+    document.body.focus({ preventScroll: true });
+}
 
-    goToTopButton.addEventListener('click', function () {
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+// Toggle jump to top button visibility based on scroll position
+let jumpToTopBtn = document.getElementById('jumpToTop');
+if (jumpToTopBtn) {
+    window.addEventListener('scroll', function () {
+        jumpToTopBtn.style.visibility = document.documentElement.scrollTop > 2000 ? 'visible' : 'hidden';
     });
+}
+
+function setFocusable(element) {
+    element.setAttribute('tabindex', '-1');
+    setTimeout(() => {
+        element.removeAttribute('tabindex');
+    }, 200);
 }

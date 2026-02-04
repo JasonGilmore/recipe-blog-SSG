@@ -148,7 +148,7 @@ ul:has(> .ingredient-item-checkbox) {
     justify-content: center;
 }
 
-#goToTop {
+#jumpToTop {
     visibility: hidden;
     position: fixed;
     bottom: 30px;
@@ -164,7 +164,7 @@ ul:has(> .ingredient-item-checkbox) {
     font-size: 1.4rem;
 }
 
-#goToTop:hover {
+#jumpToTop:hover {
     background-color: var(--accent-colour-dark);
 }
 
@@ -181,7 +181,7 @@ ul:has(> .ingredient-item-checkbox) {
         padding: 20px 15px;
     }
 
-    #goToTop {
+    #jumpToTop {
         bottom: 15px;
         right: 10px;
         padding: 8px;
@@ -194,7 +194,7 @@ ul:has(> .ingredient-item-checkbox) {
         width: 80%;
     }
 
-    #goToTop {
+    #jumpToTop {
         bottom: 25px;
         right: 20px;
         padding: 8px;
