@@ -41,6 +41,7 @@ Create a siteContent.json file within the [`src/templates/`](src/templates/) dir
 - **siteName**: the site name.
 - **mainIntroduction**: the main introduction text, used on the homepage.
 - **secondaryIntroduction**: the secondary introduction text, used on the homepage after the main introduction.
+- **recentPostsMessage**: optional, the recent post text to display on the homepage.
 - **theme**: an object containing design tokens to apply CSS compatible colour values (RGB, Hex etc.). Supported keys include accent-colour, accent-colour-dark, recipe-box-background, light-box-background, dark-box-background.
 - **siteUrl**: the site url.
 - **siteIcon**: optional, a small icon to display in the site header.
