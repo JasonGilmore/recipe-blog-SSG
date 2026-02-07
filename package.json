@@ -10,7 +10,7 @@
     "stop": "npx pm2 stop recipe-blog",
     "delete": "npx pm2 delete recipe-blog",
     "restart": "npx pm2 restart recipe-blog",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "dependencies": {
     "csso": "~5.0.5",
@@ -23,5 +23,8 @@
     "marked": "~16.4.0",
     "pm2": "~6.0.13",
     "terser": "~5.46.0"
+  },
+  "devDependencies": {
+    "jest": "~30.2.0"
   }
 }

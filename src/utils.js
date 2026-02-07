@@ -7,6 +7,23 @@ const { pipeline } = require('node:stream/promises');
 const ExifTransformer = require('exif-be-gone');
 const siteContent = require('./templates/siteContent.json');
 
+const CSS_FOLDER = 'css';
+const JS_FOLDER = 'js';
+const IMAGE_ASSETS_FOLDER = 'images/site-assets';
+const STATIC_FOLDER = 'static';
+const SEARCH_JS_FILENAME = 'search.js';
+const SEARCH_DATA_FILENAME = 'search-data.json';
+const ROBOTS_TXT_FILENAME = 'robots.txt';
+const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
+const PAGE_TYPES = {
+    POST: 'post',
+    FOOTER: 'footer',
+    TOP_LEVEL: 'top-level',
+    HOMEPAGE: 'homepage',
+};
+const HASH_ALGO = 'MD5';
+const HASH_ENCODING = 'hex';
+
 // Fallback to default config if config not present
 let siteConfig;
 const configPath = path.join(__dirname, 'config.json');
@@ -17,33 +34,15 @@ if (fs.existsSync(configPath)) {
     siteConfig = require(defaultConfigPath);
 }
 
-const CSS_FOLDER = 'css';
-const JS_FOLDER = 'js';
-const IMAGE_ASSETS_FOLDER = 'images/site-assets';
-const STATIC_FOLDER = 'static';
-const SEARCH_JS_FILENAME = 'search.js';
-const SEARCH_DATA_FILENAME = 'search-data.json';
-const ROBOTS_TXT_FILENAME = 'robots.txt';
-
-const HASH_ALGO = 'MD5';
-const HASH_ENCODING = 'hex';
+function getPostTypeConfig(postType) {
+    return siteConfig.postTypes[postType];
+}
 
 const OUTPUT_DIR_PATH = path.join(__dirname, '../', siteConfig.outputDirectory);
 const CONTENT_DIR_PATH = path.join(__dirname, '../', siteConfig.contentDirectory);
 const FOOTER_DIR_PATH = path.join(CONTENT_DIR_PATH, 'footers');
 let tempOutputDirName = siteConfig.outputDirectory;
 let tempOutputPath = OUTPUT_DIR_PATH;
-
-// Set the temp output dir for atomic write
-function setTempOutput(dirPath) {
-    tempOutputPath = dirPath;
-    tempOutputDirName = path.basename(dirPath);
-}
-
-// Returns the output path in case a temp output has been specified for atomic write
-function getOutputPath() {
-    return tempOutputPath ? tempOutputPath : OUTPUT_DIR_PATH;
-}
 
 function validateConfigurations() {
     if (!siteConfig.postTypes) {
@@ -57,12 +56,20 @@ function validateConfigurations() {
     }
 }
 
-const PAGE_TYPES = {
-    POST: 'post',
-    FOOTER: 'footer',
-    TOP_LEVEL: 'top-level',
-    HOMEPAGE: 'homepage',
-};
+// Set the temp output dir for atomic write
+function setTempOutput(dirPath) {
+    if (typeof dirPath !== 'string' || dirPath.length === 0) {
+        throw new Error('Invalid temporary output provided.');
+    }
+
+    tempOutputPath = dirPath;
+    tempOutputDirName = path.basename(dirPath);
+}
+
+// Returns the output path in case a temp output has been specified for atomic write
+function getOutputPath() {
+    return tempOutputPath ? tempOutputPath : OUTPUT_DIR_PATH;
+}
 
 // Creates the directory if not present, and clears all contents
 async function prepareDirectory(directory) {
@@ -123,22 +130,17 @@ function normalisePath(filePath) {
     return normalisedPath.startsWith('/') ? normalisedPath : '/' + normalisedPath;
 }
 
-const allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
-
-function getPostTypeConfig(postType) {
-    return siteConfig.postTypes[postType];
-}
-
 function isFeatureEnabled(feature) {
     return !!siteConfig[feature];
 }
 
 function removeLastS(word) {
+    if (typeof word !== 'string') return word;
     return removeLast(word, 's');
 }
 
 function removeLast(word, text) {
-    return word.lastIndexOf(text) === word.length - 1 ? word.slice(0, word.length - 1) : word;
+    return word.toLowerCase().endsWith(text.toLowerCase()) ? word.slice(0, -text.length) : word;
 }
 
 async function dirExistsAsync(path) {
@@ -153,7 +155,7 @@ async function fileExistsAsync(path) {
 
 async function getStatSafe(path) {
     try {
-        return await fs.promises.stat(path);
+        return await fsProm.stat(path);
     } catch {
         return null;
     }
@@ -193,20 +195,21 @@ async function scrubSaveImage(imagePath, outputDir, imageName) {
 
 module.exports = {
     siteContent,
-    OUTPUT_DIR_PATH,
-    CONTENT_DIR_PATH,
-    FOOTER_DIR_PATH,
-    setTempOutput,
-    getOutputPath,
-    PAGE_TYPES,
+    CSS_FOLDER,
+    JS_FOLDER,
     IMAGE_ASSETS_FOLDER,
     STATIC_FOLDER,
     SEARCH_JS_FILENAME,
     SEARCH_DATA_FILENAME,
     ROBOTS_TXT_FILENAME,
-    CSS_FOLDER,
-    JS_FOLDER,
+    ALLOWED_IMAGE_EXTENSIONS,
+    PAGE_TYPES,
     siteConfig,
+    OUTPUT_DIR_PATH,
+    CONTENT_DIR_PATH,
+    FOOTER_DIR_PATH,
+    setTempOutput,
+    getOutputPath,
     validateConfigurations,
     prepareDirectory,
     getFileHash,
@@ -215,7 +218,6 @@ module.exports = {
     getHashPath,
     setHashPath,
     getHashPaths,
-    allowedImageExtensions,
     getPostTypeConfig,
     isFeatureEnabled,
     removeLastS,

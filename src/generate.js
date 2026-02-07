@@ -107,7 +107,7 @@ async function prepareSiteGeneration() {
 
 // Generate images in one post directory
 async function generateImages(postDirPath, postDirOutputPath, postFiles) {
-    const postImages = getPostImages(postFiles).filter((filename) => utils.allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
+    const postImages = getPostImages(postFiles).filter((filename) => utils.ALLOWED_IMAGE_EXTENSIONS.includes(path.extname(filename).toLowerCase()));
     await fs.mkdir(postDirOutputPath, { recursive: true });
 
     for (const image of postImages) {
@@ -132,7 +132,7 @@ async function getPostMeta(postDirPath, postType, postDirName, allPostFiles) {
 }
 
 function getPostImages(postFiles) {
-    return postFiles.filter((filename) => utils.allowedImageExtensions.includes(path.extname(filename).toLowerCase()));
+    return postFiles.filter((filename) => utils.ALLOWED_IMAGE_EXTENSIONS.includes(path.extname(filename).toLowerCase()));
 }
 
 function getMdFile(postFiles) {

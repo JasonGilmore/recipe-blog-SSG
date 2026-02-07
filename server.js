@@ -40,7 +40,7 @@ app.use((req, res, next) => {
 
     // Images and assets use content hash filenames for cache busting
     // Cache images for 5 days
-    const isImage = srcUtils.allowedImageExtensions.some((ext) => path.endsWith(ext));
+    const isImage = srcUtils.ALLOWED_IMAGE_EXTENSIONS.some((ext) => path.endsWith(ext));
     if (isImage || path.endsWith('.ico')) {
         res.setHeader('Cache-Control', 'public, max-age=432000, must-revalidate');
     } else if (path.endsWith('.js') || path.endsWith('.css') || path.endsWith('.json')) {
@@ -57,7 +57,7 @@ app.use((req, res, next) => {
 // Allow cross origin request to image files for link preview tools
 // Image files are from the images folder (for favicon and other images) and each post's icon image
 app.use((req, res, next) => {
-    const isImage = srcUtils.allowedImageExtensions.some((suffix) => req.path.endsWith(suffix)) || req.path.endsWith('.ico');
+    const isImage = srcUtils.ALLOWED_IMAGE_EXTENSIONS.some((suffix) => req.path.endsWith(suffix)) || req.path.endsWith('.ico');
     if (isImage) {
         const isIconImage = req.path.includes('-icon');
         const isImageFolder = req.path.startsWith(`/${srcUtils.IMAGE_ASSETS_FOLDER}`);
