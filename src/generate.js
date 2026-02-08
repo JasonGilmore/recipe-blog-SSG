@@ -10,11 +10,9 @@ const generateAssets = require('./templates/assetsHandler.js');
 const generatePost = require('./templates/posts.js');
 const templateHelper = require('./templates/templateHelper.js');
 
-const timerLabel = 'Generate site async';
-generateSite();
-
 // Use sequential awaits to ensure predictable execution order and readable logs
 async function generateSite() {
+    const timerLabel = 'Generate site async';
     console.time(timerLabel);
     utils.validateConfigurations();
 
@@ -84,7 +82,7 @@ async function atomicSwap(tempOutputPath, backupPath) {
 }
 
 // Iterate through each post type directory, generate images and post meta
-async function prepareSiteGeneration() {
+async function prepareSiteGeneration(deps = { generateImages, getPostMeta }) {
     let allPostMeta = [];
 
     // Get contents of post type directory
@@ -98,16 +96,16 @@ async function prepareSiteGeneration() {
             const postDirPath = path.join(postTypePath, postDirName);
             const allPostFiles = await fs.readdir(postDirPath);
             const postDirOutputPath = path.join(utils.getOutputPath(), postTypeConfig.postTypeDirectory, postDirName);
-            await generateImages(postDirPath, postDirOutputPath, allPostFiles);
-            allPostMeta.push(await getPostMeta(postDirPath, postType, postDirName, allPostFiles));
+            await deps.generateImages(postDirPath, postDirOutputPath, allPostFiles);
+            allPostMeta.push(await deps.getPostMeta(postDirPath, postType, postDirName, allPostFiles));
         }
     }
     return allPostMeta;
 }
 
 // Generate images in one post directory
-async function generateImages(postDirPath, postDirOutputPath, postFiles) {
-    const postImages = getPostImages(postFiles).filter((filename) => utils.ALLOWED_IMAGE_EXTENSIONS.includes(path.extname(filename).toLowerCase()));
+async function generateImages(postDirPath, postDirOutputPath, postFiles, deps = { getPostImages }) {
+    const postImages = deps.getPostImages(postFiles).filter((filename) => utils.ALLOWED_IMAGE_EXTENSIONS.includes(path.extname(filename).toLowerCase()));
     await fs.mkdir(postDirOutputPath, { recursive: true });
 
     for (const image of postImages) {
@@ -115,41 +113,46 @@ async function generateImages(postDirPath, postDirOutputPath, postFiles) {
     }
 }
 
+function getPostImages(postFiles) {
+    if (!Array.isArray(postFiles)) return [];
+    return postFiles.filter((filename) => utils.ALLOWED_IMAGE_EXTENSIONS.includes(path.extname(filename).toLowerCase()));
+}
+
 // Generate post meta for one post directory
 // Call after generating image hashes so meta contains the hash filename
-async function getPostMeta(postDirPath, postType, postDirName, allPostFiles) {
+async function getPostMeta(postDirPath, postType, postDirName, allPostFiles, deps = { getMdFile, fm }) {
     const postTypeConfig = utils.getPostTypeConfig(postType);
-    const mdFilename = getMdFile(allPostFiles);
+    const mdFilename = deps.getMdFile(allPostFiles);
     if (!mdFilename) return;
 
     // Extract front-matter content
     const fileContent = await fs.readFile(path.join(postDirPath, mdFilename), 'utf8');
-    const { image, ...restAttributes } = fm(fileContent).attributes;
+    const { image, ...restAttributes } = deps.fm(fileContent).attributes;
     const imageOutputPath = `/${postTypeConfig.postTypeDirectory}/${postDirName}/${image}`;
     const link = `/${postTypeConfig.postTypeDirectory}/${postDirName}`;
     const imageHashPath = utils.getHashPath(imageOutputPath);
     return { ...restAttributes, link, imageHashPath, postType, mdFilename };
 }
 
-function getPostImages(postFiles) {
-    return postFiles.filter((filename) => utils.ALLOWED_IMAGE_EXTENSIONS.includes(path.extname(filename).toLowerCase()));
-}
-
 function getMdFile(postFiles) {
+    if (!Array.isArray(postFiles)) return undefined;
     return postFiles.find((file) => path.extname(file).toLowerCase() === '.md');
 }
 
 // For each post type, create the output directory and generate the files
-async function generateContent() {
+async function generateContent(deps = { generatePosts }) {
     for (const postType of Object.keys(utils.siteConfig.postTypes)) {
-        await generatePosts(postType);
+        await deps.generatePosts(postType);
     }
 }
 
 // Generates the posts for a single post type, converting .md files to .html and saving in the post type output directory
-async function generatePosts(postType) {
+async function generatePosts(postType, deps = { generatePostPage }) {
     // Get all inner directory names (the posts) for the post type
     const postTypeConfig = utils.getPostTypeConfig(postType);
+    if (!postTypeConfig?.postTypeDirectory) {
+        throw new Error(`Invalid or missing configuration for post type: ${postType}`);
+    }
     const postTypePath = path.join(utils.CONTENT_DIR_PATH, postTypeConfig.postTypeDirectory);
     const postDirNames = await fs.readdir(postTypePath);
 
@@ -160,31 +163,31 @@ async function generatePosts(postType) {
         const allPostFiles = await fs.readdir(postDirPath);
 
         // Post images have already been processed so content hash filenames can be used in the post page
-        await generatePostPage(postType, allPostFiles, postDirPath, postDirName);
+        await deps.generatePostPage(postType, allPostFiles, postDirPath, postDirName);
     }
 }
 
 // Generate the html page from the md file
-async function generatePostPage(postType, allPostFiles, postDirPath, postDirName) {
+async function generatePostPage(postType, allPostFiles, postDirPath, postDirName, deps = { getMdFile, fm, marked, templateHelper, generatePost }) {
     const postTypeConfig = utils.getPostTypeConfig(postType);
     // postTypeOutputPath already exists from generateImages
     const postTypeOutputPath = path.join(utils.getOutputPath(), postTypeConfig.postTypeDirectory);
     const postTypeDirName = postTypeConfig.postTypeDirectory;
 
     // Retrieve and format post html and front-matter attributes
-    const markdownFilename = allPostFiles.find((file) => path.extname(file).toLowerCase() === '.md');
+    const markdownFilename = deps.getMdFile(allPostFiles);
     if (!markdownFilename) {
-        throw new Error(`Missing markdown file for ${filename}`);
+        throw new Error(`Missing markdown file for ${postDirPath}`);
     }
 
     const filename = markdownFilename.slice(0, -3);
     const fileContent = await fs.readFile(path.join(postDirPath, markdownFilename), 'utf8');
-    const content = fm(fileContent);
-    let rawPostHtml = marked.parse(content.body);
-    htmlContent = templateHelper.formatPostHtml(rawPostHtml, postTypeDirName, postDirName);
+    const content = deps.fm(fileContent);
+    let rawPostHtml = deps.marked.parse(content.body);
+    htmlContent = deps.templateHelper.formatPostHtml(rawPostHtml, postTypeDirName, postDirName);
 
     // Generate the post site page
-    const html = await templateHelper.processHtml(generatePost(postTypeConfig, htmlContent, content.attributes, postTypeDirName, filename));
+    const html = await deps.templateHelper.processHtml(deps.generatePost(postTypeConfig, htmlContent, content.attributes, postTypeDirName, filename));
     const postFilePath = path.join(postTypeOutputPath, postDirName, filename + '.html');
     await fs.writeFile(postFilePath, html, 'utf8');
 }
@@ -192,6 +195,34 @@ async function generatePostPage(postType, allPostFiles, postDirPath, postDirName
 // Get an array of the most recent posts across all post types
 function getRecentPosts(allPostMeta, numberOfPosts) {
     // Sort posts by created date descending
-    allPostMeta.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
-    return allPostMeta.length < numberOfPosts ? allPostMeta : allPostMeta.slice(0, numberOfPosts);
+    return [...allPostMeta]
+        .sort((a, b) => {
+            const dateA = Date.parse(a.date);
+            const dateB = Date.parse(b.date);
+
+            // If a date is invalid, treat it as the beginning of time so it goes to the bottom of the list
+            const timeA = isNaN(dateA) ? 0 : dateA;
+            const timeB = isNaN(dateB) ? 0 : dateB;
+
+            return timeB - timeA;
+        })
+        .slice(0, numberOfPosts);
+}
+
+if (process.env.NODE_ENV === 'test') {
+    module.exports = {
+        generateSite,
+        atomicSwap,
+        prepareSiteGeneration,
+        generateImages,
+        getPostMeta,
+        getPostImages,
+        getMdFile,
+        generateContent,
+        generatePosts,
+        generatePostPage,
+        getRecentPosts,
+    };
+} else {
+    generateSite();
 }
