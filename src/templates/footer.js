@@ -10,7 +10,7 @@ const createHeader = require('./header.js');
 
 let footerItems = [];
 
-async function generateFooters() {
+async function generateFooters(deps = { createFooterPage }) {
     // Footers are optional, if no footer directory skip generation
     if (!(await utils.dirExistsAsync(utils.FOOTER_DIR_PATH))) {
         console.log(`Footers not found and footer will not be generated on the site. Ignore if not required.`);
@@ -34,12 +34,12 @@ async function generateFooters() {
     }
 
     for (const footer of footersToGenerate) {
-        const html = await processHtml(createFooterPage(footer.content, footer.displayName, footer.filename));
+        const html = await processHtml(deps.createFooterPage(footer.content, footer.displayName, footer.filename));
         await fs.writeFile(footer.footerOutputPath, html, 'utf8');
     }
 }
 
-function createFooterPage(footerHtmlContent, footerDisplayName, filename) {
+function createFooterPage(footerHtmlContent, footerDisplayName, filename, deps = { createFooter }) {
     const relativeUrl = `/${filename}`;
     const structuredData = structuredDataMarkup.createGenericPageData(footerDisplayName, relativeUrl);
     const head = createHead({
@@ -59,7 +59,7 @@ function createFooterPage(footerHtmlContent, footerDisplayName, filename) {
                 ${footerHtmlContent}
             </div>
         </main>
-        ${createFooter()}
+        ${deps.createFooter()}
     </body>
 
 </html>
@@ -67,21 +67,25 @@ function createFooterPage(footerHtmlContent, footerDisplayName, filename) {
 }
 
 // Call "generateFooters" first so footerItems are created
-function createFooter() {
-    if (!footerItems.length) {
+function createFooter(items = footerItems) {
+    if (!Array.isArray(items) || items.length === 0) {
         return '';
     }
 
-    footerItems.sort((a, b) => a.order - b.order);
+    items.sort((a, b) => a.order - b.order);
 
     return `
         <footer>
             <hr />
             <div class="footer-item-container">
-                ${footerItems.map((footerItem) => `<a href="${footerItem.location}">${footerItem.displayName}</a>`).join(' ')}
+                ${items.map((footerItem) => `<a href="${footerItem.location}">${footerItem.displayName}</a>`).join(' ')}
             </div>
         </footer>
     `;
 }
 
-module.exports = { generateFooters, createFooter };
+module.exports = {
+    generateFooters,
+    createFooter,
+    ...(process.env.NODE_ENV === 'test' && { createFooterPage }),
+};

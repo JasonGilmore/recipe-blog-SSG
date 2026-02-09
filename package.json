@@ -25,6 +25,7 @@
     "terser": "~5.46.0"
   },
   "devDependencies": {
+    "html-validate": "~10.7.0",
     "jest": "~30.2.0"
   }
 }
