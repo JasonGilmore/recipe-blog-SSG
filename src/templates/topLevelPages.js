@@ -52,12 +52,9 @@ function createTopLevelPage(postType, postTypeConfig, allPostMeta) {
                 ${topLevelIconFilename ? `<div class="toplevel-page-image"><img src="${topLevelIconHashPath}" alt="" /></div>` : ''}
                 ${createPostCards(postMetaList, false, topLevelDescription ? 'h3' : 'h2')}
             </main>
-
             ${footerHandler.createFooter()}
         </body>
-
-        </html>
-    `;
+    </html>`;
 }
 
 module.exports = generateTopLevelPages;
