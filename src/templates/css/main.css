@@ -124,8 +124,12 @@ main {
 
 .burger-container {
     margin: auto 0px;
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     cursor: pointer;
+    background: transparent;
+    border: none;
 }
 
 .burger-container .bar1,
@@ -134,7 +138,7 @@ main {
     width: 32px;
     height: 5px;
     background-color: black;
-    margin: 6px 0;
+    margin: 3px 0;
     transition: 0.4s;
 }
 
@@ -323,8 +327,12 @@ mark {
 
 .close-search {
     margin: auto 0px;
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     cursor: pointer;
+    background: transparent;
+    border: none;
 }
 
 .close-search .bar1,
@@ -332,7 +340,7 @@ mark {
     width: 32px;
     height: 5px;
     background-color: black;
-    margin: 6px 0;
+    margin: 3px 0;
 }
 
 .close-search .bar1 {
