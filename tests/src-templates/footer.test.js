@@ -1,30 +1,22 @@
 require('html-validate/jest');
+const fsProm = require('node:fs/promises');
+const path = require('node:path');
+const utils = require('../../src/utils.js');
 const footer = require('../../src/templates/footer.js');
 
 beforeEach(() => {
     jest.clearAllMocks();
 });
 
-const fsProm = require('node:fs/promises');
-const path = require('node:path');
-const utils = require('../../src/utils.js');
-const { processHtml } = require('../../src/templates/templateHelper.js');
-const createHead = require('../../src/templates/head.js');
-const createHeader = require('../../src/templates/header.js');
 jest.mock('../../src/utils.js', () => {
-    const originalModule = jest.requireActual('../../src/utils.js');
     return {
-        ...originalModule,
+        ...jest.requireActual('../../src/utils.js'),
         dirExistsAsync: jest.fn(),
         getOutputPath: jest.fn(),
         FOOTER_DIR_PATH: '/footers',
     };
 });
-jest.mock('node:fs/promises', () => ({
-    writeFile: jest.fn(),
-    readdir: jest.fn(),
-    readFile: jest.fn(),
-}));
+jest.mock('node:fs/promises');
 jest.mock('front-matter', () =>
     jest.fn().mockReturnValue({
         attributes: {
@@ -35,10 +27,10 @@ jest.mock('front-matter', () =>
     }),
 );
 jest.mock('marked', () => ({ parse: jest.fn(() => '<p>footer html content</p>') }));
-jest.mock('../../src/templates/templateHelper.js', () => ({ processHtml: jest.fn() }));
+jest.mock('../../src/templates/templateHelper.js');
 jest.mock('../../src/templates/structuredDataMarkup.js', () => ({ createGenericPageData: jest.fn() }));
-jest.mock('../../src/templates/head.js', () => jest.fn());
-jest.mock('../../src/templates/header.js', () => jest.fn());
+jest.mock('../../src/templates/head.js');
+jest.mock('../../src/templates/header.js');
 
 describe('generateFooters', () => {
     test('does not generate if no footers found', async () => {
@@ -61,6 +53,7 @@ describe('generateFooters', () => {
     test('generate all footers found', async () => {
         utils.dirExistsAsync.mockResolvedValue(true);
         utils.getOutputPath.mockReturnValue('/output');
+        const { processHtml } = require('../../src/templates/templateHelper.js');
         processHtml.mockResolvedValueOnce('content1').mockResolvedValueOnce('content2');
         fsProm.readdir.mockResolvedValue(['footer1.md', 'footer2.md', 'footer3.pdf']);
         fsProm.readFile.mockResolvedValueOnce('footer1 content').mockResolvedValueOnce('footer2 content');
@@ -78,6 +71,7 @@ describe('generateFooters', () => {
 
 test('createFooterPage', () => {
     const mockCreateFooter = jest.fn();
+    const createHead = require('../../src/templates/head.js');
     createHead.mockReturnValue('<html lang="en"><head><title>title</title></head>');
 
     const html = footer.createFooterPage('footer content', 'Footer', 'footer', { createFooter: mockCreateFooter });

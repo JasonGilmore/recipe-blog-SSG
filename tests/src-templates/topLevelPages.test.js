@@ -1,26 +1,30 @@
 require('html-validate/jest');
 const path = require('node:path');
+const fsProm = require('node:fs/promises');
+const templateHelper = require('../../src/templates/templateHelper.js');
+const postCards = require('../../src/templates/postCards.js');
+const generateTopLevelPages = require('../../src/templates/topLevelPages.js');
 
-jest.mock('../../src/utils.js', () => ({
-    siteConfig: { postTypes: { recipes: {}, blogs: {} } },
-    getOutputPath: jest.fn(() => '/output'),
-    getPostTypeConfig: jest.fn((t) => ({ postTypeDirectory: t, postTypeDisplayName: t === 'recipes' ? 'Recipes' : 'Blogs' })),
-    siteContent: { recipesImage: null, recipesDescription: null, blogsImage: null, blogsDescription: null },
-    getHashPath: jest.fn((p) => `/hash${p}`),
-    IMAGE_ASSETS_FOLDER: 'images',
-    PAGE_TYPES: { TOP_LEVEL: 'TOP' },
-}));
+jest.mock('../../src/utils.js', () => {
+    return {
+        ...jest.requireActual('../../src/utils.js'),
+        siteConfig: { postTypes: { recipes: {}, blogs: {} } },
+        getOutputPath: jest.fn(() => '/output'),
+        getPostTypeConfig: jest.fn((t) => ({ postTypeDirectory: t, postTypeDisplayName: t === 'recipes' ? 'Recipes' : 'Blogs' })),
+        siteContent: { recipesImage: null, recipesDescription: null, blogsImage: null, blogsDescription: null },
+        getHashPath: jest.fn((p) => `/hash${p}`),
+        IMAGE_ASSETS_FOLDER: 'images',
+        PAGE_TYPES: { TOP_LEVEL: 'TOP' },
+    };
+});
 
-jest.mock('node:fs/promises', () => ({ writeFile: jest.fn() }));
-jest.mock('../../src/templates/templateHelper.js', () => ({ processHtml: jest.fn() }));
+jest.mock('node:fs/promises');
+jest.mock('../../src/templates/templateHelper.js');
 jest.mock('../../src/templates/structuredDataMarkup.js', () => ({ createTopLevelData: jest.fn(() => ({ sd: 'data' })) }));
 jest.mock('../../src/templates/head.js', () => jest.fn(() => '<html lang="en"><head><title>title</title></head>'));
 jest.mock('../../src/templates/header.js', () => jest.fn(() => '<header></header>'));
-jest.mock('../../src/templates/postCards.js', () => jest.fn());
+jest.mock('../../src/templates/postCards.js');
 jest.mock('../../src/templates/footer.js', () => ({ createFooter: jest.fn(() => '<footer></footer>') }));
-
-const templateHelper = require('../../src/templates/templateHelper.js');
-const generateTopLevelPages = require('../../src/templates/topLevelPages.js');
 
 beforeEach(() => {
     jest.clearAllMocks();
@@ -28,7 +32,6 @@ beforeEach(() => {
 
 describe('generateTopLevelPages', () => {
     test('write top-level index.html for each post type', async () => {
-        const fsProm = require('node:fs/promises');
         templateHelper.processHtml.mockResolvedValueOnce('content1').mockResolvedValueOnce('content2');
         const allPostMeta = [
             { postType: 'recipes', date: '2022-01-01' },
@@ -43,7 +46,6 @@ describe('generateTopLevelPages', () => {
     });
 
     test('generated page contains title, description, icon and post-cards output', async () => {
-        const postCards = require('../../src/templates/postCards.js');
         postCards.mockReturnValue('<post-cards></post-cards>');
         const utils = require('../../src/utils.js');
         utils.siteContent.recipesImage = 'recipes.png';
@@ -63,14 +65,13 @@ describe('generateTopLevelPages', () => {
         expect(generatedHtml).toContain('<footer>');
     });
 
-    test('filters and sorts posts to create individual top-level pages', async () => {
+    test('filter and sorts post to create individual top-level pages', async () => {
         const utils = require('../../src/utils.js');
         utils.siteContent.recipesImage = 'recipes.png';
         utils.siteContent.recipesDescription = 'Recipes desc';
         utils.siteContent.blogsImage = 'blogs.png';
         utils.siteContent.blogsDescription = 'Blogs desc';
         templateHelper.processHtml.mockImplementation((x) => Promise.resolve(x));
-        const postCards = require('../../src/templates/postCards.js');
         postCards.mockImplementation((postMeta) => postMeta.map((p) => p.title).join(' '));
         // Posts are sorted descending
         const allPostMeta = [
