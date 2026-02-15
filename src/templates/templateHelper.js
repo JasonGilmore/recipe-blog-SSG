@@ -58,7 +58,7 @@ function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
     htmlContent = htmlContent.replaceAll(/<li><input disabled="" type="checkbox">(.*?)(?=<\/li>|<ul>)/g, (match, text) => {
         const id = `checkbox-${checkboxIdCounter}`;
         checkboxIdCounter++;
-        return `<li class="ingredient-item-checkbox"><input type="checkbox" class="test" id="${id}"> <label for="${id}">${text}</label>`;
+        return `<li class="ingredient-item-checkbox"><input type="checkbox" id="${id}"> <label for="${id}">${text}</label>`;
     });
     return htmlContent;
 }
@@ -138,7 +138,7 @@ function cleanMarkdown(markdown) {
             .replace(/!\[(.*?)\]\(.*?\)/g, '$1')
             // Links, keep anchor text
             .replace(/\[(.*?)\]\(.*?\)/g, '$1')
-            // Placeholder content
+            // Placeholder content in {}
             .replace(/\{.*?\}/g, '')
             // Words containing numbers
             .replace(/[^\s]*\d[^\s]*/g, '')
