@@ -8,14 +8,12 @@ beforeEach(() => {
     jest.clearAllMocks();
 });
 
-jest.mock('../../src/utils.js', () => {
-    return {
-        ...jest.requireActual('../../src/utils.js'),
-        dirExistsAsync: jest.fn(),
-        getOutputPath: jest.fn(),
-        FOOTER_DIR_PATH: '/footers',
-    };
-});
+jest.mock('../../src/utils.js', () => ({
+    ...jest.requireActual('../../src/utils.js'),
+    dirExistsAsync: jest.fn(),
+    getOutputPath: jest.fn(),
+    FOOTER_DIR_PATH: '/footers',
+}));
 jest.mock('node:fs/promises');
 jest.mock('front-matter', () =>
     jest.fn().mockReturnValue({

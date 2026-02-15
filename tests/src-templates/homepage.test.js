@@ -6,23 +6,21 @@ beforeEach(() => {
     jest.clearAllMocks();
 });
 
-jest.mock('../../src/utils.js', () => {
-    return {
-        ...jest.requireActual('../../src/utils.js'),
-        getOutputPath: jest.fn(() => '/output'),
-        siteContent: {
-            siteName: 'Site',
-            heroImage: 'hero.jpg',
-            heroImageAlt: 'alt text',
-            mainIntroduction: 'Main intro',
-            secondaryIntroduction: 'Welcome',
-            recentPostsMessage: 'Recent posts',
-        },
-        getHashPath: jest.fn((p) => `/hash${p}`),
-        IMAGE_ASSETS_FOLDER: 'images',
-        PAGE_TYPES: { HOMEPAGE: 'HOMEPAGE' },
-    };
-});
+jest.mock('../../src/utils.js', () => ({
+    ...jest.requireActual('../../src/utils.js'),
+    getOutputPath: jest.fn(() => '/output'),
+    siteContent: {
+        siteName: 'Site',
+        heroImage: 'hero.jpg',
+        heroImageAlt: 'alt text',
+        mainIntroduction: 'Main intro',
+        secondaryIntroduction: 'Welcome',
+        recentPostsMessage: 'Recent posts',
+    },
+    getHashPath: jest.fn((p) => `/hash${p}`),
+    IMAGE_ASSETS_FOLDER: 'images',
+    PAGE_TYPES: { HOMEPAGE: 'HOMEPAGE' },
+}));
 
 jest.mock('node:fs/promises');
 jest.mock('../../src/templates/templateHelper.js');

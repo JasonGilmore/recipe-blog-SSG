@@ -5,16 +5,14 @@ beforeEach(() => {
     jest.clearAllMocks();
 });
 
-jest.mock('../../src/utils.js', () => {
-    return {
-        ...jest.requireActual('../../src/utils.js'),
-        isFeatureEnabled: jest.fn(),
-        siteConfig: { postTypes: { recipes: { postTypeDirectory: 'recipes', postTypeDisplayName: 'Recipes' } } },
-        siteContent: { siteName: 'My Site', siteIcon: null },
-        getHashPath: jest.fn(),
-        IMAGE_ASSETS_FOLDER: 'images',
-    };
-});
+jest.mock('../../src/utils.js', () => ({
+    ...jest.requireActual('../../src/utils.js'),
+    isFeatureEnabled: jest.fn(),
+    siteConfig: { postTypes: { recipes: { postTypeDirectory: 'recipes', postTypeDisplayName: 'Recipes' } } },
+    siteContent: { siteName: 'My Site', siteIcon: null },
+    getHashPath: jest.fn(),
+    IMAGE_ASSETS_FOLDER: 'images',
+}));
 jest.mock('../../src/templates/templateHelper.js', () => ({
     getSearchIcon: jest.fn(() => '<svg/>'),
 }));

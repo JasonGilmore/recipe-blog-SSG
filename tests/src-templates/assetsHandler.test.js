@@ -9,24 +9,22 @@ beforeEach(() => {
     jest.clearAllMocks();
 });
 
-jest.mock('../../src/utils.js', () => {
-    return {
-        ...jest.requireActual('../../src/utils.js'),
-        getOutputPath: jest.fn(() => '/output'),
-        IMAGE_ASSETS_FOLDER: 'images',
-        dirExistsAsync: jest.fn(),
-        scrubSaveImage: jest.fn(() => Promise.resolve()),
-        CSS_FOLDER: 'css',
-        siteContent: { theme: { primary: '#12345' } },
-        JS_FOLDER: 'js',
-        SEARCH_JS_FILENAME: 'search.js',
-        SEARCH_DATA_FILENAME: 'search-data.json',
-        isFeatureEnabled: jest.fn(),
-        getHashPath: jest.fn((p) => `/hash${p}`),
-        ROBOTS_TXT_FILENAME: 'robots.txt',
-        fileExistsAsync: jest.fn(),
-    };
-});
+jest.mock('../../src/utils.js', () => ({
+    ...jest.requireActual('../../src/utils.js'),
+    getOutputPath: jest.fn(() => '/output'),
+    IMAGE_ASSETS_FOLDER: 'images',
+    dirExistsAsync: jest.fn(),
+    scrubSaveImage: jest.fn(() => Promise.resolve()),
+    CSS_FOLDER: 'css',
+    siteContent: { theme: { primary: '#12345' } },
+    JS_FOLDER: 'js',
+    SEARCH_JS_FILENAME: 'search.js',
+    SEARCH_DATA_FILENAME: 'search-data.json',
+    isFeatureEnabled: jest.fn(),
+    getHashPath: jest.fn((p) => `/hash${p}`),
+    ROBOTS_TXT_FILENAME: 'robots.txt',
+    fileExistsAsync: jest.fn(),
+}));
 jest.mock('node:fs/promises');
 jest.mock('../../src/templates/templateHelper.js', () => ({
     processCss: jest.fn((s) => `cssmin:${s}`),

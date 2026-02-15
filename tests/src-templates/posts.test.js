@@ -9,12 +9,10 @@ jest.mock('../../src/templates/structuredDataMarkup.js', () => ({
     createPostData: jest.fn(() => '<script type="application/ld+json"></script>'),
 }));
 jest.mock('../../src/templates/head.js', () => jest.fn(() => '<html lang="en"><head><title>title</title></head>'));
-jest.mock('../../src/utils.js', () => {
-    return {
-        ...jest.requireActual('../../src/utils.js'),
-        PAGE_TYPES: { POST: 'Post' },
-    };
-});
+jest.mock('../../src/utils.js', () => ({
+    ...jest.requireActual('../../src/utils.js'),
+    PAGE_TYPES: { POST: 'Post' },
+}));
 jest.mock('../../src/templates/header.js', () => jest.fn(() => '<header></header>'));
 jest.mock('../../src/templates/templateHelper.js', () => ({ getUpArrow: jest.fn(() => '<svg/>') }));
 jest.mock('../../src/templates/footer.js', () => ({ createFooter: jest.fn(() => '<footer></footer>') }));

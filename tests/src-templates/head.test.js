@@ -6,22 +6,20 @@ beforeEach(() => {
     jest.clearAllMocks();
 });
 
-jest.mock('../../src/utils.js', () => {
-    return {
-        ...jest.requireActual('../../src/utils.js'),
-        siteContent: {
-            siteUrl: 'https://example.com',
-            siteName: 'Example Site',
-            heroImageSmall: 'hero.jpg',
-        },
-        getHashPath: jest.fn((p) => `/hash${p}`),
-        IMAGE_ASSETS_FOLDER: 'images',
-        JS_FOLDER: 'js',
-        SEARCH_JS_FILENAME: 'search.js',
-        PAGE_TYPES: { POST: 'POST', FOOTER: 'FOOTER', HOMEPAGE: 'HOMEPAGE', TOP_LEVEL: 'TOP' },
-        isFeatureEnabled: jest.fn(),
-    };
-});
+jest.mock('../../src/utils.js', () => ({
+    ...jest.requireActual('../../src/utils.js'),
+    siteContent: {
+        siteUrl: 'https://example.com',
+        siteName: 'Example Site',
+        heroImageSmall: 'hero.jpg',
+    },
+    getHashPath: jest.fn((p) => `/hash${p}`),
+    IMAGE_ASSETS_FOLDER: 'images',
+    JS_FOLDER: 'js',
+    SEARCH_JS_FILENAME: 'search.js',
+    PAGE_TYPES: { POST: 'POST', FOOTER: 'FOOTER', HOMEPAGE: 'HOMEPAGE', TOP_LEVEL: 'TOP' },
+    isFeatureEnabled: jest.fn(),
+}));
 
 describe('createHead', () => {
     // Add html normally added by other templates

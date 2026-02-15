@@ -5,13 +5,11 @@ beforeEach(() => {
     jest.clearAllMocks();
 });
 
-jest.mock('../../src/utils.js', () => {
-    return {
-        ...jest.requireActual('../../src/utils.js'),
-        getPostTypeConfig: jest.fn(() => ({ postTypeDisplayName: 'Recipes' })),
-        removeLastS: jest.fn((s) => s.replace(/s$/, '')),
-    };
-});
+jest.mock('../../src/utils.js', () => ({
+    ...jest.requireActual('../../src/utils.js'),
+    getPostTypeConfig: jest.fn(() => ({ postTypeDisplayName: 'Recipes' })),
+    removeLastS: jest.fn((s) => s.replace(/s$/, '')),
+}));
 
 describe('createPostCards', () => {
     const samplePost = {
