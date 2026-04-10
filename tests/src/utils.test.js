@@ -1,14 +1,12 @@
-// Load utils within each test as its imports may need to be mocked
-
 beforeEach(() => {
+    jest.clearAllMocks();
     jest.resetModules();
-    jest.resetAllMocks();
-    // Mock config so utils.js sets top-level config on load
-    jest.mock('node:fs', () => ({
-        existsSync: jest.fn().mockReturnValue(true),
-    }));
-    jest.doMock('../../src/config.json', () => ({ contentDirectory: 'mockcontent', outputDirectory: 'mockoutput' }), { virtual: true });
 });
+
+jest.mock('node:fs', () => ({
+    existsSync: jest.fn().mockReturnValue(true),
+}));
+jest.doMock('../../src/config.json', () => ({ contentDirectory: 'mockcontent', outputDirectory: 'mockoutput' }), { virtual: true });
 
 describe('Config loader', () => {
     test('load config if exists', () => {

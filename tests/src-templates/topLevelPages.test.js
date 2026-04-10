@@ -17,7 +17,6 @@ jest.mock('../../src/utils.js', () => {
         PAGE_TYPES: { TOP_LEVEL: 'TOP' },
     };
 });
-
 jest.mock('node:fs/promises');
 jest.mock('../../src/templates/templateHelper.js');
 jest.mock('../../src/templates/structuredDataMarkup.js', () => ({ createTopLevelData: jest.fn(() => ({ sd: 'data' })) }));

@@ -1,11 +1,11 @@
-beforeEach(() => {
-    jest.clearAllMocks();
-});
-
 const testOutputPath = 'output';
 const testTempOutputPath = 'temp';
 const testContentPath = 'content';
 const postType = 'blogs';
+
+beforeEach(() => {
+    jest.clearAllMocks();
+});
 
 jest.mock('node:fs', () => ({
     existsSync: jest.fn().mockReturnValue(true),
