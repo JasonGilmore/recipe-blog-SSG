@@ -39,7 +39,7 @@ function createHomepage(recentPosts) {
                     <h2 class="page-intro-secondary-title">${utils.siteContent.secondaryIntroduction}</h2>
                 </div>
             </div>
-            ${utils.siteContent.recentPostsMessage ? `<hr class="divide"></hr> <h2 class="recent-posts-text">${utils.siteContent.recentPostsMessage}</h2>` : ''}
+            ${utils.siteContent.recentPostsMessage ? `<hr class="divide"> <h2 class="recent-posts-text">${utils.siteContent.recentPostsMessage}</h2>` : ''}
             ${createPostCards(recentPosts, true, 'h3')}
         </main>
         ${footerHandler.createFooter()}

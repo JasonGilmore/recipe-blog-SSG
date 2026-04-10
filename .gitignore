@@ -16,3 +16,6 @@ src/templates/static
 
 # Dynamic files
 data/
+
+# Tests
+coverage/

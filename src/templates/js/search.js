@@ -25,7 +25,15 @@ document.addEventListener('click', (e) => {
 searchDialog = document.querySelector('.search-dialog');
 searchResultsContainer = document.querySelector('.search-results');
 
-const closeDialog = () => searchDialog.close();
+const closeDialog = () => {
+    searchDialog.close();
+    // Make body focusable to shift screen reader to start of page
+    document.body.setAttribute('tabindex', '-1');
+    document.body.focus({ preventScroll: true });
+    setTimeout(() => {
+        document.body.removeAttribute('tabindex');
+    }, 200);
+};
 const closeSearchBtn = document.querySelector('.close-search');
 closeSearchBtn.addEventListener('click', closeDialog);
 closeSearchBtn.addEventListener('keydown', (event) => {

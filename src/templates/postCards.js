@@ -15,16 +15,14 @@ function createPostCard(post, isHomePage, titleTag) {
     const postTypeConfig = utils.getPostTypeConfig(post.postType);
     const type = utils.removeLastS(postTypeConfig.postTypeDisplayName).toLowerCase();
 
-    return `
-            <a href="${post.link}">
+    return `<a href="${post.link}">
                 <article class="post-thumbnail">
                     ${isHomePage ? `<div class="type-icon">${type}</div>` : ''}
                     <img src="${post.imageHashPath}" alt="" />
                     <${titleTag} class="post-thumbnail-title">${post.title}</${titleTag}>
                     <p class="post-thumbnail-description">${post.description}</p>
                 </article>
-            </a>
-    `;
+            </a>`;
 }
 
 module.exports = createPostCards;

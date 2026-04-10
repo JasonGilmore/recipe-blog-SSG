@@ -45,8 +45,7 @@ function createHead({ pageTitle, pageDescription, pageType, relativeUrl, relativ
         ${shouldPageTrack ? `<script src="${pageTrackJsHashPath}" defer></script>` : ''}
 
         ${structuredData ? structuredData : ''}
-    </head>
-    `;
+    </head>`;
 }
 
 function getOgTypeForPage(pageType) {
