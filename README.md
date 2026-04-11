@@ -6,7 +6,7 @@ A small static site generator for publishing recipe and food blogs. Write conten
 
 - Convert Markdown posts with front-matter into HTML pages.
 - Configurable site structure and navigation via `src/config.json` (overrides [`src/config.default.json`](src/config.default.json)).
-- Generate homepage, top-level pages and post pages using simple templating (see [`src/templates/`](src/templates)).
+- Generate homepage, top-level pages (including with pagination) and post pages using simple templating (see [`src/templates/`](src/templates)).
 - Copy and sanitise image assets (with Exif removal).
 - Generate content hash filenames for images and site assets, for reliable cache busting.
 - Simple visit counting.
@@ -50,6 +50,7 @@ Create a siteContent.json file within the [`src/templates/`](src/templates/) dir
 - **heroImageAlt**: alt text for the hero images.
 - **[post type name]Image (such as recipesImage)**: optional, the name of an image in the [`src/templates/images/`](src/templates/images/) directory, to display as a small icon below the top-level page heading.
 - **[post type name]Description (such as recipesDescription)**: optional, descriptive text to display at the top of the top-level page as well as head markup.
+- **maxPostsPerPage**: the maximum number of posts per top level page before pagination.
 - **searchPlaceholders**: optional, an array of placeholder texts to use in site search input.
 
 Optionally add a robots.txt in the [`src/templates/static`](src/templates/static) directory.

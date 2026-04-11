@@ -193,6 +193,11 @@ async function scrubSaveImage(imagePath, outputDir, imageName) {
     }
 }
 
+function getTopLevelPageUrl(postTypeDirectory, pageNumber) {
+    const page = !pageNumber || pageNumber === 1 ? '' : `page/${pageNumber}/`;
+    return `/${postTypeDirectory}/${page}`;
+}
+
 module.exports = {
     siteContent,
     CSS_FOLDER,
@@ -224,4 +229,5 @@ module.exports = {
     dirExistsAsync,
     fileExistsAsync,
     scrubSaveImage,
+    getTopLevelPageUrl,
 };

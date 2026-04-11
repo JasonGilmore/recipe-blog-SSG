@@ -30,14 +30,15 @@ function createHomepageData() {
     }</script>`;
 }
 
-function createTopLevelData(postTypeConfig, pageDescription) {
+function createTopLevelData(postTypeConfig, pageDescription, pageNumber) {
+    const relativeTopLevelUrl = utils.getTopLevelPageUrl(postTypeConfig.postTypeDirectory, pageNumber);
     return `<script type="application/ld+json">
     {
         "${SCHEMA_CONTEXT}",
         "@graph": [
             {
                 "@type": "WebPage",
-                "url": "${utils.siteContent.siteUrl}/${postTypeConfig.postTypeDirectory}/",
+                "url": "${utils.siteContent.siteUrl}${relativeTopLevelUrl}",
                 "name": "${postTypeConfig.postTypeDisplayName}",
                 ${pageDescription ? `"description": "${pageDescription}",` : ''}
                 "isPartOf": {
@@ -45,7 +46,7 @@ function createTopLevelData(postTypeConfig, pageDescription) {
                     "@id": "${WEBSITE_ID}"
                 }
             },
-            ${getOneLevelBreadcrumbs(postTypeConfig.postTypeDisplayName, '/' + postTypeConfig.postTypeDirectory + '/')}
+            ${getOneLevelBreadcrumbs(postTypeConfig.postTypeDisplayName, relativeTopLevelUrl)}
         ]
     }</script>`;
 }

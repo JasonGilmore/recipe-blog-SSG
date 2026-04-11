@@ -28,6 +28,18 @@ function getSearchIcon() {
             </svg>`;
 }
 
+function getPrevIcon() {
+    return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>`;
+}
+
+function getNextIcon() {
+    return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6">
+            </svg>`;
+}
+
 // Replace the relative image urls, add css and other formatting features
 function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
     const folderPath = `/${postTypeDirectoryName}/${postDirectoryName}/`;
@@ -187,6 +199,8 @@ module.exports = {
     getUpArrow,
     getDownArrow,
     getSearchIcon,
+    getPrevIcon,
+    getNextIcon,
     formatPostHtml,
     generateSearchData,
     processHtml,
