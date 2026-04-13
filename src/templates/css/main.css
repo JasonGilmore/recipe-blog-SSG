@@ -376,7 +376,6 @@ mark {
 }
 
 .page-intro-title {
-    margin-top: 25px;
     margin-bottom: 0;
     font-size: 2.5rem;
     font-weight: normal;
@@ -384,7 +383,6 @@ mark {
 
 .page-intro-secondary-title {
     margin-top: 25px;
-    margin-bottom: 20px;
     font-size: 1.5rem;
     margin-bottom: 0;
 }
@@ -408,9 +406,16 @@ mark {
     margin: 15px;
 }
 
+.top-level-main {
+    /* Display as flex so pagination component can be fixed to the bottom of the page for large devices */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .toplevel-page-image {
+    margin-top: 20px;
     text-align: center;
-    padding-bottom: 20px;
 }
 
 .toplevel-page-image img {
@@ -422,10 +427,14 @@ mark {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    align-content: flex-start;
     max-width: 1200px;
-    margin: 0 auto;
     gap: 40px 4%;
     padding-bottom: 20px;
+    /* Special handling since parent is also a flexbox, to ensure it fills the width correctly */
+    width: 100%;
+    /* Ensure thumbnail container grows so pagination component is fixed to bottom of page */
+    flex: 1;
 }
 
 .post-thumbnail-container a {
@@ -479,7 +488,6 @@ mark {
 .pagination-wrapper {
     text-align: center;
     margin-top: 40px;
-    margin-bottom: 20px;
 }
 
 .pagination {
@@ -506,6 +514,8 @@ mark {
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Use a font with consistent line height spacing for numbers */
+    font-family: 'Times New Roman', Georgia, serif;
 }
 
 .pagination-link.active {
@@ -526,6 +536,10 @@ mark {
     display: flex;
     align-items: end;
     justify-content: center;
+}
+
+footer {
+    margin-top: 20px;
 }
 
 .footer-content-page-container {
@@ -635,10 +649,6 @@ mark {
         font-size: 1.4rem;
     }
 
-    .page-intro {
-        margin-bottom: 15px;
-    }
-
     .page-intro-image {
         height: 40vw;
     }
@@ -667,7 +677,7 @@ mark {
     }
 
     .post-thumbnail-container {
-        margin: 0 20px;
+        padding: 0 20px;
     }
 
     .post-thumbnail-title {
@@ -684,7 +694,7 @@ mark {
     }
 
     .pagination-wrapper {
-        margin-top: 20px;
+        max-width: 95vw;
     }
 
     .footer-content-page-container {

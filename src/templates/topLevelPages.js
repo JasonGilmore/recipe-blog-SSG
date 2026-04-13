@@ -62,7 +62,7 @@ function createTopLevelPage(postType, pagination) {
         ${head}
         <body>
             ${createHeader()}
-            <main>
+            <main class="top-level-main">
                 ${getPageIntro(pagination, postType, topLevelDescription)}
                 ${createPostCards(pagination.pagePosts, false, topLevelDescription && pageNumber === 1 ? 'h3' : 'h2')}
                 ${paginationHtml}
@@ -83,8 +83,8 @@ function getPageIntro(pagination, postType, topLevelDescription) {
                         <h1 class="page-intro-title">${postTypeConfig.postTypeDisplayName}</h1>
                         ${topLevelDescription && pagination.currentPage === 1 ? `<h2 class="page-intro-secondary-title">${topLevelDescription}</h2>` : ''}
                     </div>
-                </div>
-                ${topLevelIconFilename && pagination.currentPage === 1 ? `<div class="toplevel-page-image"><img src="${topLevelIconHashPath}" alt="" /></div>` : ''}`;
+                    ${topLevelIconFilename && pagination.currentPage === 1 ? `<div class="toplevel-page-image"><img src="${topLevelIconHashPath}" alt="" /></div>` : ''}
+                </div>`;
 }
 
 function createPaginationHtml(postTypeConfig, pagination) {
