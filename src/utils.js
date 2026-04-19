@@ -194,7 +194,7 @@ async function scrubSaveImage(imagePath, outputDir, imageName) {
 }
 
 function getTopLevelPageUrl(postTypeDirectory, pageNumber) {
-    const page = !pageNumber || pageNumber === 1 ? '' : `page/${pageNumber}/`;
+    const page = !pageNumber || isNaN(pageNumber) || pageNumber === 1 ? '' : `page/${pageNumber}/`;
     return `/${postTypeDirectory}/${page}`;
 }
 

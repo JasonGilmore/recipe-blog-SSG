@@ -18,7 +18,7 @@ app.use(
 if (srcUtils.isFeatureEnabled('enableVisitCounter')) {
     const visitCounter = require('./lib/visitCounter.js');
     app.use(express.json({ limit: '1kb' }));
-    app.use(visitCounter.middleware);
+    app.use(visitCounter.visitCounterMiddleware);
     visitCounter.startAutoSave();
 }
 
@@ -37,11 +37,10 @@ app.use((req, res, next) => {
 // Set cache control
 app.use((req, res, next) => {
     const path = req.path;
-
     // Images and assets use content hash filenames for cache busting
     // Cache images for 5 days
-    const isImage = srcUtils.ALLOWED_IMAGE_EXTENSIONS.some((ext) => path.endsWith(ext));
-    if (isImage || path.endsWith('.ico')) {
+    const isImage = srcUtils.ALLOWED_IMAGE_EXTENSIONS.some((ext) => path.endsWith(ext) || path.endsWith('.ico'));
+    if (isImage) {
         res.setHeader('Cache-Control', 'public, max-age=432000, must-revalidate');
     } else if (path.endsWith('.js') || path.endsWith('.css') || path.endsWith('.json')) {
         // Cache static assets for 5 days
@@ -57,10 +56,11 @@ app.use((req, res, next) => {
 // Allow cross origin request to image files for link preview tools
 // Image files are from the images folder (for favicon and other images) and each post's icon image
 app.use((req, res, next) => {
-    const isImage = srcUtils.ALLOWED_IMAGE_EXTENSIONS.some((suffix) => req.path.endsWith(suffix)) || req.path.endsWith('.ico');
+    const path = req.path;
+    const isImage = srcUtils.ALLOWED_IMAGE_EXTENSIONS.some((ext) => path.endsWith(ext)) || path.endsWith('.ico');
     if (isImage) {
-        const isIconImage = req.path.includes('-icon');
-        const isImageFolder = req.path.startsWith(`/${srcUtils.IMAGE_ASSETS_FOLDER}`);
+        const isIconImage = path.includes('-icon');
+        const isImageFolder = path.startsWith(`/${srcUtils.IMAGE_ASSETS_FOLDER}`);
         if (isIconImage || isImageFolder) {
             res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
         }

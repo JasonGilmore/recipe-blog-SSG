@@ -435,6 +435,8 @@ mark {
     width: 100%;
     /* Ensure thumbnail container grows so pagination component is fixed to bottom of page */
     flex: 1;
+    /* For homepage, main is not a flex, so centre the content */
+    margin: 0 auto;
 }
 
 .post-thumbnail-container a {

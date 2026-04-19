@@ -48,12 +48,12 @@ describe('track events middlware', () => {
     test('POST /track-event pageview calls sendStatus(200) and does not call next', () => {
         const utils = require('../../src/utils.js');
         utils.parseRequest.mockReturnValue({ isPost: true, matchedPostType: 'recipes', postName: 'bread' });
-        const { middleware } = require('../../lib/visitCounter.js');
+        const { visitCounterMiddleware } = require('../../lib/visitCounter.js');
 
         const req = { method: 'POST', path: '/track-event', headers: {}, body: { event: 'pageview', pathname: '/recipes/bread' }, query: {} };
         const res = { sendStatus: jest.fn() };
         const next = jest.fn();
-        middleware(req, res, next);
+        visitCounterMiddleware(req, res, next);
         expect(res.sendStatus).toHaveBeenCalledWith(200);
         expect(next).not.toHaveBeenCalled();
     });
@@ -62,9 +62,9 @@ describe('track events middlware', () => {
         const req = { method: 'POST', path: '/track-event', headers: {}, body: { event: 'search', query: 'chocolate' }, query: {} };
         const res = { sendStatus: jest.fn() };
         const next = jest.fn();
-        const { middleware } = require('../../lib/visitCounter.js');
+        const { visitCounterMiddleware } = require('../../lib/visitCounter.js');
 
-        middleware(req, res, next);
+        visitCounterMiddleware(req, res, next);
         expect(res.sendStatus).toHaveBeenCalledWith(200);
         expect(next).not.toHaveBeenCalled();
     });
@@ -73,9 +73,9 @@ describe('track events middlware', () => {
         const req = { method: 'POST', path: '/track-event', headers: {}, body: {}, query: { test: 'true' } };
         const res = { sendStatus: jest.fn() };
         const next = jest.fn();
-        const { middleware } = require('../../lib/visitCounter.js');
+        const { visitCounterMiddleware } = require('../../lib/visitCounter.js');
 
-        middleware(req, res, next);
+        visitCounterMiddleware(req, res, next);
         expect(res.sendStatus).toHaveBeenCalledWith(200);
         expect(next).not.toHaveBeenCalled();
     });
@@ -84,9 +84,9 @@ describe('track events middlware', () => {
         const req = { method: 'GET', path: '/images/photo.jpg', headers: { 'user-agent': 'ua' }, ip: '1.2.3.4', body: {}, query: {} };
         const res = { sendStatus: jest.fn() };
         const next = jest.fn();
-        const { middleware } = require('../../lib/visitCounter.js');
+        const { visitCounterMiddleware } = require('../../lib/visitCounter.js');
 
-        middleware(req, res, next);
+        visitCounterMiddleware(req, res, next);
         expect(next).toHaveBeenCalled();
         expect(res.sendStatus).not.toHaveBeenCalled();
     });
@@ -95,9 +95,9 @@ describe('track events middlware', () => {
         const req = { method: 'GET', path: '/', headers: { 'user-agent': 'ua' }, ip: '1.2.3.4', body: {}, query: {} };
         const res = { sendStatus: jest.fn() };
         const next = jest.fn();
-        const { middleware } = require('../../lib/visitCounter.js');
+        const { visitCounterMiddleware } = require('../../lib/visitCounter.js');
 
-        middleware(req, res, next);
+        visitCounterMiddleware(req, res, next);
         expect(next).toHaveBeenCalled();
     });
 });

@@ -303,3 +303,30 @@ describe('scrubSaveImage', () => {
         await expect(() => utils.scrubSaveImage('/path/image.jpg', '/out', 'image.jpg')).rejects.toThrow('Error removing exif');
     });
 });
+
+describe('getTopLevelPageUrl', () => {
+    const directory = 'blog';
+    const { getTopLevelPageUrl } = require('../../src/utils.js');
+
+    test('returns base URL when page number not provided or not a number', () => {
+        const nullResult = getTopLevelPageUrl(directory);
+        expect(nullResult).toBe(`/${directory}/`);
+        const invalidResult = getTopLevelPageUrl(directory, 'hello');
+        expect(invalidResult).toBe(`/${directory}/`);
+    });
+
+    test('returns the base URL when page number is 1', () => {
+        const result = getTopLevelPageUrl(directory, 1);
+        expect(result).toBe(`/${directory}/`);
+    });
+
+    test('includes the page path when page number is greater than 1', () => {
+        const result = getTopLevelPageUrl(directory, 2);
+        expect(result).toBe(`/${directory}/page/2/`);
+    });
+
+    test('handles different post type directories=', () => {
+        const result = getTopLevelPageUrl('news', 5);
+        expect(result).toBe('/news/page/5/');
+    });
+});
