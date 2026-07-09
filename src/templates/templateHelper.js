@@ -8,16 +8,24 @@ const { minify: jsMinify } = require('terser');
 const utils = require('../utils.js');
 
 function getUpArrow() {
-    return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="19" x2="12" y2="5"></line>
                 <polyline points="5 12 12 5 19 12"></polyline>
             </svg>`;
 }
 
 function getDownArrow() {
-    return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <polyline points="19 12 12 19 5 12"></polyline>
+            </svg>`;
+}
+
+function getPrintIcon() {
+    return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 9V4h10v5"></path>
+                <path d="M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"></path>
+                <rect x="7" y="13" width="10" height="7" rx="1"></rect>
             </svg>`;
 }
 
@@ -50,11 +58,12 @@ function formatPostHtml(htmlContent, postTypeDirectoryName, postDirectoryName) {
         .replaceAll('</table>', '</table></div>')
         .replaceAll('<p>{recipeboxstart}</p>', '<div id="recipe" class="recipe-box" role="region" aria-label="Recipe box">')
         .replaceAll('<p>{recipeboxend}</p>', '</div>')
-        .replaceAll('{jumptorecipebox}', `<button class="jump-to-recipe flex-centre" type="button">${getDownArrow()} Jump to recipe</button>`)
-        .replaceAll('<p>{lightstyleboxstart}</p>', '<div class="light-style-box">')
-        .replaceAll('<p>{lightstyleboxend}</p>', '</div>')
-        .replaceAll('<p>{darkstyleboxstart}</p>', '<div class="dark-style-box">')
-        .replaceAll('<p>{darkstyleboxend}</p>', '</div>');
+        .replaceAll('{jumptorecipebox}', `<button class="jump-to-recipe button-style-box flex-centre-inline" type="button">${getDownArrow()} Jump to recipe</button>`)
+        .replaceAll('{printrecipebox}', `<button class="print-recipe button-style-box flex-centre-inline" type="button">${getPrintIcon()} Print recipe</button>`)
+        .replaceAll('<p>{notesboxstart}</p>', '<div class="light-style-box">')
+        .replaceAll('<p>{notesboxend}</p>', '</div>')
+        .replaceAll('<p>{extranotesboxstart}</p>', '<div class="dark-style-box">')
+        .replaceAll('<p>{extranotesboxend}</p>', '</div>');
 
     // Update image references to use the content hash filename
     Object.entries(utils.getHashPaths()).forEach(([logical, hash]) => {

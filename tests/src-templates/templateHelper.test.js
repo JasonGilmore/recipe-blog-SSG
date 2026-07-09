@@ -63,10 +63,10 @@ test('formatPostHtml replaces markers, image paths and checkbox transformation',
             <p>{recipeboxstart}</p>
             <p>{recipeboxend}</p>
             {jumptorecipebox}
-            <p>{lightstyleboxstart}</p>
-            <p>{lightstyleboxend}</p>
-            <p>{darkstyleboxstart}</p>
-            <p>{darkstyleboxend}</p>
+            <p>{notesboxstart}</p>
+            <p>{notesboxend}</p>
+            <p>{extranotesboxstart}</p>
+            <p>{extranotesboxend}</p>
             <table><tr><td>1</td></tr></table>
             <img src="./image1.jpg">
             <img src="./image2.jpg">

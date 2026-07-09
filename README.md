@@ -7,10 +7,10 @@ A small static site generator for publishing recipe and food blogs. Write conten
 - Convert Markdown posts with front-matter into HTML pages.
 - Configurable site structure and navigation via `src/config.json` (overrides [`src/config.default.json`](src/config.default.json)).
 - Generate homepage, top-level pages (including with pagination) and post pages using simple templating (see [`src/templates/`](src/templates)).
-- Copy and sanitise image assets (with Exif removal).
 - Generate content hash filenames for images and site assets, for reliable cache busting.
-- Simple visit counting.
+- Copy and sanitise image assets (with Exif removal).
 - Client-side search.
+- Simple visit counting.
 
 ## Quick start
 
@@ -139,7 +139,7 @@ This project supports a few post-specific conveniences for writing recipes and f
 {recipeboxend}
 ```
 
-Use `{lightstyleboxstart} {lightstyleboxend}` and `{darkstyleboxstart} {darkstyleboxend}` for additional styled layout blocks to group content.
+Use `{notesboxstart} {notesboxend}` and `{extranotesboxstart} {extranotesboxend}` for additional styled layout blocks to group content.
 
 ### Tables
 
@@ -156,7 +156,8 @@ Example:
 
 ### Additional Features
 
-- **Jump to recipe**: Add a jump to recipe button by adding the `{jumptorecipebox}` marker anywhere in the content. This will generate a button that, when clicked, scrolls the page to the start of the first recipe box.
+- **Jump to recipe**: Add a jump to recipe button with `{jumptorecipebox}` anywhere in the content. This will generate a button that, when clicked, scrolls the page to the start of the first recipe box.
+- **Print recipe**: Add a print button with `{printrecipebox}` anywhere in the content. When clicked this will open the post in a new tab displaying the site icon, name, post url, `{recipeboxstart}` and `{notesboxstart}` only, and allows changing the font size before printing.
 - **Ingredient checkboxes**: Add checkboxes for ingredients using markdown task list syntax `- [ ]`. These will be styled and will cross out the text when checked.
 
 ## Search

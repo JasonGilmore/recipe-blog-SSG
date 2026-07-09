@@ -38,6 +38,12 @@ async function generateAssets() {
             return await generateSearchBundle();
         }
 
+        if (item === 'posts.js') {
+            let postsJs = await fs.readFile(srcPath, 'utf8');
+            postsJs = postsJs.replace("'#PRINT_TRACK_PLACEHOLDER'", utils.isFeatureEnabled('enableVisitCounter'));
+            return await templateHelper.processJs(postsJs);
+        }
+
         return await templateHelper.processJs(await fs.readFile(srcPath, 'utf8'));
     });
 

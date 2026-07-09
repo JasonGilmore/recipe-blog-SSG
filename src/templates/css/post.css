@@ -41,7 +41,8 @@
     background-color: var(--dark-box-background);
 }
 
-.jump-to-recipe {
+.button-style-box {
+    display: inline-block;
     cursor: pointer;
     padding: 5px 8px;
     font-size: 1.1rem;
@@ -52,13 +53,13 @@
     box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2), 0 4px 16px 0 rgba(0, 0, 0, 0.19);
 }
 
-.jump-to-recipe svg {
-    margin-right: 3px;
-}
-
-.jump-to-recipe:hover {
+.button-style-box:hover {
     background-color: var(--accent-colour-dark);
     box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.3), 0 4px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+.button-style-box svg {
+    margin-right: 3px;
 }
 
 .recipe-box .content-image,
@@ -148,6 +149,12 @@ ul:has(> .ingredient-item-checkbox) {
     justify-content: center;
 }
 
+.flex-centre-inline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 #jumpToTop {
     visibility: hidden;
     position: fixed;
@@ -174,6 +181,11 @@ ul:has(> .ingredient-item-checkbox) {
         width: 95%;
     }
 
+    /* Buttons may wrap when next to each other, add margins for spacing */
+    .button-style-box {
+        margin-bottom: 4px;
+    }
+
     .recipe-box,
     .light-style-box,
     .dark-style-box {
@@ -198,5 +210,40 @@ ul:has(> .ingredient-item-checkbox) {
         bottom: 25px;
         right: 20px;
         padding: 8px;
+    }
+}
+
+/* print-recipe-mode is set on the body on page load if in print mode */
+body.print-recipe-mode header .header-wide-grouping,
+body.print-recipe-mode header .header-small-grouping,
+body.print-recipe-mode > footer,
+body.print-recipe-mode main .content-page-container > :not(.recipe-box, .light-style-box) {
+    display: none !important;
+}
+
+body.print-recipe-mode .site-header {
+    background: none !important;
+    border: none !important;
+    position: relative;
+}
+
+body.print-recipe-mode .recipe-box, body.print-recipe-mode .light-style-box {
+    background: none !important;
+}
+
+body.print-recipe-mode .recipe-box img {
+    width: 20% !important;
+    margin: 0 !important;
+    display: block !important;
+}
+
+@media print {
+    .print-controls, #jumpToTop {
+        display: none !important;
+    }
+
+    /* Fix site header to the top of the first page */
+    .site-header {
+        position: static !important;
     }
 }

@@ -167,6 +167,7 @@ test('countPageVisit', () => {
 });
 
 test('countSearch', () => {
+    // Implicitly tests storeFrequencyTracking
     const { countSearch, getStatsGroup, searchTermFreqToday } = require('../../lib/visitCounter.js');
 
     countSearch('  Cookies  ');
@@ -193,6 +194,38 @@ test('countSearch', () => {
     expect(searchTermFreqToday.get(truncated)).toBe(1);
 });
 
+test('countPrint', () => {
+    // Implicitly tests storeFrequencyTracking
+    const { countPrint, getStatsGroup, printFreqToday } = require('../../lib/visitCounter.js');
+
+    countPrint('  Cookies  ');
+    expect(getStatsGroup(new Date()).printHits).toBe(1);
+    expect(printFreqToday.get('cookies')).toBe(1);
+
+    countPrint('cookies');
+    expect(getStatsGroup(new Date()).printHits).toBe(2);
+    expect(printFreqToday.get('cookies')).toBe(2);
+
+    countPrint('Brownies');
+    expect(getStatsGroup(new Date()).printHits).toBe(3);
+    expect(printFreqToday.get('brownies')).toBe(1);
+});
+
+test('cleanTerm', () => {
+    const { cleanTerm } = require('../../lib/visitCounter.js');
+
+    expect(cleanTerm('COOKIES')).toBe('cookies');
+    expect(cleanTerm('   cake   ')).toBe('cake');
+
+    const longString = 'a'.repeat(150);
+    const expectedResult = 'a'.repeat(100);
+    expect(cleanTerm(longString)).toBe(expectedResult);
+    expect(cleanTerm(longString).length).toBe(100);
+
+    expect(cleanTerm(undefined)).toBeUndefined();
+    expect(cleanTerm(null)).toBeUndefined();
+});
+
 describe('saveVisits', () => {
     test('perform an atomic write', () => {
         const fs = require('node:fs');
@@ -209,9 +242,10 @@ describe('saveVisits', () => {
 
     test('log error if atomic write fails', () => {
         const fs = require('node:fs');
-        const { saveVisits, getStatsGroup, getTopSearches, visitCounter } = require('../../lib/visitCounter.js');
+        const { saveVisits, getStatsGroup, getTopFrequencyResults, visitCounter } = require('../../lib/visitCounter.js');
         const statsToday = getStatsGroup(new Date());
-        statsToday.topSearches = getTopSearches();
+        statsToday.topSearches = {};
+        statsToday.topPrints = {};
         const expectedData = JSON.stringify(visitCounter, null, 4);
         fs.writeFileSync.mockImplementation((path, content, encoding) => {
             if (content === expectedData) {
@@ -226,45 +260,43 @@ describe('saveVisits', () => {
     });
 });
 
-describe('getTopSearches', () => {
+describe('getTopFrequencyResults', () => {
     test('Returns top searches and handles no searches', () => {
-        const { countSearch, getTopSearches } = require('../../lib/visitCounter.js');
+        const { getTopFrequencyResults } = require('../../lib/visitCounter.js');
 
-        const topNoResults = getTopSearches();
+        const topNoResults = getTopFrequencyResults();
         expect(topNoResults).toEqual({});
 
-        countSearch('Cookies');
-        countSearch('Brownies');
-        const topResults = getTopSearches();
-
+        const trackingMap = new Map([
+            ['cookies', 1],
+            ['brownies', 2],
+        ]);
+        const topResults = getTopFrequencyResults(trackingMap);
         expect(topResults.cookies).toBe(1);
-        expect(topResults.brownies).toBe(1);
+        expect(topResults.brownies).toBe(2);
     });
 
     test('Correctly orders results and handles tied counts extending above max results', () => {
-        const { countSearch, getTopSearches } = require('../../lib/visitCounter.js');
-        countSearch('Brownies');
-        countSearch('Brownies');
-        countSearch('Brownies');
-        countSearch('Cookies');
-        countSearch('Cookies');
-        countSearch('Cookies');
-        countSearch('Cookies');
-        countSearch('Cupcakes');
-        countSearch('Cupcakes');
-        countSearch('Loaf cakes');
-        countSearch('Donuts');
-        countSearch('Donuts');
+        const { getTopFrequencyResults } = require('../../lib/visitCounter.js');
+        const trackingMap = new Map([
+            ['brownies', 3],
+            ['cookies', 4],
+            ['cupcakes', 2],
+            ['loaf cakes', 1],
+            ['donuts', 2],
+            ['pies', 2],
+        ]);
 
-        const topResults = getTopSearches(3);
+        const topResults = getTopFrequencyResults(trackingMap);
         expect(topResults.cookies).toBe(4);
         expect(topResults.brownies).toBe(3);
         expect(topResults.cupcakes).toBe(2);
         expect(topResults.donuts).toBe(2);
+        expect(topResults.pies).toBe(2);
         expect(topResults['loaf cakes']).toBe(undefined);
 
         // Ensure results are in descending order by count
-        expect(Object.keys(topResults)).toEqual(['cookies', 'brownies', 'cupcakes', 'donuts']);
+        expect(Object.keys(topResults)).toEqual(['cookies', 'brownies', 'cupcakes', 'donuts', 'pies']);
     });
 });
 

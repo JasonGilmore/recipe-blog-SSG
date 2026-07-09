@@ -10,7 +10,7 @@ let searchStore = null;
 let searchPromise = null;
 let searchFailures = 0;
 
-const searchTrack = '#SEARCH_TRACK_PLACEHOLDER';
+const searchTrackEnabled = '#SEARCH_TRACK_PLACEHOLDER';
 let searchTrackTimeout = null;
 
 // Handle open dialog
@@ -57,7 +57,7 @@ searchInput.addEventListener('input', (event) => {
         performSearch(event.target.value);
     }, 400);
 
-    if (searchTrack) {
+    if (searchTrackEnabled) {
         clearTimeout(searchTrackTimeout);
         searchTrackTimeout = setTimeout(() => {
             trackSearch(event.target.value);
