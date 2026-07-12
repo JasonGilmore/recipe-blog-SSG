@@ -27,15 +27,19 @@ function createHomepage(recentPosts) {
     const heroImageHashPath = utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/${utils.siteContent.heroImage}`);
 
     return `${head}
-    <body>
+    <body class="homepage">
         ${createHeader()}
         <main>
-            <div class="page-intro">
-                <div class="page-intro-image">
-                    <img fetchpriority="high" src="${heroImageHashPath}" alt="${utils.siteContent.heroImageAlt}" />
+            <div class="hero">
+                <img fetchpriority="high" src="${heroImageHashPath}" alt="${utils.siteContent.heroImageAlt}" />
+                <div class="hero-content">
+                    <div class="hero-text-wrapper">
+                        <h1 class="hero-title-text">${utils.siteContent.mainIntroduction}</h1>
+                    </div>
                 </div>
+            </div>
+            <div class="page-intro">
                 <div class="page-intro-text-container">
-                    <h1 class="page-intro-title">${utils.siteContent.mainIntroduction}</h1>
                     <h2 class="page-intro-secondary-title">${utils.siteContent.secondaryIntroduction}</h2>
                 </div>
             </div>

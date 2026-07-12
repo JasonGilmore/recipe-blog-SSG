@@ -41,6 +41,58 @@ main {
     font-size: 1.6rem;
     border-top: 2px solid var(--accent-colour);
     border-bottom: 1px solid rgb(228, 228, 228);
+    --hover-bg: rgba(0, 0, 0, 0.1);
+}
+
+/* On homepage, site header is transparent until scroll */
+.homepage .site-header {
+    position: fixed;
+    width: 100%;
+    border-bottom: none;
+    background-color: transparent;
+    color: white;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --hover-bg: rgba(255, 255, 255, 0.25);
+}
+
+/* Backup if css scroll animation not supported, or menu is opened */
+.site-header.display-solid,
+.site-header:has(.burger-container[aria-expanded="true"]) {
+    animation: none !important;
+    background-color: rgb(230, 230, 230);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgb(228, 228, 228);
+    color: black;
+    text-shadow: none;
+    --hover-bg: rgba(0, 0, 0, 0.1);
+}
+
+/* Clear header on top of hero image, transitions to blur then solid */
+@supports (animation-timeline: scroll()) {
+    .homepage .site-header {
+        animation: headerSolid linear forwards;
+        animation-timeline: scroll();
+        animation-range: 0px 200px;
+    }
+}
+
+@keyframes headerSolid {
+    from {
+        backdrop-filter: blur(0px);
+    }
+    25% {
+        color: black;
+        --hover-bg: rgba(0, 0, 0, 0.1);
+    }
+    to {
+        background-color: rgb(230, 230, 230);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid rgb(228, 228, 228);
+        color: black;
+        text-shadow: none;
+        --hover-bg: rgba(0, 0, 0, 0.1);
+    }
 }
 
 .header-wide-grouping {
@@ -112,12 +164,12 @@ main {
 .top-level-links,
 .site-title-block {
     text-decoration: none;
-    color: black;
+    color: inherit;
 }
 
 .site-header a:hover,
 .site-header .search-button:hover {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: var(--hover-bg);
     border-radius: 10px;
     cursor: pointer;
 }
@@ -132,14 +184,44 @@ main {
     border: none;
 }
 
-.burger-container .bar1,
-.burger-container .bar2,
-.burger-container .bar3 {
+.burger-container > :is(.bar1, .bar2, .bar3) {
     width: 32px;
     height: 5px;
     background-color: black;
     margin: 3px 0;
     transition: 0.4s;
+}
+
+.homepage .burger-container > :is(.bar1, .bar2, .bar3) {
+    background-color: white;
+}
+
+/* Backup if css scroll animation not supported, or menu is opened */
+.site-header.display-solid .burger-container > :is(.bar1, .bar2, .bar3),
+.site-header:has(.burger-container[aria-expanded="true"]) .burger-container > :is(.bar1, .bar2, .bar3) {
+    animation: none !important;
+    background-color: black;
+}
+
+/* Same as .homepage .site-header animation */
+@supports (animation-timeline: scroll()) {
+    .homepage .burger-container > :is(.bar1, .bar2, .bar3) {
+        animation: burgerColor linear forwards;
+        animation-timeline: scroll();
+        animation-range: 0px 200px;
+    }
+}
+
+@keyframes burgerColor {
+    from {
+        background-color: white; 
+    }
+    25% {
+        background-color: black;
+    }
+    to {
+        background-color: black; 
+    }
 }
 
 .burger-select .bar1 {
@@ -335,8 +417,7 @@ mark {
     border: none;
 }
 
-.close-search .bar1,
-.close-search .bar2 {
+.close-search :is(.bar1, .bar2) {
     width: 32px;
     height: 5px;
     background-color: black;
@@ -358,21 +439,72 @@ mark {
     margin-bottom: 30px;
 }
 
-.page-intro-image {
+.hero {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
+    grid-template-areas: "hero-stack";
     width: 100%;
-    height: 20vw;
-    max-width: 1800px;
+    height: 40vh;
+    min-height: 260px;
+    overflow: hidden;
+    margin-bottom: 40px;
 }
 
-.page-intro-image img {
+/* Force the image and content into the same full size grid area */
+.hero > img,
+.hero-content {
+    grid-area: hero-stack;
     width: 100%;
     height: 100%;
+}
+
+.hero > img {
     object-fit: cover;
+    object-position: center;
+}
+
+.hero-content {
+    z-index: 1;
+    background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4));
+    
+    /* Use an internal grid to manage the header gap (first row is the size of header and is empty) */
+    display: grid;
+    grid-template-rows: 60px 1fr;
+    width: 100%;
+    height: 100%;
+}
+
+/* Row 2 of the hero-content layer */
+.hero-text-wrapper {
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+    padding: 0 2rem;
+    box-sizing: border-box;
+}
+
+.hero-title-text {
+    margin: 0; 
+    font-size: 4rem;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    line-height: 1.4;
+
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideUpFadeIn 0.5s ease-out forwards;
+    animation-delay: 0.2s;
 }
 
 .page-intro-text-container {
-    width: 75%;
+    width: 100%;
     text-align: center;
+    max-width: 1200px
 }
 
 .page-intro-title {
@@ -651,8 +783,16 @@ footer {
         font-size: 1.4rem;
     }
 
-    .page-intro-image {
-        height: 40vw;
+    .hero {
+        height: 50vh;
+    }
+
+    .hero-text-wrapper {
+        padding: 0 0.5rem;
+    }
+
+    .hero-title-text {
+        font-size: 3rem;
     }
 
     .page-intro-text-container {
@@ -718,8 +858,8 @@ footer {
         display: flex;
     }
 
-    .page-intro-image {
-        height: 25vw;
+    .site-title-block {
+        margin-right: auto;
     }
 
     .page-intro-text-container {
