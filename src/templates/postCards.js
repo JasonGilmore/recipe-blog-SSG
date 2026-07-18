@@ -20,7 +20,9 @@ function createPostCard(post, isHomePage, titleTag) {
                     ${isHomePage ? `<div class="type-icon">${type}</div>` : ''}
                     <img src="${post.imageHashPath}" alt="" />
                     <${titleTag} class="post-thumbnail-title">${post.title}</${titleTag}>
-                    <p class="post-thumbnail-description">${post.description}</p>
+                    <div class="post-thumbnail-description-box">
+                        <p class="post-thumbnail-description">${post.description}</p>
+                    </div>
                 </article>
             </a>`;
 }

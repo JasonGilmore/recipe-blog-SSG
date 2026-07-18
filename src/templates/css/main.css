@@ -80,10 +80,12 @@ main {
     from {
         backdrop-filter: blur(0px);
     }
+
     25% {
         color: black;
         --hover-bg: rgba(0, 0, 0, 0.1);
     }
+
     to {
         background-color: rgb(230, 230, 230);
         backdrop-filter: blur(10px);
@@ -184,7 +186,7 @@ main {
     border: none;
 }
 
-.burger-container > :is(.bar1, .bar2, .bar3) {
+.burger-container> :is(.bar1, .bar2, .bar3) {
     width: 32px;
     height: 5px;
     background-color: black;
@@ -192,20 +194,20 @@ main {
     transition: 0.4s;
 }
 
-.homepage .burger-container > :is(.bar1, .bar2, .bar3) {
+.homepage .burger-container> :is(.bar1, .bar2, .bar3) {
     background-color: white;
 }
 
 /* Backup if css scroll animation not supported, or menu is opened */
-.site-header.display-solid .burger-container > :is(.bar1, .bar2, .bar3),
-.site-header:has(.burger-container[aria-expanded="true"]) .burger-container > :is(.bar1, .bar2, .bar3) {
+.site-header.display-solid .burger-container> :is(.bar1, .bar2, .bar3),
+.site-header:has(.burger-container[aria-expanded="true"]) .burger-container> :is(.bar1, .bar2, .bar3) {
     animation: none !important;
     background-color: black;
 }
 
 /* Same as .homepage .site-header animation */
 @supports (animation-timeline: scroll()) {
-    .homepage .burger-container > :is(.bar1, .bar2, .bar3) {
+    .homepage .burger-container> :is(.bar1, .bar2, .bar3) {
         animation: burgerColor linear forwards;
         animation-timeline: scroll();
         animation-range: 0px 200px;
@@ -214,13 +216,15 @@ main {
 
 @keyframes burgerColor {
     from {
-        background-color: white; 
+        background-color: white;
     }
+
     25% {
         background-color: black;
     }
+
     to {
-        background-color: black; 
+        background-color: black;
     }
 }
 
@@ -448,18 +452,18 @@ mark {
     height: 40vh;
     min-height: 260px;
     overflow: hidden;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 /* Force the image and content into the same full size grid area */
-.hero > img,
+.hero>img,
 .hero-content {
     grid-area: hero-stack;
     width: 100%;
     height: 100%;
 }
 
-.hero > img {
+.hero>img {
     object-fit: cover;
     object-position: center;
 }
@@ -467,7 +471,7 @@ mark {
 .hero-content {
     z-index: 1;
     background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4));
-    
+
     /* Use an internal grid to manage the header gap (first row is the size of header and is empty) */
     display: grid;
     grid-template-rows: 60px 1fr;
@@ -480,14 +484,14 @@ mark {
     grid-row: 2;
     display: flex;
     flex-direction: column;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
     padding: 0 2rem;
     box-sizing: border-box;
 }
 
 .hero-title-text {
-    margin: 0; 
+    margin: 0;
     font-size: 4rem;
     font-weight: 800;
     color: white;
@@ -502,9 +506,9 @@ mark {
 }
 
 .page-intro-text-container {
-    width: 100%;
+    width: 85%;
+    max-width: 1200px;
     text-align: center;
-    max-width: 1200px
 }
 
 .page-intro-title {
@@ -514,9 +518,8 @@ mark {
 }
 
 .page-intro-secondary-title {
-    margin-top: 25px;
     font-size: 1.5rem;
-    margin-bottom: 0;
+    margin: 0;
 }
 
 .divide {
@@ -531,6 +534,7 @@ mark {
 .recent-posts-text {
     width: 100%;
     text-align: center;
+    margin-top: 0;
     margin-bottom: 15px;
 }
 
@@ -575,13 +579,13 @@ mark {
     display: block;
     text-decoration: none;
     color: black;
+    height: 340px;
     width: 100%;
     max-width: 350px;
 }
 
 .post-thumbnail {
     height: 100%;
-    height: 340px;
     text-align: center;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     position: relative;
@@ -615,8 +619,28 @@ mark {
     padding-bottom: 5px;
 }
 
-.post-thumbnail-description {
+.post-thumbnail-description-box {
+    /* 4 lines */
+    height: 5.2em;
+    position: relative;
+    overflow: hidden;
+}
+
+.post-thumbnail-description-box p {
     margin: 0px 10px;
+    line-height: 1.3;
+}
+
+/* Display a fade at the end of the 4 line max description */
+.post-thumbnail-description::after {
+    content: "";
+    text-align: right;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20%;
+    height: 1.3em;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 50%);
 }
 
 .pagination-wrapper {
@@ -805,12 +829,6 @@ footer {
 
     .page-intro-secondary-title {
         line-height: 1.4;
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-
-    .divide {
-        margin-bottom: 15px;
     }
 
     .page-intro-view-text {
@@ -824,10 +842,6 @@ footer {
 
     .post-thumbnail-title {
         margin: 0 5px;
-        line-height: 1.3;
-    }
-
-    .post-thumbnail-description {
         line-height: 1.3;
     }
 
@@ -862,12 +876,22 @@ footer {
         margin-right: auto;
     }
 
-    .page-intro-text-container {
-        width: 85%;
-    }
-
     .footer-content-page-container {
         width: 80%;
     }
+}
 
+/* Very small device */
+@media (max-width: 300px) {
+
+    /* Allow post card height to expand due to header wrapping */
+    .post-thumbnail-container a,
+    .post-thumbnail {
+        height: unset;
+    }
+
+    /* Still retain the 4 line description with fade */
+    .post-thumbnail-description::after {
+        width: 40%;
+    }
 }
