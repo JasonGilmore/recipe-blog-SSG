@@ -36,21 +36,23 @@ A small static site generator for publishing recipe and food blogs. Write conten
 
 The site generator reads default settings from [`src/config.default.json`](src/config.default.json). To customise content and output directories, post types (which controls top-level pages) and feature toggles, create `src/config.json` which will override the defaults.
 
-Create a siteContent.json file within the [`src/templates/`](src/templates/) directory for key site information including a reference to the homepage image. Place the homepage image and a favicon into the [`src/templates/images/`](src/templates/images/) directory. siteContent.json supports the following fields:
+Create a siteContent.json file within the [`src/templates/`](src/templates/) directory for key site information. Place images and a favicon into the [`src/templates/images/`](src/templates/images/) directory. siteContent.json supports the following fields:
 
 - **siteName**: the site name.
-- **mainIntroduction**: the main introduction text, used on the homepage.
-- **secondaryIntroduction**: the secondary introduction text, used on the homepage after the main introduction.
+- **mainIntroduction**: the main introduction text, displayed over the hero image.
+- **secondaryIntroduction**: the secondary introduction text, displayed on the homepage after the hero section.
 - **recentPostsMessage**: optional, the recent post text to display on the homepage.
-- **theme**: an object containing design tokens to apply CSS compatible colour values (RGB, Hex etc.). Supported keys include accent-colour, accent-colour-dark, recipe-box-background, light-box-background, dark-box-background.
+- **theme**: an object containing design tokens to apply CSS compatible colour values (RGB, Hex etc.). Supported keys are accent-colour, accent-colour-dark, recipe-box-background, light-box-background, dark-box-background.
 - **siteUrl**: the site url.
-- **siteIcon**: optional, a small icon to display in the site header.
-- **heroImage**: the name of the main image in the [`src/templates/images/`](src/templates/images/) directory, used for the homepage hero image.
+- **siteIcon**: optional, the name of an image in the [`src/templates/images/`](src/templates/images/) directory, displayed in the site header.
+- **heroImage**: the name of an image in the [`src/templates/images/`](src/templates/images/) directory, used for the homepage hero image.
 - **heroImageSmall**: the name of a smaller sized version of the hero image (<300KB) in the [`src/templates/images/`](src/templates/images/) directory, used for og image previews to conform to image size limits.
-- **heroImageAlt**: alt text for the hero images.
-- **[post type name]Image (such as recipesImage)**: optional, the name of an image in the [`src/templates/images/`](src/templates/images/) directory, to display as a small icon below the top-level page heading.
+- **heroImageAlt**: alt text for heroImage.
+- **introImage**: optional, the name of an image in the [`src/templates/images/`](src/templates/images/) directory, displayed with secondaryIntroduction.
+- **introImageAlt**: alt text for introImage.
+- **[post type name]Image (such as recipesImage)**: optional, the name of an image in the [`src/templates/images/`](src/templates/images/) directory, to display as a small icon on the top-level page heading.
 - **[post type name]Description (such as recipesDescription)**: optional, descriptive text to display at the top of the top-level page as well as head markup.
-- **maxPostsPerPage**: the maximum number of posts per top level page before pagination.
+- **maxPostsPerPage**: optional, the maximum number of posts per top level page before pagination.
 - **searchPlaceholders**: optional, an array of placeholder texts to use in site search input.
 
 Optionally add a robots.txt in the [`src/templates/static`](src/templates/static) directory.

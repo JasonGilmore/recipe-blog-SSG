@@ -197,6 +197,16 @@ test('removeLastS', () => {
     expect(utils.removeLastS(undefined)).toBe(undefined);
 });
 
+test('replaceNewLinesWithBr', () => {
+    const utils = require('../../src/utils.js');
+    expect(utils.replaceNewLinesWithBr('first\nsecond')).toBe('first<br>second');
+    expect(utils.replaceNewLinesWithBr('first\r\nsecond')).toBe('first<br>second');
+    expect(utils.replaceNewLinesWithBr('first\rsecond')).toBe('first<br>second');
+    expect(utils.replaceNewLinesWithBr('no newlines')).toBe('no newlines');
+    expect(utils.replaceNewLinesWithBr(undefined)).toBe(undefined);
+    expect(utils.replaceNewLinesWithBr(null)).toBe(undefined);
+});
+
 describe('Exists async', () => {
     test('dirExistsAsync true', async () => {
         jest.doMock('node:fs/promises', () => ({

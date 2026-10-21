@@ -78,13 +78,24 @@ function getPageIntro(pagination, postType, topLevelDescription) {
     const topLevelIconFilename = utils.siteContent[`${postType}Image`];
     const topLevelIconHashPath = utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/${topLevelIconFilename}`);
 
-    return `<div class="page-intro">
-                    <div class="page-intro-text-container">
-                        <h1 class="page-intro-title">${postTypeConfig.postTypeDisplayName}</h1>
-                        ${topLevelDescription && pagination.currentPage === 1 ? `<h2 class="page-intro-secondary-title">${topLevelDescription}</h2>` : ''}
+    return `${
+        topLevelDescription && pagination.currentPage === 1
+            ? `<div class="page-intro-outer-section">
+                    <div class="page-intro-inner-flex">
+                        <div class="page-intro-text-container">
+                            <h1 class="page-intro-title">${postTypeConfig.postTypeDisplayName}</h1>
+                            <h2 class="page-intro-secondary-title">${utils.replaceNewLinesWithBr(topLevelDescription)}</h2>
+                        </div>${
+                            topLevelIconFilename
+                                ? `<div class="top-level-image-container top-level-image-small">
+                            <img src="${topLevelIconHashPath}" alt="" />
+                        </div>`
+                                : ''
+                        }
                     </div>
-                    ${topLevelIconFilename && pagination.currentPage === 1 ? `<div class="toplevel-page-image"><img src="${topLevelIconHashPath}" alt="" /></div>` : ''}
-                </div>`;
+                </div>`
+            : `<h1 class="page-intro-title page-intro-title-padding">${postTypeConfig.postTypeDisplayName}</h1>`
+    }`;
 }
 
 function createPaginationHtml(postTypeConfig, pagination) {

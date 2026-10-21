@@ -25,6 +25,8 @@ function createHomepage(recentPosts) {
     });
 
     const heroImageHashPath = utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/${utils.siteContent.heroImage}`);
+    const introImage = utils.siteContent.introImage;
+    const introImageHashPath = utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/${utils.siteContent.introImage}`);
 
     return `${head}
     <body class="homepage">
@@ -34,13 +36,21 @@ function createHomepage(recentPosts) {
                 <img fetchpriority="high" src="${heroImageHashPath}" alt="${utils.siteContent.heroImageAlt}" />
                 <div class="hero-content">
                     <div class="hero-text-wrapper">
-                        <h1 class="hero-title-text">${utils.siteContent.mainIntroduction}</h1>
+                        <h1 class="hero-title-text">${utils.replaceNewLinesWithBr(utils.siteContent.mainIntroduction)}</h1>
                     </div>
                 </div>
             </div>
-            <div class="page-intro">
-                <div class="page-intro-text-container">
-                    <h2 class="page-intro-secondary-title">${utils.siteContent.secondaryIntroduction}</h2>
+            <div class="page-intro-outer-section">
+                <div class="page-intro-inner-flex">
+                    <div class="page-intro-text-container">
+                        <h2 class="page-intro-secondary-title">${utils.replaceNewLinesWithBr(utils.siteContent.secondaryIntroduction)}</h2>
+                    </div>${
+                        introImage
+                            ? `<div class="page-intro-image-container">
+                        <img src="${introImageHashPath}" alt="${utils.siteContent.introImageAlt}" />
+                    </div>`
+                            : ''
+                    }
                 </div>
             </div>
             ${utils.siteContent.recentPostsMessage ? `<hr class="divide"> <h2 class="recent-posts-text">${utils.siteContent.recentPostsMessage}</h2>` : ''}

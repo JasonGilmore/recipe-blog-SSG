@@ -168,15 +168,17 @@ function addMessageResult(message) {
 }
 
 function createResultItem(result, index, query) {
-    const resultContainer = document.createElement('a');
-    resultContainer.setAttribute('href', result.link);
-    resultContainer.classList.add('search-result');
-    resultContainer.style.animationDelay = `${index * 0.05}s`;
+    const searchResult = document.createElement('a');
+    searchResult.setAttribute('href', result.link);
+    searchResult.classList.add('search-result');
 
     // Image
     const img = document.createElement('img');
     img.src = result.imageHashPath;
     img.alt = '';
+    const imgWrapper = document.createElement('div');
+    imgWrapper.classList.add('search-result-img-wrapper');
+    imgWrapper.appendChild(img);
 
     // Text div
     const textDiv = document.createElement('div');
@@ -195,9 +197,13 @@ function createResultItem(result, index, query) {
     textDiv.appendChild(title);
     textDiv.appendChild(description);
 
-    resultContainer.appendChild(img);
-    resultContainer.appendChild(textDiv);
-    return resultContainer;
+    searchResult.appendChild(imgWrapper);
+    searchResult.appendChild(textDiv);
+    const resultWrapper = document.createElement('div');
+    resultWrapper.classList.add('search-result-wrapper');
+    resultWrapper.style.animationDelay = `${index * 0.1}s`;
+    resultWrapper.appendChild(searchResult);
+    return resultWrapper;
 }
 
 // Escapes dangerous characters and returns text with highlights on any query word matches

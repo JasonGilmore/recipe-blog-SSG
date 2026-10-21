@@ -3,6 +3,7 @@
     width: clamp(600px, 65%, 952px);
     margin: auto;
     font-size: 1.2rem;
+    line-height: 1.5;
 }
 
 .content-image {
@@ -50,12 +51,22 @@
     background-color: var(--accent-colour);
     border: none;
     border-radius: 3px;
-    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2), 0 4px 16px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 4px 16px 0 rgba(0, 0, 0, 0.10);
 }
 
 .button-style-box:hover {
     background-color: var(--accent-colour-dark);
-    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.3), 0 4px 16px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.18), 0 6px 20px 0 rgba(0, 0, 0, 0.14);
+}
+
+.button-style-box, #jumpToTop {
+    transition: transform 0.2s ease-in-out;
+}
+
+@media (hover: hover) {
+    .button-style-box:hover, #jumpToTop:hover {
+        transform: translate(0, -2px);
+    }
 }
 
 .button-style-box svg {

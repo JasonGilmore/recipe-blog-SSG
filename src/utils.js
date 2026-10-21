@@ -143,6 +143,10 @@ function removeLast(word, text) {
     return word.toLowerCase().endsWith(text.toLowerCase()) ? word.slice(0, -text.length) : word;
 }
 
+function replaceNewLinesWithBr(text) {
+    return text?.replace(/\r\n|\r|\n/g, '<br>');
+}
+
 async function dirExistsAsync(path) {
     const stats = await getStatSafe(path);
     return stats ? stats.isDirectory() : false;
@@ -226,6 +230,7 @@ module.exports = {
     getPostTypeConfig,
     isFeatureEnabled,
     removeLastS,
+    replaceNewLinesWithBr,
     dirExistsAsync,
     fileExistsAsync,
     scrubSaveImage,
