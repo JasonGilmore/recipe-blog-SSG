@@ -34,6 +34,7 @@ const closeDialog = () => {
         document.body.removeAttribute('tabindex');
     }, 200);
 };
+
 const closeSearchBtn = document.querySelector('.close-search');
 closeSearchBtn.addEventListener('click', closeDialog);
 closeSearchBtn.addEventListener('keydown', (event) => {
@@ -41,6 +42,15 @@ closeSearchBtn.addEventListener('keydown', (event) => {
         event.preventDefault();
         closeDialog();
     }
+});
+
+// Listener for browsers that do not support the closedby attribute
+searchDialog.addEventListener('click', (event) => {
+    if (event.target !== searchDialog) return;
+
+    const bounds = searchDialog.getBoundingClientRect();
+    const clickedOutside = event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom;
+    if (clickedOutside) closeDialog();
 });
 
 // Debounce search
