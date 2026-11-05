@@ -105,7 +105,7 @@ async function prepareSiteGeneration(deps = { generateImages, getPostMeta }) {
 
 // Generate images in one post directory
 async function generateImages(postDirPath, postDirOutputPath, postFiles, deps = { getPostImages }) {
-    const postImages = deps.getPostImages(postFiles).filter((filename) => utils.ALLOWED_IMAGE_EXTENSIONS.includes(path.extname(filename).toLowerCase()));
+    const postImages = deps.getPostImages(postFiles);
     await fs.mkdir(postDirOutputPath, { recursive: true });
 
     for (const image of postImages) {

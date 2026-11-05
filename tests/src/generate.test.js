@@ -111,15 +111,16 @@ test('prepareSiteGeneration', async () => {
 
 test('generateImages', async () => {
     fsProm.mkdir.mockResolvedValue(true);
-    const postFiles = ['post1', 'post2'];
-    const mockGetPostImages = jest.fn().mockReturnValue({ filter: () => postFiles });
+    const postImages = ['post1.jpg', 'post2.jpg'];
+    const mockGetPostImages = jest.fn().mockReturnValue(postImages);
     utils.scrubSaveImage.mockResolvedValue();
-    await generate.generateImages('/content/blogdir/blog1', '/output/blogdir/blogdir1', postFiles, { getPostImages: mockGetPostImages });
+    await generate.generateImages('/content/blogdir/blog1', '/output/blogdir/blogdir1', postImages, { getPostImages: mockGetPostImages });
 
     expect(fsProm.mkdir).toHaveBeenCalledTimes(1);
     expect(fsProm.mkdir).toHaveBeenCalledWith('/output/blogdir/blogdir1', expect.anything());
     expect(utils.scrubSaveImage).toHaveBeenCalledTimes(2);
-    expect(utils.scrubSaveImage).toHaveBeenCalledWith(path.join('/content/blogdir/blog1', 'post1'), '/output/blogdir/blogdir1', 'post1');
+    expect(utils.scrubSaveImage).toHaveBeenCalledWith(path.join('/content/blogdir/blog1', 'post1.jpg'), '/output/blogdir/blogdir1', 'post1.jpg');
+    expect(utils.scrubSaveImage).toHaveBeenCalledWith(path.join('/content/blogdir/blog1', 'post2.jpg'), '/output/blogdir/blogdir1', 'post2.jpg');
 });
 
 test('getPostImages', () => {

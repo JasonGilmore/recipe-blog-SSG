@@ -14,7 +14,7 @@ const STATIC_FOLDER = 'static';
 const SEARCH_JS_FILENAME = 'search.js';
 const SEARCH_DATA_FILENAME = 'search-data.json';
 const ROBOTS_TXT_FILENAME = 'robots.txt';
-const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
+const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
 const PAGE_TYPES = {
     POST: 'post',
     FOOTER: 'footer',
