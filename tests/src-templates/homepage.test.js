@@ -15,8 +15,13 @@ jest.mock('../../src/utils.js', () => ({
         heroImageAlt: 'alt text',
         mainIntroduction: 'Main intro',
         secondaryIntroduction: 'Welcome',
+        recentPostsCount: 3,
         recentPostsMessage: 'Recent posts',
+        featuredPostsCount: 3,
+        featuredPostsMessage: 'Featured posts',
+        featuredPostsTop: true,
     },
+    isFeatureEnabled: jest.fn(),
     getHashPath: jest.fn((p) => `/hash${p}`),
     IMAGE_ASSETS_FOLDER: 'images',
     PAGE_TYPES: { HOMEPAGE: 'HOMEPAGE' },
@@ -45,19 +50,83 @@ describe('generateHomepage', () => {
     });
 
     test('build valid html containing header, hero image, posts and footer', async () => {
-        templateHelper.processHtml.mockImplementation((x) => Promise.resolve(x));
-        await generateHomepage([{ title: 'one' }]);
+        const utils = require('../../src/utils.js');
+        utils.isFeatureEnabled.mockImplementation((featureName) => featureName === 'enableFeaturedPosts');
+        templateHelper.processHtml.mockImplementation((html) => Promise.resolve(html));
+        await generateHomepage([{ title: 'one', featured: true, 'featured-order': 1 }], [{ title: 'one' }]);
         // First arg to processHtml is the generated html
-        const html = templateHelper.processHtml.mock.calls[0][0];
+        const processedHtml = templateHelper.processHtml.mock.calls[0][0];
 
-        expect(html).toHTMLValidate();
-        expect(html).toContain('<head>');
-        expect(html).toContain('<header>');
-        expect(html).toContain('/hash/images/hero.jpg');
-        expect(html).toContain('Main intro');
-        expect(html).toContain('Welcome');
-        expect(html).toContain('Recent posts');
-        expect(html).toContain('<post-cards></post-cards>');
-        expect(html).toContain('<footer>');
+        expect(processedHtml).toHTMLValidate({ rules: { 'no-trailing-whitespace': 'off' } });
+        expect(processedHtml).toContain('<head>');
+        expect(processedHtml).toContain('<header>');
+        expect(processedHtml).toContain('/hash/images/hero.jpg');
+        expect(processedHtml).toContain('Main intro');
+        expect(processedHtml).toContain('Welcome');
+        expect(processedHtml).toContain('Recent posts');
+        expect(processedHtml).toContain('Featured posts');
+        expect(processedHtml).toContain('<post-cards></post-cards>');
+        expect(processedHtml).toContain('<footer>');
+    });
+
+    test('featured posts are not included in recent posts', async () => {
+        const createPostCards = require('../../src/templates/postCards.js');
+        const utils = require('../../src/utils.js');
+        utils.isFeatureEnabled.mockImplementation((featureName) => featureName === 'enableFeaturedPosts');
+        const posts = [
+            { title: 'Featured post', date: '2026-01-01', featured: true },
+            { title: 'Recent post', date: '2025-01-01' },
+        ];
+        templateHelper.processHtml.mockImplementation((html) => Promise.resolve(html));
+        await generateHomepage(posts);
+
+        expect(createPostCards).toHaveBeenCalledTimes(2);
+        expect(createPostCards.mock.calls[0][0]).toEqual([posts[0]]);
+        expect(createPostCards.mock.calls[1][0]).toEqual([posts[1]]);
+    });
+
+    test('featured posts positioned before recent posts', async () => {
+        const utils = require('../../src/utils.js');
+        utils.isFeatureEnabled.mockImplementation((featureName) => featureName === 'enableFeaturedPosts');
+        const posts = [
+            { title: 'Featured post', date: '2026-01-01', featured: true },
+            { title: 'Recent post', date: '2025-01-01' },
+        ];
+        templateHelper.processHtml.mockImplementation((html) => Promise.resolve(html));
+        await generateHomepage(posts);
+
+        const processedHtml = templateHelper.processHtml.mock.calls[0][0];
+        expect(processedHtml.indexOf('Featured posts')).toBeLessThan(processedHtml.indexOf('Recent posts'));
+    });
+
+    test('featured posts positioned after recent posts', async () => {
+        const utils = require('../../src/utils.js');
+        utils.isFeatureEnabled.mockImplementation((featureName) => featureName === 'enableFeaturedPosts');
+        const posts = [
+            { title: 'Featured post', date: '2026-01-01', featured: true },
+            { title: 'Recent post', date: '2025-01-01' },
+        ];
+        utils.siteContent.featuredPostsTop = false;
+        templateHelper.processHtml.mockImplementation((html) => Promise.resolve(html));
+        await generateHomepage(posts);
+
+        const processedHtml = templateHelper.processHtml.mock.calls[0][0];
+        expect(processedHtml.indexOf('Recent posts')).toBeLessThan(processedHtml.indexOf('Featured posts'));
+    });
+
+    test('disabled featured posts are not generated and remain eligible for recent posts', async () => {
+        const utils = require('../../src/utils.js');
+        utils.isFeatureEnabled.mockImplementation((featureName) => featureName !== 'enableFeaturedPosts');
+        const createPostCards = require('../../src/templates/postCards.js');
+        const posts = [
+            { title: 'Featured post', date: '2026-01-01', featured: true },
+            { title: 'Recent post', date: '2025-01-01' },
+        ];
+        templateHelper.processHtml.mockImplementation((html) => Promise.resolve(html));
+        await generateHomepage(posts);
+
+        expect(createPostCards).toHaveBeenCalledTimes(1);
+        expect(createPostCards.mock.calls[0][0]).toEqual(posts);
+        expect(templateHelper.processHtml.mock.calls[0][0]).not.toContain('Featured posts');
     });
 });

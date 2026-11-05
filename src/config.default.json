@@ -15,5 +15,6 @@
     },
     "enableVisitCounter": true,
     "enableSearch": true,
-    "enableMinify": true
+    "enableMinify": true,
+    "enableFeaturedPosts": false
 }

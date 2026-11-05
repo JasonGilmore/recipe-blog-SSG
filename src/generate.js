@@ -41,8 +41,7 @@ async function generateSite() {
         await generateContent();
 
         // Generate the rest of the site
-        const recentPosts = getRecentPosts(allPostMeta, 5);
-        await generateHomepage(recentPosts);
+        await generateHomepage(allPostMeta);
         await generateTopLevelPages(allPostMeta);
     } catch (err) {
         throw new Error('Error generating site. Existing public directory preserved. ' + err.stack);
@@ -192,23 +191,6 @@ async function generatePostPage(postType, allPostFiles, postDirPath, postDirName
     await fs.writeFile(postFilePath, html, 'utf8');
 }
 
-// Get an array of the most recent posts across all post types
-function getRecentPosts(allPostMeta, numberOfPosts) {
-    // Sort posts by created date descending
-    return [...allPostMeta]
-        .sort((a, b) => {
-            const dateA = Date.parse(a.date);
-            const dateB = Date.parse(b.date);
-
-            // If a date is invalid, treat it as the beginning of time so it goes to the bottom of the list
-            const timeA = isNaN(dateA) ? 0 : dateA;
-            const timeB = isNaN(dateB) ? 0 : dateB;
-
-            return timeB - timeA;
-        })
-        .slice(0, numberOfPosts);
-}
-
 if (process.env.NODE_ENV === 'test') {
     module.exports = {
         generateSite,
@@ -221,7 +203,6 @@ if (process.env.NODE_ENV === 'test') {
         generateContent,
         generatePosts,
         generatePostPage,
-        getRecentPosts,
     };
 } else {
     generateSite();

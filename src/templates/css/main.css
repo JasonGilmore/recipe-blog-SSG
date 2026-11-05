@@ -619,10 +619,10 @@ mark {
     background-color: var(--accent-colour);
     border-radius: 50px;
     border: none;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
-.recent-posts-text {
+.divide-text {
     width: 100%;
     text-align: center;
     margin-top: 0;
@@ -653,7 +653,7 @@ mark {
     align-content: flex-start;
     max-width: 1200px;
     gap: 40px 4%;
-    padding-bottom: 20px;
+    padding-bottom: 30px;
     /* Special handling since parent is also a flexbox, to ensure it fills the width correctly */
     width: 100%;
     /* Ensure thumbnail container grows so pagination component is fixed to bottom of page */
@@ -958,7 +958,7 @@ footer {
     }
 
     .post-thumbnail-container {
-        padding: 0 20px;
+        padding: 0 20px 30px;
     }
 
     .post-thumbnail-title {

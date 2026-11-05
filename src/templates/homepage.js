@@ -8,12 +8,16 @@ const createHeader = require('./header.js');
 const createPostCards = require('./postCards.js');
 const footerHandler = require('./footer.js');
 
-async function generateHomepage(recentPosts) {
-    const html = await processHtml(createHomepage(recentPosts));
+async function generateHomepage(allPostMeta) {
+    const featuredPostsEnabled = utils.isFeatureEnabled('enableFeaturedPosts');
+    const featuredPosts = featuredPostsEnabled ? utils.getFeaturedPosts(allPostMeta, utils.siteContent.featuredPostsCount) : [];
+    const recentPostCandidates = featuredPostsEnabled ? allPostMeta.filter((post) => post.featured !== true) : allPostMeta;
+    const recentPosts = utils.getRecentPosts(recentPostCandidates, utils.siteContent.recentPostsCount);
+    const html = await processHtml(createHomepage(featuredPosts, recentPosts));
     await fs.writeFile(path.join(utils.getOutputPath(), '/index.html'), html, 'utf8');
 }
 
-function createHomepage(recentPosts) {
+function createHomepage(featuredPosts, recentPosts) {
     const structuredData = structuredDataMarkup.createHomepageData();
     const head = createHead({
         pageTitle: utils.siteContent.siteName,
@@ -27,6 +31,15 @@ function createHomepage(recentPosts) {
     const heroImageHashPath = utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/${utils.siteContent.heroImage}`);
     const introImage = utils.siteContent.introImage;
     const introImageHashPath = utils.getHashPath(`/${utils.IMAGE_ASSETS_FOLDER}/${utils.siteContent.introImage}`);
+
+    const featuredPostsEnabled = utils.isFeatureEnabled('enableFeaturedPosts');
+    const featuredPostsSection = featuredPostsEnabled
+        ? `${featuredPosts.length && utils.siteContent.featuredPostsMessage ? `<hr class="divide"> <h2 class="divide-text">${utils.siteContent.featuredPostsMessage}</h2>` : ''}
+            ${featuredPosts.length ? createPostCards(featuredPosts, true, 'h3') : ''}`
+        : '';
+    const recentPostsSection = `${utils.siteContent.recentPostsMessage ? `<hr class="divide"> <h2 class="divide-text">${utils.siteContent.recentPostsMessage}</h2>` : ''}
+            ${createPostCards(recentPosts, true, 'h3')}`;
+    const postsSections = utils.siteContent.featuredPostsTop ? `${featuredPostsSection}${recentPostsSection}` : `${recentPostsSection}${featuredPostsSection}`;
 
     return `${head}
     <body class="homepage">
@@ -53,8 +66,7 @@ function createHomepage(recentPosts) {
                     }
                 </div>
             </div>
-            ${utils.siteContent.recentPostsMessage ? `<hr class="divide"> <h2 class="recent-posts-text">${utils.siteContent.recentPostsMessage}</h2>` : ''}
-            ${createPostCards(recentPosts, true, 'h3')}
+            ${postsSections}
         </main>
         ${footerHandler.createFooter()}
     </body>

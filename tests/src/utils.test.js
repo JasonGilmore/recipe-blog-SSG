@@ -340,3 +340,96 @@ describe('getTopLevelPageUrl', () => {
         expect(result).toBe('/news/page/5/');
     });
 });
+
+describe('getRecentPosts', () => {
+    const utils = require('../../src/utils.js');
+    const mockPosts = [
+        { title: 'Old Post', date: '2024-01-01' },
+        { title: 'Middle Post', date: '2025-01-01' },
+        { title: 'Newest Post', date: '2026-01-01' },
+    ];
+
+    test('sort posts by date descending', () => {
+        const result = utils.getRecentPosts(mockPosts, 2);
+        expect(result[0].title).toBe('Newest Post');
+        expect(result[1].title).toBe('Middle Post');
+    });
+
+    test('return specified number of posts', () => {
+        const result = utils.getRecentPosts(mockPosts, 1);
+        expect(result).toHaveLength(1);
+        expect(result[0].title).toBe('Newest Post');
+    });
+
+    test('return all posts if number of posts less than specified', () => {
+        const result = utils.getRecentPosts(mockPosts, 100);
+        expect(result).toHaveLength(3);
+    });
+
+    test('handle empty arrays', () => {
+        const result = utils.getRecentPosts([], 5);
+        expect(result).toEqual([]);
+    });
+
+    test('not mutate the original array', () => {
+        const originalOrder = [...mockPosts].map((p) => p.title);
+        utils.getRecentPosts(mockPosts, 2);
+        const currentOrder = mockPosts.map((p) => p.title);
+        expect(currentOrder).toEqual(originalOrder);
+    });
+
+    test('push invalid date strings to bottom', () => {
+        const messyPosts = [
+            { title: 'Bad Date', date: 'invalid' },
+            { title: 'New Post', date: '2026-01-01' },
+            { title: 'Old Post', date: '2020-01-01' },
+        ];
+
+        const result = utils.getRecentPosts(messyPosts, 3);
+        expect(result[0].title).toBe('New Post');
+        expect(result[1].title).toBe('Old Post');
+        expect(result[2].title).toBe('Bad Date');
+    });
+});
+
+describe('getFeaturedPosts', () => {
+    const utils = require('../../src/utils.js');
+    const mockPosts = [
+        { title: 'Old Featured', date: '2024-01-01', featured: true },
+        { title: 'Newest Featured', date: '2026-01-01', featured: true },
+        { title: 'Regular Post', date: '2025-01-01', featured: false },
+        { title: 'Middle Featured', date: '2025-01-01', featured: true },
+    ];
+
+    test('return only featured posts sorted by date descending', () => {
+        const result = utils.getFeaturedPosts(mockPosts, 10);
+        expect(result.map((post) => post.title)).toEqual(['Newest Featured', 'Middle Featured', 'Old Featured']);
+    });
+
+    test('return the specified number of featured posts', () => {
+        const result = utils.getFeaturedPosts(mockPosts, 2);
+        expect(result).toHaveLength(2);
+        expect(result.map((post) => post.title)).toEqual(['Newest Featured', 'Middle Featured']);
+    });
+
+    test('return an empty array when there are no featured posts', () => {
+        expect(utils.getFeaturedPosts([{ title: 'Regular Post', featured: false }], 3)).toEqual([]);
+    });
+
+    test('does not mutate the original array', () => {
+        const originalOrder = [...mockPosts].map((post) => post.title);
+        utils.getFeaturedPosts(mockPosts, 3);
+        expect(mockPosts.map((post) => post.title)).toEqual(originalOrder);
+    });
+
+    test('order featured posts by optional featured-order before unordered posts', () => {
+        const orderedPosts = [
+            { title: 'Unordered Old', date: '2024-01-01', featured: true },
+            { title: 'Featured Second', date: '2026-01-01', featured: true, 'featured-order': 2 },
+            { title: 'Unordered New', date: '2025-01-01', featured: true },
+            { title: 'Featured First', date: '2020-01-01', featured: true, 'featured-order': 1 },
+        ];
+        const result = utils.getFeaturedPosts(orderedPosts, 10);
+        expect(result.map((post) => post.title)).toEqual(['Featured First', 'Featured Second', 'Unordered New', 'Unordered Old']);
+    });
+});

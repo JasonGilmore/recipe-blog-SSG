@@ -11,6 +11,7 @@ public.tmp
 
 # Site specific content
 src/templates/siteContent.json
+src/config.json
 src/templates/images
 src/templates/static
 

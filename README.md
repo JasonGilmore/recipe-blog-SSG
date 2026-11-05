@@ -41,7 +41,11 @@ Create a siteContent.json file within the [`src/templates/`](src/templates/) dir
 - **siteName**: the site name.
 - **mainIntroduction**: the main introduction text, displayed over the hero image.
 - **secondaryIntroduction**: the secondary introduction text, displayed on the homepage after the hero section.
-- **recentPostsMessage**: optional, the recent post text to display on the homepage.
+- **recentPostsCount**: the maximum number of recent posts to display on the homepage.
+- **recentPostsMessage**: optional, the recent post heading text to display on the homepage.
+- **featuredPostsCount**: the maximum number of featured posts to display on the homepage. Requires `enableFeaturedPosts` feature toggle.
+- **featuredPostsMessage**: optional, the featured post heading text to display on the homepage.
+- **featuredPostsTop**: if `true`, featured posts are displayed before recent posts. Featured posts are excluded from the recent post list.
 - **theme**: an object containing design tokens to apply CSS compatible colour values (RGB, Hex etc.). Supported keys are accent-colour, accent-colour-dark, recipe-box-background, light-box-background, dark-box-background.
 - **siteUrl**: the site url.
 - **siteIcon**: optional, the name of an image in the [`src/templates/images/`](src/templates/images/) directory, displayed in the site header.
@@ -91,6 +95,8 @@ Front-matter for posts:
 
 - **title**: the name of the post for display on site cards and og link previews.
 - **description**: the description of the post for display on site cards and og link previews.
+- **featured**: optional, set to `true` to include the post in the homepage featured section. Requires `enableFeaturedPosts` feature toggle.
+- **featured-order**: optional, numeric order for featured posts. Lower numbers appear first; posts without this value fall back to newest-first date sorting.
 - **keywords**: comma separated keywords related to the post.
 - **date**: the date in ISO format for recent post sorting.
 - **image**: the image of the post for display on site cards and og link previews.

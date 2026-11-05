@@ -202,6 +202,53 @@ function getTopLevelPageUrl(postTypeDirectory, pageNumber) {
     return `/${postTypeDirectory}/${page}`;
 }
 
+// Get an array of the most recent posts across all post types
+function getRecentPosts(allPostMeta, numberOfPosts = 5) {
+    // Sort posts by created date descending
+    return [...allPostMeta]
+        .sort((a, b) => {
+            const dateA = Date.parse(a.date);
+            const dateB = Date.parse(b.date);
+
+            // If a date is invalid, treat it as the beginning of time so it goes to the bottom of the list
+            const timeA = isNaN(dateA) ? 0 : dateA;
+            const timeB = isNaN(dateB) ? 0 : dateB;
+            return timeB - timeA;
+        })
+        .slice(0, numberOfPosts);
+}
+
+// Get an array of featured posts with explicit featured-order values sorted first
+// Posts without an order continue to use created date descending
+function getFeaturedPosts(allPostMeta, numberOfPosts = 5) {
+    const getFeaturedOrder = (post) => {
+        const val = post?.['featured-order'];
+        const order = Number(val);
+        return val !== null && val !== '' && Number.isFinite(order) ? order : undefined;
+    };
+
+    return [...allPostMeta]
+        .filter((post) => post.featured === true)
+        .sort((a, b) => {
+            const orderA = getFeaturedOrder(a);
+            const orderB = getFeaturedOrder(b);
+            const hasA = orderA !== undefined;
+            const hasB = orderB !== undefined;
+
+            if (hasA && hasB && orderA !== orderB) return orderA - orderB;
+            if (hasA && !hasB) return -1;
+            if (!hasA && hasB) return 1;
+
+            // Fallback: if they are equal or undefined, sort by date (newest first)
+            const dateA = Date.parse(a.date);
+            const dateB = Date.parse(b.date);
+            const timeA = isNaN(dateA) ? 0 : dateA;
+            const timeB = isNaN(dateB) ? 0 : dateB;
+            return timeB - timeA;
+        })
+        .slice(0, numberOfPosts);
+}
+
 module.exports = {
     siteContent,
     CSS_FOLDER,
@@ -235,4 +282,6 @@ module.exports = {
     fileExistsAsync,
     scrubSaveImage,
     getTopLevelPageUrl,
+    getRecentPosts,
+    getFeaturedPosts,
 };
