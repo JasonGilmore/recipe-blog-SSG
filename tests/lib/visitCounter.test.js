@@ -6,11 +6,16 @@ beforeEach(() => {
 jest.mock('node:fs');
 jest.mock('../../src/utils.js', () => ({
     ...jest.requireActual('../../src/utils.js'),
-    parseRequest: jest.fn(),
 }));
+jest.mock('../../lib/utils.js', () => ({ parseRequest: jest.fn() }));
 jest.mock('../../src/config.json', () => ({ contentDirectory: 'configContent1', outputDirectory: 'configOutput1', postTypes: { recipes: {}, blogs: {} } }), {
     virtual: true,
 });
+
+function mockPostManifest(links) {
+    const fs = require('node:fs');
+    fs.readFileSync.mockImplementation((filePath) => (String(filePath).endsWith('.post-manifest.json') ? JSON.stringify(links) : '{}'));
+}
 
 describe('init', () => {
     test('create visit count directory and file if not exist', () => {
@@ -33,6 +38,15 @@ describe('init', () => {
         expect(fs.mkdirSync).not.toHaveBeenCalled();
     });
 
+    test('load published post manifest', () => {
+        const fs = require('node:fs');
+        const srcUtils = require('../../src/utils.js');
+        const path = require('node:path');
+        mockPostManifest(['/recipes/bread']);
+        require('../../lib/visitCounter.js');
+        expect(fs.readFileSync).toHaveBeenCalledWith(path.join(srcUtils.OUTPUT_DIR_PATH, srcUtils.POST_MANIFEST_FILENAME), 'utf8');
+    });
+
     test('should handle corrupted JSON by starting fresh', () => {
         const fs = require('node:fs');
         fs.existsSync.mockReturnValue(true);
@@ -46,14 +60,50 @@ describe('init', () => {
 
 describe('track events middlware', () => {
     test('POST /track-event pageview calls sendStatus(200) and does not call next', () => {
-        const utils = require('../../src/utils.js');
-        utils.parseRequest.mockReturnValue({ isPost: true, matchedPostType: 'recipes', postName: 'bread' });
+        mockPostManifest(['/recipes/bread']);
+        const utils = require('../../lib/utils.js');
+        utils.parseRequest.mockReturnValue({ isPost: true, isCanonicalPostPath: true, matchedPostType: 'recipes', postName: 'bread' });
         const { visitCounterMiddleware } = require('../../lib/visitCounter.js');
 
         const req = { ip: '127.0.0.1', method: 'POST', path: '/track-event', headers: {}, body: { event: 'pageview', pathname: '/recipes/bread' }, query: {} };
         const res = { sendStatus: jest.fn(), setHeader: jest.fn() };
         const next = jest.fn();
         visitCounterMiddleware(req, res, next);
+        expect(res.sendStatus).toHaveBeenCalledWith(200);
+        expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store');
+        expect(next).not.toHaveBeenCalled();
+    });
+
+    test('POST /track-event ignores pageview for non-existent post', () => {
+        mockPostManifest(['/recipes/bread']);
+        const utils = require('../../lib/utils.js');
+        utils.parseRequest.mockReturnValue({ isPost: true, isCanonicalPostPath: true, matchedPostType: 'fake', postName: 'post' });
+        const { visitCounterMiddleware, visitCounter, getStatsGroup } = require('../../lib/visitCounter.js');
+        const beforePostHits = getStatsGroup(new Date()).postHits;
+        const req = { ip: '127.0.0.1', method: 'POST', path: '/track-event', headers: {}, body: { event: 'pageview', pathname: '/fake/post' }, query: {} };
+        const res = { sendStatus: jest.fn(), setHeader: jest.fn() };
+        const next = jest.fn();
+        visitCounterMiddleware(req, res, next);
+        expect(getStatsGroup(new Date()).postHits).toBe(beforePostHits);
+        expect(visitCounter.totalPostHits.fake?.post).toBeUndefined();
+        expect(res.sendStatus).toHaveBeenCalledWith(200);
+        expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store');
+        expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store');
+        expect(next).not.toHaveBeenCalled();
+    });
+
+    test('POST /track-event ignores pageview for existing post but with nested path', () => {
+        mockPostManifest(['/recipes/apple-tart']);
+        const utils = require('../../lib/utils.js');
+        utils.parseRequest.mockReturnValue({ isPost: true, isCanonicalPostPath: false, matchedPostType: 'recipes', postName: 'apple-tart' });
+        const { visitCounterMiddleware, visitCounter, getStatsGroup } = require('../../lib/visitCounter.js');
+        const beforePostHits = getStatsGroup(new Date()).postHits;
+        const req = { ip: '127.0.0.1', method: 'POST', path: '/track-event', headers: {}, body: { event: 'pageview', pathname: '/recipes/arbitrary/apple-tart' }, query: {} };
+        const res = { sendStatus: jest.fn(), setHeader: jest.fn() };
+        const next = jest.fn();
+        visitCounterMiddleware(req, res, next);
+        expect(getStatsGroup(new Date()).postHits).toBe(beforePostHits);
+        expect(visitCounter.totalPostHits.recipes?.['apple-tart']).toBeUndefined();
         expect(res.sendStatus).toHaveBeenCalledWith(200);
         expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store');
         expect(next).not.toHaveBeenCalled();
@@ -72,6 +122,9 @@ describe('track events middlware', () => {
     });
 
     test('POST /track-event print calls sendStatus(200) and does not call next', () => {
+        mockPostManifest(['/recipes/tart']);
+        const utils = require('../../lib/utils.js');
+        utils.parseRequest.mockReturnValue({ isPost: true, isCanonicalPostPath: true, matchedPostType: 'recipes', postName: 'tart' });
         const req = { method: 'POST', path: '/track-event', headers: {}, body: { event: 'print', pathname: '/recipes/tart?format=print' }, query: {} };
         const res = { sendStatus: jest.fn(), setHeader: jest.fn() };
         const next = jest.fn();

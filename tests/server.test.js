@@ -4,6 +4,7 @@ jest.mock('express', () => {
     const internalMiddlewares = [];
     const mockExpress = jest.fn(() => ({
         use: jest.fn((m) => internalMiddlewares.push(m)),
+        post: jest.fn(),
         listen: jest.fn((p, cb) => {
             if (cb) cb();
             return {
@@ -50,7 +51,7 @@ describe('server setup', () => {
     test('sets up static files directory with html extension', () => {
         require('../server.js');
         expect(express.getInternalMiddlewares()).toContain('staticMiddleware');
-        expect(express.static).toHaveBeenCalledWith(expect.stringContaining('public'), { extensions: ['html'] });
+        expect(express.static).toHaveBeenCalledWith(expect.stringContaining('public'), { extensions: ['html'], dotfiles: 'ignore' });
     });
 
     test('server listens', () => {
@@ -68,6 +69,7 @@ describe('visit counter', () => {
         require('../server.js');
 
         expect(express.json).toHaveBeenCalledWith({ limit: '1kb' });
+        expect(express.mock.results[0].value.post).toHaveBeenCalledWith('/track-event', 'jsonMiddleware');
         expect(express.getInternalMiddlewares()).toContain('visitMiddleware');
         expect(visitCounter.startAutoSave).toHaveBeenCalled();
     });
@@ -79,6 +81,7 @@ describe('visit counter', () => {
         require('../server.js');
 
         expect(express.json).not.toHaveBeenCalled();
+        expect(express.mock.results[0].value.post).not.toHaveBeenCalled();
         expect(express.getInternalMiddlewares()).not.toContain('visitMiddleware');
         expect(visitCounter.startAutoSave).not.toHaveBeenCalled();
     });

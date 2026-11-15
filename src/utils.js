@@ -14,6 +14,7 @@ const STATIC_FOLDER = 'static';
 const SEARCH_JS_FILENAME = 'search.js';
 const SEARCH_DATA_FILENAME = 'search-data.json';
 const ROBOTS_TXT_FILENAME = 'robots.txt';
+const POST_MANIFEST_FILENAME = '.post-manifest.json';
 const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
 const PAGE_TYPES = {
     POST: 'post',
@@ -258,6 +259,7 @@ module.exports = {
     SEARCH_JS_FILENAME,
     SEARCH_DATA_FILENAME,
     ROBOTS_TXT_FILENAME,
+    POST_MANIFEST_FILENAME,
     ALLOWED_IMAGE_EXTENSIONS,
     PAGE_TYPES,
     siteConfig,

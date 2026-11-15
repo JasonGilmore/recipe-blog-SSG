@@ -109,6 +109,12 @@ test('prepareSiteGeneration', async () => {
     expect(result).toEqual([expectedMeta, expectedMeta]);
 });
 
+test('writePostManifest stores unique post links and ignores missing metadata', async () => {
+    const posts = [{ link: '/recipes/apple-tart' }, { link: '/blogs/baking-paper' }, { link: '/recipes/apple-tart' }, undefined, {}];
+    await generate.writePostManifest(posts);
+    expect(fsProm.writeFile).toHaveBeenCalledWith(path.join(testTempOutputPath, '.post-manifest.json'), JSON.stringify(['/recipes/apple-tart', '/blogs/baking-paper']), 'utf8');
+});
+
 test('generateImages', async () => {
     fsProm.mkdir.mockResolvedValue(true);
     const postImages = ['post1.jpg', 'post2.jpg'];

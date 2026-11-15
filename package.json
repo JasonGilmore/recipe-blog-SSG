@@ -21,7 +21,7 @@
     "html-minifier-terser": "~7.2.0",
     "lunr": "~2.3.9",
     "marked": "~16.4.0",
-    "pm2": "~6.0.13",
+    "pm2": "~7.1.2",
     "terser": "~5.46.0"
   },
   "devDependencies": {

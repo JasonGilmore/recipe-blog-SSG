@@ -7,7 +7,7 @@ const utils = require('./lib/utils.js');
 const port = process.env.PORT || 3000;
 const app = express();
 srcUtils.validateConfigurations();
-app.set('trust proxy', true);
+app.set('trust proxy', 'loopback');
 
 app.use(
     helmet({
@@ -17,7 +17,7 @@ app.use(
 
 if (srcUtils.isFeatureEnabled('enableVisitCounter')) {
     const visitCounter = require('./lib/visitCounter.js');
-    app.use(express.json({ limit: '1kb' }));
+    app.post('/track-event', express.json({ limit: '1kb' }));
     app.use(visitCounter.visitCounterMiddleware);
     visitCounter.startAutoSave();
 }
@@ -68,7 +68,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
+app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'], dotfiles: 'ignore' }));
 
 const server = app.listen(port, () => {
     console.log(`App listening on port ${port}`);

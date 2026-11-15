@@ -100,7 +100,7 @@ Front-matter for posts:
 - **keywords**: comma separated keywords related to the post.
 - **date**: the date in ISO format for recent post sorting.
 - **image**: the image of the post for display on site cards and og link previews.
-    - Ensure the image is <300KB to conform to image size limits for link previews.
+    - Ensure the image is <300KB and the name includes `-icon` to enable it for link previews.
 
 Front-matter for footers:
 
@@ -182,9 +182,10 @@ This generator includes a high-performance client-side search powered by Lunr.js
 This generator includes an optional visit counter to track site visits.
 
 - Visit counting is enabled by default but can be customised via the `enableVisitCounter` property in the configuration. Simple numeric data is stored, persisted in `data/visitCounts.json` for 7 days and then archived in `data/visitCounts-archive.jsonl`.
-- totalPostHits are incremented indefinitely, and visit stats are captured daily.
+- totalPostHits are incremented indefinitely, with visits matched against a generated post manifest before recording. A server restart is required to reload the updated manifest after build.
+- For counting hits a simple client-side JavaScript tracking is used. Visit stats are captured daily.
 - To prevent internal testing inflating visit counting, counting is bypassed if the url search string contains the parameter `test=true`.
-- For counting hits a simple client-side JavaScript tracking is used. For counting unique visitors, hashed ip address and user agent are counted and reset each day. If you require stricter privacy, disable this feature.
+- For counting unique visitors, hashed ip address and user agent are counted and reset each day. If you require stricter privacy, disable this feature.
 - Example:
 
 ```json

@@ -26,6 +26,7 @@ async function generateSite() {
         // Preparation tasks for buliding site including generating images since their conten hash filenames are required in the next steps
         // Each post meta contains front-matter attributes plus additional properties link, imageHashPath, postType and mdFilename
         const allPostMeta = await prepareSiteGeneration();
+        await writePostManifest(allPostMeta);
 
         if (utils.isFeatureEnabled('enableSearch')) {
             await templateHelper.generateSearchData(allPostMeta);
@@ -50,6 +51,13 @@ async function generateSite() {
     // Generation success, complete atomic swap
     atomicSwap(tempOutputPath, backupPath);
     console.timeEnd(timerLabel);
+}
+
+// Create post manifest for visit counting, to validate against generated posts
+async function writePostManifest(allPostMeta) {
+    const postLinks = [...new Set((Array.isArray(allPostMeta) ? allPostMeta : []).filter((post) => typeof post?.link === 'string').map((post) => post.link))];
+    const manifestPath = path.join(utils.getOutputPath(), utils.POST_MANIFEST_FILENAME);
+    await fs.writeFile(manifestPath, JSON.stringify(postLinks), 'utf8');
 }
 
 async function atomicSwap(tempOutputPath, backupPath) {
@@ -196,6 +204,7 @@ if (process.env.NODE_ENV === 'test') {
         generateSite,
         atomicSwap,
         prepareSiteGeneration,
+        writePostManifest,
         generateImages,
         getPostMeta,
         getPostImages,
